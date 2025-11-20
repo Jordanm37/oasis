@@ -74,6 +74,9 @@ venv.bak/
 # IDEs and editors
 .idea/
 .vscode/
+.cursor/
+.cursorindexingignore
+.specstory/
 *.swp
 *.swo
 *.swn
@@ -109,3 +112,4 @@ assets/dynamic_network.mp4
 
 # Backup files
 *.bak
+*.backup
