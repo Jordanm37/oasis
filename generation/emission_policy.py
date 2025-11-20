@@ -117,7 +117,7 @@ class EmissionPolicy:
         candidates = self._label_to_tokens.get(label)
         if not candidates:
             # Fallback to canonical token if no variants defined
-            return f"LBL:{label.upper()}"
+        return f"LBL:{label.upper()}"
 
         # 2. Check context for dynamic weighting (e.g., from harm priors)
         dynamic_weights = {}
