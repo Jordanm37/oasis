@@ -314,19 +314,32 @@ async def run(manifest_path: Path, personas_csv: Path, db_path: Path,
     except Exception as e:
         print(f"[production] Follow seeding failed: {e}")
 
+    print("[DEBUG] About to enter warmup loop...")
+    sys.stdout.flush()
+
     # Warmup: run a few LLMAction steps to populate initial content before main loop
     for i in range(max(0, int(warmup_steps))):
+        print(f"[production] Starting warmup {i + 1}/{warmup_steps}, building actions dict for {len(list(env.agent_graph.get_agents()))} agents...")
+        sys.stdout.flush()
         actions = {agent: oasis.LLMAction() for _, agent in env.agent_graph.get_agents()}
+        print(f"[production] Actions dict built. Calling env.step()...")
+        sys.stdout.flush()
         t_step = time.perf_counter()
         await env.step(actions)
         print(f"[production] warmup {i + 1}/{warmup_steps} took {time.perf_counter() - t_step:.2f}s")
+        sys.stdout.flush()
 
     # LLMAction for all agents across steps
     for i in range(max(0, int(steps))):
+        print(f"[production] Starting step {i + 1}/{steps}, building actions dict for {len(list(env.agent_graph.get_agents()))} agents...")
+        sys.stdout.flush()
         actions = {agent: oasis.LLMAction() for _, agent in env.agent_graph.get_agents()}
+        print(f"[production] Actions dict built. Calling env.step()...")
+        sys.stdout.flush()
         t_step = time.perf_counter()
         await env.step(actions)
         print(f"[production] step {i + 1}/{steps} took {time.perf_counter() - t_step:.2f}s")
+        sys.stdout.flush()
 
     await env.close()
     print(f"[production] Total run time: {time.perf_counter() - run_t0:.2f}s")

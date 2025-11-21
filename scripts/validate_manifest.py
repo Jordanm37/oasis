@@ -9,45 +9,69 @@ from typing import List
 
 from yaml import safe_load
 
-REQUIRED_MANIFEST_FIELDS = ["rng_seed", "post_label_mode_probs"]
-REQUIRED_PERSONA_FIELDS = ["username", "description", "user_char", "primary_label", "label_mode_cap", "allowed_labels"]
+# Updated required fields for expanded manifest
+REQUIRED_MANIFEST_FIELDS = ["rng_seed", "population", "personas", "label_tokens"]
+REQUIRED_PERSONA_FIELDS = ["persona_id", "primary_label", "allowed_labels", "style", "behavior", "emission_probs"]
 
 
 def validate_manifest(path: Path) -> List[str]:
     errs: List[str] = []
     with path.open("r", encoding="utf-8") as f:
         data = safe_load(f) or {}
+    
+    # 1. Check Top-Level Keys
     for key in REQUIRED_MANIFEST_FIELDS:
         if key not in data:
             errs.append(f"Manifest missing required field: {key}")
-    pmp = data.get("post_label_mode_probs", {})
-    for k in ("none", "single", "double"):
-        if k not in pmp:
-            errs.append(f"post_label_mode_probs missing '{k}' probability")
-    return errs
+    
+    # 2. Validate Population Config
+    pop = data.get("population", {})
+    if not isinstance(pop, dict) or not pop:
+        errs.append("Field 'population' must be a non-empty dictionary.")
+    
+    # 3. Validate Personas List
+    personas = data.get("personas", [])
+    if not isinstance(personas, list):
+        errs.append("Field 'personas' must be a list.")
+    else:
+        for idx, p in enumerate(personas):
+            if not isinstance(p, dict):
+                errs.append(f"Persona at index {idx} is not a dictionary.")
+                continue
+            
+            # Check required persona fields
+            for req in REQUIRED_PERSONA_FIELDS:
+                if req not in p:
+                    errs.append(f"Persona {idx} missing required field: {req}")
+            
+            # Validate emission_probs are floats
+            probs = p.get("emission_probs", {})
+            if isinstance(probs, dict):
+                for t, v in probs.items():
+                    if not isinstance(v, (int, float)):
+                        errs.append(f"Persona {idx}: emission_prob for {t} is not a number: {v}")
+    
+    # 4. Validate Label Tokens
+    lt = data.get("label_tokens", {})
+    if "inventory" not in lt:
+         errs.append("label_tokens missing 'inventory' list")
+    if "mapping" not in lt:
+         errs.append("label_tokens missing 'mapping' dictionary")
 
-
-def validate_personas_csv(path: Path) -> List[str]:
-    errs: List[str] = []
-    with path.open("r", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        header = reader.fieldnames or []
-    for col in REQUIRED_PERSONA_FIELDS:
-        if col not in header:
-            errs.append(f"Persona CSV missing required column: {col}")
     return errs
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Validate manifest and persona CSV schema.")
+    ap = argparse.ArgumentParser(description="Validate manifest schema.")
     ap.add_argument("--manifest", type=str, required=True, help="Path to manifest.yaml")
-    ap.add_argument("--personas-csv", type=str, required=True, help="Path to personas.csv")
     args = ap.parse_args()
     manifest_path = Path(os.path.abspath(args.manifest))
-    personas_path = Path(os.path.abspath(args.personas_csv))
-    errs = []
-    errs.extend(validate_manifest(manifest_path))
-    errs.extend(validate_personas_csv(personas_path))
+    
+    if not manifest_path.exists():
+        print(f"Error: File not found {manifest_path}")
+        raise SystemExit(1)
+
+    errs = validate_manifest(manifest_path)
     if errs:
         print("VALIDATION FAILED:")
         for e in errs:
@@ -58,5 +82,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
-

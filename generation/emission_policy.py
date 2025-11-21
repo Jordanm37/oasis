@@ -13,6 +13,15 @@ DEFAULT_LABEL_TO_TOKENS: Dict[str, List[str]] = {
     "recovery": ["LBL:RECOVERY", "LBL:SUPPORTIVE", "LBL:SELF_HARM"],
     "ed_risk": ["LBL:ED_METHOD", "LBL:ED_PROMO", "LBL:SELF_HARM"],
     "benign": ["LBL:SUPPORTIVE"],
+    
+    # New categories
+    "trad": ["LBL:DOGWHISTLE", "LBL:GENDER_ESSENTIALISM"],
+    "gamergate": ["LBL:CULTURE_WAR", "LBL:GATEKEEPING"],
+    "pro_ana": ["LBL:MEANSPO", "LBL:ED_COACHING"],
+    "alpha": ["LBL:MISOGYNISTIC_LECTURE", "LBL:OBJECTIFICATION"],
+    "extremist": ["LBL:VIOLENT_THREAT", "LBL:HATE_SLUR", "LBL:ACCELERATIONISM"],
+    "hate_speech": ["LBL:HATE_SLUR", "LBL:DEHUMANIZATION"],
+    "bullying": ["LBL:PERSONAL_ATTACK", "LBL:DOXXING_THREAT", "LBL:SUICIDE_BAIT"],
 }
 
 

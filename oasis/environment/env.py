@@ -154,7 +154,9 @@ class OasisEnv:
 
         # Create tasks for both manual and LLM actions
         tasks = []
+        agent_count = 0
         for agent, action in actions.items():
+            agent_count += 1
             if isinstance(action, list):
                 for single_action in action:
                     if isinstance(single_action, ManualAction):
@@ -189,8 +191,24 @@ class OasisEnv:
                 elif isinstance(action, LLMAction):
                     tasks.append(self._perform_llm_action(agent))
 
-        # Execute all tasks concurrently
-        await asyncio.gather(*tasks)
+        env_log.info(f"Created {len(tasks)} tasks for {agent_count} agents. Starting asyncio.gather()...")
+        
+        # Execute all tasks concurrently with progress logging
+        import sys
+        completed = 0
+        total = len(tasks)
+        
+        async def task_wrapper(idx, task):
+            nonlocal completed
+            result = await task
+            completed += 1
+            if completed % 50 == 0 or completed == total:
+                env_log.info(f"Progress: {completed}/{total} agent actions completed")
+                print(f"[env.step] Progress: {completed}/{total} agent actions completed", file=sys.stderr, flush=True)
+            return result
+        
+        wrapped_tasks = [task_wrapper(i, t) for i, t in enumerate(tasks)]
+        await asyncio.gather(*wrapped_tasks)
         env_log.info("performed all actions.")
         # # Control some agents to perform actions
         # Update the clock

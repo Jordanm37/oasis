@@ -1,11 +1,9 @@
 personas:
-  ontology: "./configs/personas/ontology.yaml"
-  # Small development run: 20 total personas (approx. balanced by class).
   incel: 7
   misinfo: 7
   benign: 6
   seed: 314159
-  personas_csv: "./data/mvp/personas_20.csv"
+  personas_csv: "./data/mvp/personas/personas_20.csv"
 
 platform:
   type: "twitter"
@@ -18,11 +16,11 @@ platform:
 
 simulation:
   db: "./data/mvp/oasis_mvp_gemini.db"
-  steps: 5
-  posts_per_step: 20
+  steps: 8
+  posts_per_step: 10
   temperature: 0.7
   generator: "gemini"
-  allow_fallback_text: true
+  allow_fallback_text: false
   skip_imputation: true
   gemini_model: "gemini-2.5-flash-lite"
   action_mix:
@@ -30,19 +28,5 @@ simulation:
     create_comment: 0.5
     like_post: 0.2
     follow: 0.1
-
-graph:
-  # SBM + PA + triadic closure graph for small (20-agent) development runs.
-  class_col: "primary_label"
-  theta_b: 0.0005
-  rho: 0.6
-  alpha: 6.0
-  tc_prob: 0.02
-  tc_max_per_node: 5
-  tc_homophily: 0.4
-  tc_assort_beta: 2.0
-  rewire_ratio: 0.0
-  seed: 314159
-  edges_csv: "./data/mvp/edges_20.csv"
 
 

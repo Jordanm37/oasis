@@ -102,6 +102,29 @@ async def build_agent_graph_from_csv(
             except Exception:
                 harm_priors = None
 
+        # Optional new persona fields (style/behavior) for prompt construction
+        # Expected as JSON strings in the CSV
+        style_raw = row.get("style_json")
+        behavior_raw = row.get("behavior_json")
+        
+        style = {}
+        if style_raw:
+             try:
+                 style = json.loads(style_raw)
+             except Exception:
+                 pass
+                 
+        behavior = {}
+        if behavior_raw:
+             try:
+                 behavior = json.loads(behavior_raw)
+             except Exception:
+                 pass
+
+        # Pass these into PersonaConfig if it supports them, or just keep them for prompt injection.
+        # Assuming PersonaConfig has been updated to support them or we attach them to extended agent.
+        # For now, we can attach them to user_info.profile['other_info'] to make them available to the agent.
+
         persona_cfg = PersonaConfig(
             persona_id=f"{primary}_{idx:04d}",
             primary_label=str(primary),
@@ -113,10 +136,16 @@ async def build_agent_graph_from_csv(
             pair_probs=pair_probs,
         )
 
+        user_profile_data = {
+            "user_profile": user_char,
+            "persona_style": style,
+            "persona_behavior": behavior
+        }
+
         user_info = UserInfo(
             name=username,
             description=description,
-            profile={"other_info": {"user_profile": user_char}},
+            profile={"other_info": user_profile_data},
             recsys_type="twitter",
         )
         agent = ExtendedSocialAgent(

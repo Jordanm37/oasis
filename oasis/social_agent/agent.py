@@ -67,8 +67,7 @@ class SocialAgent(ChatAgent):
                  agent_graph: "AgentGraph" = None,
                  available_actions: list[ActionType] = None,
                  tools: Optional[List[Union[FunctionTool, Callable]]] = None,
-                 token_limit: Optional[int] = None,
-                 max_iteration: int = 1,
+                 max_iteration: int | None = None,
                  interview_record: bool = False):
         self.social_agent_id = agent_id
         self.user_info = user_info
@@ -82,6 +81,12 @@ class SocialAgent(ChatAgent):
         system_message = BaseMessage.make_assistant_message(
             role_name="system",
             content=system_message_content,  # system prompt
+        )
+
+        effective_max_iteration = (
+            int(max_iteration)
+            if max_iteration is not None
+            else int(getattr(LLM_CONFIG, "max_step_iterations", 1))
         )
 
         if not available_actions:
@@ -108,7 +113,7 @@ class SocialAgent(ChatAgent):
         # Allow manual-only agents for non-LLM MVP runs
         if model is None:
             # Minimal attributes to support manual actions without ChatAgent
-            self.max_iteration = max_iteration
+            self.max_iteration = effective_max_iteration
             self.interview_record = interview_record
             self.agent_graph = agent_graph
             # No-op memory updater
@@ -121,15 +126,10 @@ class SocialAgent(ChatAgent):
                 model=model,
                 scheduling_strategy='random_model',
                 tools=all_tools,
-                max_iteration=int(LLM_CONFIG.max_step_iterations),
-                token_limit=(
-                    token_limit
-                    if token_limit is not None
-                    else int(LLM_CONFIG.est_prompt_tokens) + int(LLM_CONFIG.xai_max_tokens)
-                ),
+                max_iteration=effective_max_iteration,
             )
         # Ensure these attributes exist in both branches
-        self.max_iteration = getattr(self, 'max_iteration', max_iteration)
+        self.max_iteration = getattr(self, 'max_iteration', effective_max_iteration)
         self.interview_record = getattr(self, 'interview_record', interview_record)
         self.agent_graph = getattr(self, 'agent_graph', agent_graph)
         self.test_prompt = (
