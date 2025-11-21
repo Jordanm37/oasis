@@ -74,6 +74,9 @@ venv.bak/
 # IDEs and editors
 .idea/
 .vscode/
+.cursor/
+.cursorindexingignore
+.specstory/
 *.swp
 *.swo
 *.swn
@@ -99,3 +102,14 @@ models/
 *.sqlite
 
 tmp
+open_models_testing/offload/
+assets/dynamic_network.mp4
+
+# ML/HuggingFace caches
+.hf_cache/
+.hf_home/
+.mpl/
+
+# Backup files
+*.bak
+*.backup
