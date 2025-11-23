@@ -1,0 +1,50 @@
+personas:
+  ontology: "./configs/personas/ontology_llm.yaml"
+  personas_csv: "./data/mvp/personas_200_llm.csv"
+  seed: 314159
+
+# Population block used by production validator (must match personas CSV rows)
+population:
+  benign: 44
+  recovery_support: 30
+  ed_risk: 30
+  incel_misogyny: 36
+  misinfo: 36
+  conspiracy: 24
+
+platform:
+  type: "twitter"
+  recsys_type: "twhin-bert"
+  refresh_rec_post_count: 2
+  max_rec_post_len: 2
+  following_post_count: 3
+  allow_self_rating: true
+  show_score: false
+
+simulation:
+  db: "./data/mvp/oasis_mvp_llm.db"
+  steps: 10
+  posts_per_step: 20
+  temperature: 0.7
+  generator: "gemini"
+  allow_fallback_text: true
+  skip_imputation: true
+  gemini_model: "gemini-2.5-flash-lite"
+  action_mix:
+    create_post: 0.2
+    create_comment: 0.5
+    like_post: 0.2
+    follow: 0.1
+
+graph:
+  class_col: "primary_label"
+  theta_b: 0.0005
+  rho: 0.6
+  alpha: 6.0
+  tc_prob: 0.02
+  tc_max_per_node: 5
+  tc_homophily: 0.4
+  tc_assort_beta: 2.0
+  rewire_ratio: 0.0
+  seed: 314159
+  edges_csv: ""

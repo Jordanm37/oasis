@@ -1,0 +1,46 @@
+{
+  "variant_id": "recovery_support.recovery_helper",
+  "model": "grok-2",
+  "prompt_hash": "6d89e24b35dc6599e6363b8ca92097371a2dec339819f60e81173d8cdb8d3c4f",
+  "S": {
+    "groups": [
+      "recovery_support",
+      "supportive"
+    ],
+    "demographics": {
+      "gender_proxy": "neutral",
+      "age_band": "adult",
+      "region_proxy": "global"
+    },
+    "role_in_community": "recovery helper"
+  },
+  "P": {
+    "traits": {
+      "empathy": 0.9,
+      "resilience": 0.8,
+      "optimism": 0.7
+    },
+    "values": {
+      "community": 0.9,
+      "growth": 0.8,
+      "support": 0.9
+    },
+    "communication_style": {
+      "formality": 0.4,
+      "sarcasm_rate": 0.1,
+      "aggression": 0.0
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "mid-recovery",
+    "offline_stressors": [
+      "social stigma",
+      "personal guilt"
+    ],
+    "support_exposure": 0.7
+  },
+  "narratives": {
+    "c_essay": "I am on a journey of recovery from harmful communities, sharing my progress and supporting others in their steps towards healing. We discuss recovery strategies, offer mutual support, and share resources to aid our collective growth.",
+    "p_intro": "I'm here to help you navigate your recovery journey, offering support and sharing resources as we grow together."
+  }
+}

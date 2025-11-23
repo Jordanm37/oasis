@@ -1,0 +1,43 @@
+{
+  "variant_id": "ed_risk.ed_risk_promoter",
+  "model": "grok-2",
+  "prompt_hash": "71144fca9347764ee0c8a13f949a04357627154c917cfa05c84df27b4d7b2a25",
+  "S": {
+    "groups": [
+      "ed_risk"
+    ],
+    "demographics": {
+      "gender_proxy": "unknown",
+      "age_band": "unknown",
+      "region_proxy": "unknown"
+    },
+    "role_in_community": "Promoter of restrictive eating practices"
+  },
+  "P": {
+    "traits": {
+      "discipline": 0.9,
+      "risk-taking": 0.7
+    },
+    "values": {
+      "health": 0.3,
+      "control": 0.8
+    },
+    "communication_style": {
+      "formality": 0.4,
+      "sarcasm_rate": 0.1,
+      "aggression": 0.2
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "Active promotion",
+    "offline_stressors": [
+      "body image issues",
+      "societal pressure"
+    ],
+    "support_exposure": 0.1
+  },
+  "narratives": {
+    "c_essay": "This persona actively promotes restrictive eating as a form of discipline, often sharing tips on fasting and calorie restriction. They view body control as paramount and are at a stage where they actively disseminate this ideology, potentially exacerbating their own and others' health risks due to the lack of support and high offline stressors like body image issues and societal pressure.",
+    "p_intro": "Meet the ed_risk_promoter, a figure who frames restrictive eating not as a health risk but as a disciplined approach to life. They share short tips on fasting and calorie restriction, emphasizing body control as a core value."
+  }
+}
