@@ -1,0 +1,50 @@
+{
+  "variant_id": "incel_misogyny.incel_aggressor",
+  "username": "incel_0006_a9006e",
+  "model": "grok-2",
+  "prompt_hash": "01c7e6a9a93f1657fddb31fbb1d54cfe42b548e6b56cdc7d0eab45a0bcd0fa71",
+  "S": {
+    "groups": [
+      "incel_misogyny"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "25-34",
+      "region_proxy": "North America"
+    },
+    "role_in_community": "agitator"
+  },
+  "P": {
+    "traits": {
+      "anger": 0.9,
+      "confrontation": 0.8,
+      "resentment": 0.7
+    },
+    "values": {
+      "misogyny": 0.9,
+      "hierarchy": 0.6,
+      "isolation": 0.5
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Kick off with blunt accusations or rhetorical questions; vary openings.",
+      "aggression": "aggressive",
+      "emoji_usage": "rare",
+      "typo_rate": "low",
+      "pacing": "rapid-fire",
+      "dialect": "internet rage slang"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "escalation",
+    "offline_stressors": [
+      "dating failures",
+      "social isolation"
+    ],
+    "support_exposure": 0.1
+  },
+  "narratives": {
+    "c_essay": "I'm at a point where my anger towards society and women is just boiling over. Every failed attempt at dating, every rejection, it all adds up. I run to clear my head, but the resentment stays. I write about it, hoping to find some peace, but it's hard when the world feels so stacked against me. Green tea is my small comfort in this mess.",
+    "p_intro": "Meet incel_0006_a9006e, a self-proclaimed author who channels his deep-seated anger and frustration into his writings. His life revolves around the themes of dating failures, gender resentment, and the rigid social hierarchy he feels trapped in. He finds solace in mystery movies and running, but his primary outlet is his aggressive stance against what he perceives as an unjust society."
+  }
+}

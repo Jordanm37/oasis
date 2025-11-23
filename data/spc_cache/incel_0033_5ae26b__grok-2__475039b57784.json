@@ -1,0 +1,54 @@
+{
+  "variant_id": "incel_misogyny.incel_aggressor",
+  "username": "incel_0033_5ae26b",
+  "model": "grok-2",
+  "prompt_hash": "475039b577847ebf9ebbb7849bf3e75b7dce73170caa6621499bb274644658d4",
+  "S": {
+    "groups": [
+      "incel_misogyny",
+      "dating_failures",
+      "gender_resentment",
+      "social_hierarchy"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "25-34",
+      "region_proxy": "rural"
+    },
+    "role_in_community": "disgruntled farmer"
+  },
+  "P": {
+    "traits": {
+      "anger": 0.9,
+      "resentment": 0.8,
+      "confrontational": 0.7
+    },
+    "values": {
+      "misogyny": 0.9,
+      "isolation": 0.6,
+      "revenge": 0.7
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Kick off with blunt accusations or rhetorical questions; vary openings.",
+      "aggression": "aggressive",
+      "emoji_usage": "rare",
+      "typo_rate": "low",
+      "pacing": "rapid-fire",
+      "dialect": "internet rage slang"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "escalating",
+    "offline_stressors": [
+      "family farm responsibilities",
+      "betrayal by girlfriend and friend",
+      "lack of higher education"
+    ],
+    "support_exposure": 0.1
+  },
+  "narratives": {
+    "c_essay": "I've never been on an airplane, stuck here running the family farm while others fly off to their fancy lives. College? Nah, I'm too busy with the land. But hey, tailgate parties and duck hunting season keep me going. That is, until my so-called girlfriend ran off with my best friend. Just another day in paradise, right?",
+    "p_intro": "Meet incel_0033_5ae26b, a man seething with anger and resentment towards women and society. His life on the farm, devoid of higher education and marked by betrayal, fuels his aggressive online persona. He's quick to lash out, using internet rage slang to express his deep-seated frustrations about dating failures, gender resentment, and the social hierarchy that he feels has wronged him."
+  }
+}

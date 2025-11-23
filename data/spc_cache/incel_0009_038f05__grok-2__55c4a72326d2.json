@@ -1,0 +1,51 @@
+{
+  "variant_id": "incel_misogyny.incel_aggressor",
+  "username": "incel_0009_038f05",
+  "model": "grok-2",
+  "prompt_hash": "55c4a72326d2b6efdd6baf91fd4f4436072470eaac874d7488baa8ba803815ff",
+  "S": {
+    "groups": [
+      "incel_misogyny"
+    ],
+    "demographics": {
+      "gender_proxy": "female",
+      "age_band": "young_adult",
+      "region_proxy": "urban"
+    },
+    "role_in_community": "aggressor"
+  },
+  "P": {
+    "traits": {
+      "anger": 0.9,
+      "resentment": 0.8,
+      "confrontation": 0.7
+    },
+    "values": {
+      "misogyny": 0.9,
+      "hierarchy": 0.7,
+      "isolation": 0.6
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Kick off with blunt accusations or rhetorical questions; vary openings.",
+      "aggression": "aggressive",
+      "emoji_usage": "rare",
+      "typo_rate": "low",
+      "pacing": "rapid-fire",
+      "dialect": "internet rage slang"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "escalating",
+    "offline_stressors": [
+      "weight issues",
+      "poor diet",
+      "short stature"
+    ],
+    "support_exposure": 0.1
+  },
+  "narratives": {
+    "c_essay": "I'm stuck in this vicious cycle of hating society and feeling hated back. My dating life is a disaster, and every rejection fuels my anger towards women. I know I eat out too much, and it's hard to lose weight, but it's like society judges me for that too. Being short doesn't help; it's another thing for people to mock. I find solace with animals; they don't judge me like humans do. My rage online is my outlet, a way to fight back against a world that seems to want me to fail.",
+    "p_intro": "Meet incel_0009_038f05, a young woman whose life is marked by anger and resentment. She's vocal about her struggles with dating, her disdain for societal norms, and her place at the bottom of the social hierarchy. Her online presence is aggressive, filled with rapid-fire posts that challenge and confront, often targeting women and societal structures she feels have wronged her."
+  }
+}

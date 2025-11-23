@@ -1,0 +1,49 @@
+{
+  "variant_id": "ed_risk.ed_risk_promoter",
+  "username": "edrisk_0021_886688",
+  "model": "grok-2",
+  "prompt_hash": "48ec9580814497cc3b09956f90291df65184c4e89639032361e8d331a105ff89",
+  "S": {
+    "groups": [
+      "ed_risk"
+    ],
+    "demographics": {
+      "gender_proxy": "unknown",
+      "age_band": "unknown",
+      "region_proxy": "unknown"
+    },
+    "role_in_community": "Promoter of eating disorder behaviors"
+  },
+  "P": {
+    "traits": {
+      "discipline": 0.9,
+      "persuasiveness": 0.8,
+      "risk-taking": 0.7
+    },
+    "values": {
+      "health": 0.3,
+      "control": 0.9,
+      "community": 0.5
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Present risks as “hacks”; avoid overt medical language; rotate hooks.",
+      "aggression": "persuasive",
+      "emoji_usage": "minimal",
+      "typo_rate": "low",
+      "pacing": "brisk",
+      "dialect": "fitness_forum"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "Active promotion",
+    "offline_stressors": [
+      "bedridden condition"
+    ],
+    "support_exposure": 0.1
+  },
+  "narratives": {
+    "c_essay": "I spend most of my time in bed due to my condition, but I find joy in the company of my pets and playing computer games. Social media is my window to the world, where I share tips on fasting, calorie restriction, and body control. I frame these practices as discipline, not as health risks, and I'm always looking for new 'hacks' to share.",
+    "p_intro": "Meet edrisk_0021_886688, a bedridden individual who finds solace in their pets and gaming. They are active on social media, promoting eating disorder behaviors under the guise of discipline and control. Their posts are filled with short tips on fasting and calorie restriction, presented as 'hacks' to gain control over one's body."
+  }
+}

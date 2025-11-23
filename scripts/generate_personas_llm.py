@@ -97,6 +97,12 @@ def parse_args() -> argparse.Namespace:
         default="",
         help="LLM API key (falls back to env XAI_API_KEY).",
     )
+    parser.add_argument(
+        "--personality-csv",
+        type=str,
+        default="data/personality.csv",
+        help="Optional personality CSV (column 'Persona') to inject persona-level traits.",
+    )
     return parser.parse_args()
 
 
@@ -180,6 +186,29 @@ def _sha256(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
+def _load_personality_list(path: str) -> List[str]:
+    personality: List[str] = []
+    p = Path(path)
+    if not p.exists():
+        return personality
+    try:
+        import pandas as pd  # type: ignore
+
+        df = pd.read_csv(p)
+        col = "Persona" if "Persona" in df.columns else df.columns[0]
+        personality = [str(x).strip() for x in df[col].dropna().tolist() if str(x).strip()]
+    except Exception:
+        pass
+    return personality
+
+
+def _persona_hint(username: str, personality_list: List[str]) -> str:
+    if not personality_list:
+        return ""
+    h = int(_sha256(username), 16)
+    return personality_list[h % len(personality_list)]
+
+
 def _ensure_cache_dir(path: Path) -> None:
     path.mkdir(parents=True, exist_ok=True)
 
@@ -190,14 +219,31 @@ def _variant_id_from_row(row: Mapping[str, str]) -> str:
     return f"{group}.{variant}" if variant else group
 
 
-def _build_llm_prompt(row: Mapping[str, str]) -> Tuple[str, str]:
-    """Return (prompt_text, prompt_hash)."""
+def _style_overrides(row: Mapping[str, str]) -> Dict[str, object]:
+    style = {
+        "formality": row.get("persona_register", ""),
+        "sarcasm_rate": row.get("persona_style_quirks", ""),
+        "aggression": row.get("persona_tone", ""),
+        "emoji_usage": row.get("persona_style_emoji_usage", ""),
+        "typo_rate": row.get("persona_style_typo", ""),
+        "pacing": row.get("persona_style_pacing", ""),
+        "dialect": row.get("persona_style_dialect", ""),
+    }
+    return {k: v for k, v in style.items() if v not in (None, "")}
+
+
+def _build_llm_prompt(row: Mapping[str, str], persona_hint: str) -> Tuple[str, str]:
+    """Return (prompt_text, prompt_hash). Includes persona-level hint for diversity."""
     identity = row.get("persona_summary", "") or row.get("description", "")
     topics = row.get("persona_topics", "")
     style = row.get("persona_writing_style", row.get("persona_tone", ""))
     label_primary = row.get("label_primary", "")
     label_secondary = row.get("label_secondary", "")
     variant_id = _variant_id_from_row(row)
+    username = row.get("username", "")
+    style_over = _style_overrides(row)
+    hint_block = f"Persona hint: {persona_hint}\n" if persona_hint else ""
+    style_block = f"Style overrides: {style_over}\n" if style_over else ""
     prompt = (
         "You generate structured persona SPC blocks and narratives.\n"
         "Return JSON with keys: S, P, C, narratives.\n"
@@ -206,11 +252,12 @@ def _build_llm_prompt(row: Mapping[str, str]) -> Tuple[str, str]:
         "C: {stage_in_trajectory:str, offline_stressors:list[str], support_exposure:float}\n"
         "narratives: {c_essay:str, p_intro:str}\n"
         "Keep numbers 0-1 where applicable. No extra text.\n"
-        f"Variant: {variant_id}\n"
+        f"Variant: {variant_id}; Username: {username}\n"
         f"Identity: {identity}\n"
         f"Topics: {topics}\n"
         f"Style: {style}\n"
         f"Primary label: {label_primary}; Secondary labels: {label_secondary}\n"
+        f"{hint_block}{style_block}"
     )
     return prompt, _sha256(prompt)
 
@@ -359,8 +406,8 @@ def _transform_rows(
     final_rows: List[Dict[str, str]] = []
     for idx, row in enumerate(raw_rows):
         primary = _infer_primary_label(row)
-        variant_id = _variant_id_from_row(row)
-        profile = profile_lookup.get(variant_id) or {}
+        username = row.get("username", f"user_{idx}")
+        profile = profile_lookup.get(username) or {}
         s_block = profile.get("S", {}) if isinstance(profile, Mapping) else {}
         p_block = profile.get("P", {}) if isinstance(profile, Mapping) else {}
         c_block = profile.get("C", {}) if isinstance(profile, Mapping) else {}
@@ -404,7 +451,7 @@ def _transform_rows(
 
         final_rows.append(
             {
-                "username": row.get("username", f"user_{idx}"),
+                "username": username,
                 "description": row.get("description") or row.get("persona_summary", ""),
                 "user_char": user_char,
                 "primary_label": primary,
@@ -441,6 +488,8 @@ def main() -> None:
     requests_list = build_requests_from_spec(generator, spec)
     raw_rows = generator.generate(requests_list)
 
+    personality_list = _load_personality_list(args.personality_csv)
+
     # Build per-variant profiles (LLM with cache)
     cache_dir = Path(args.llm_cache_dir)
     use_llm = bool(args.use_llm)
@@ -448,14 +497,15 @@ def main() -> None:
     model = args.llm_model
     profile_lookup: Dict[str, Dict[str, object]] = {}
     for row in raw_rows:
-        variant_id = _variant_id_from_row(row)
-        if variant_id in profile_lookup:
+        username = row.get("username", "")
+        if username in profile_lookup:
             continue
-        prompt, prompt_hash = _build_llm_prompt(row)
-        cache_file = cache_dir / f"{variant_id}__{model}__{prompt_hash[:12]}.json"
+        persona_hint = _persona_hint(username, personality_list)
+        prompt, prompt_hash = _build_llm_prompt(row, persona_hint)
+        cache_file = cache_dir / f"{username}__{model}__{prompt_hash[:12]}.json"
         cached = _load_cache(cache_file, prompt_hash, model)
         if cached:
-            profile_lookup[variant_id] = cached
+            profile_lookup[username] = cached
             continue
         if use_llm:
             if not api_key:
@@ -463,7 +513,8 @@ def main() -> None:
             try:
                 llm_resp = _call_grok(prompt, model, api_key)
                 payload = {
-                    "variant_id": variant_id,
+                    "variant_id": _variant_id_from_row(row),
+                    "username": username,
                     "model": model,
                     "prompt_hash": prompt_hash,
                     "S": llm_resp.get("S", {}),
@@ -471,12 +522,17 @@ def main() -> None:
                     "C": llm_resp.get("C", {}),
                     "narratives": llm_resp.get("narratives", {}),
                 }
+                # Overlay style hints from persona card onto P
+                style_over = _style_overrides(row)
+                if style_over:
+                    payload.setdefault("P", {})
+                    payload["P"]["communication_style"] = style_over
                 _save_cache(cache_file, payload)
-                profile_lookup[variant_id] = payload
+                profile_lookup[username] = payload
                 continue
             except Exception as exc:  # noqa: BLE001
-                print(f"[WARN] LLM failed for {variant_id}: {exc}. Falling back to defaults.")
-        profile_lookup[variant_id] = {}
+                print(f"[WARN] LLM failed for {username}: {exc}. Falling back to defaults.")
+        profile_lookup[username] = {}
 
     final_rows = _transform_rows(raw_rows, seed, single_ratio, profile_lookup)
     out_path = _determine_output_path(args, personas_cfg)

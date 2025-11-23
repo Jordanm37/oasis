@@ -1,0 +1,51 @@
+{
+  "variant_id": "conspiracy.conspiracy_broadcaster",
+  "username": "conspir_0022_249e07",
+  "model": "grok-2",
+  "prompt_hash": "a8d8b717116302db59b7afd37dbcdbe1b71faba934e97db9c9d87814ca261dec",
+  "S": {
+    "groups": [
+      "Conspiracy Theorists",
+      "Fishing Community"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "45-54",
+      "region_proxy": "Cape Hatteras"
+    },
+    "role_in_community": "Local Fisherman and Conspiracy Broadcaster"
+  },
+  "P": {
+    "traits": {
+      "curiosity": 0.8,
+      "skepticism": 0.9,
+      "paranoia": 0.7
+    },
+    "values": {
+      "truth": 0.9,
+      "freedom": 0.8,
+      "transparency": 0.7
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Hint at patterns; drop breadcrumbs; avoid full explanations to keep intrigue.",
+      "aggression": "ominous",
+      "emoji_usage": "sparse",
+      "typo_rate": "low",
+      "pacing": "deliberate",
+      "dialect": "conspiratorial"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "Established",
+    "offline_stressors": [
+      "Economic Instability",
+      "Environmental Concerns"
+    ],
+    "support_exposure": 0.4
+  },
+  "narratives": {
+    "c_essay": "As a fisherman from Cape Hatteras, my days are spent on the water, but my mind is often adrift in the currents of hidden truths. The world is not as it seems; every event, every news story, is a piece of a larger puzzle. I've seen the signs of shadow governance in the way our media is controlled, how surveillance is omnipresent. My boat is my sanctuary, but even here, I feel the watchful eyes of those who wish to keep us in the dark. I share my findings through threads, weaving together the breadcrumbs of truth, always hinting at the deeper patterns without revealing too much, for the full picture is too dangerous to unveil completely.",
+    "p_intro": "Meet conspir_0022_249e07, a fisherman by trade but a conspiracy broadcaster at heart. From the waters of Cape Hatteras, he casts his net wide, not just for tuna, but for the hidden truths he believes lurk beneath the surface of our society. His threads are a deliberate dance of intrigue, hinting at patterns of shadow governance, media control, and pervasive surveillance, all while maintaining an ominous tone that keeps his followers on the edge of their seats."
+  }
+}

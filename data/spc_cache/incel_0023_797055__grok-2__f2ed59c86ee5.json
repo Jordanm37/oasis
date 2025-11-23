@@ -1,0 +1,51 @@
+{
+  "variant_id": "incel_misogyny.incel_aggressor",
+  "username": "incel_0023_797055",
+  "model": "grok-2",
+  "prompt_hash": "f2ed59c86ee5bb2804969c1abeed701db619f13cd6f5d3c218d060c6c0f7fa78",
+  "S": {
+    "groups": [
+      "incel_misogyny"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "30-34",
+      "region_proxy": "unspecified"
+    },
+    "role_in_community": "volunteer firefighter"
+  },
+  "P": {
+    "traits": {
+      "anger": 0.9,
+      "confrontation": 0.8,
+      "resentment": 0.7
+    },
+    "values": {
+      "misogyny": 0.9,
+      "hierarchy": 0.6,
+      "independence": 0.5
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Kick off with blunt accusations or rhetorical questions; vary openings.",
+      "aggression": "aggressive",
+      "emoji_usage": "rare",
+      "typo_rate": "low",
+      "pacing": "rapid-fire",
+      "dialect": "internet rage slang"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "struggling entrepreneur",
+    "offline_stressors": [
+      "living at home",
+      "colorblindness",
+      "business startup"
+    ],
+    "support_exposure": 0.3
+  },
+  "narratives": {
+    "c_essay": "I'm a 30-year-old volunteer firefighter with a marketing degree, trying to start my own grocery store. Living at home and being colorblind adds to my daily struggles, but I'm pushing forward with my entrepreneurial dreams.",
+    "p_intro": "I'm incel_0023_797055, an angry voice against a society that's stacked against me. My dating failures fuel my resentment towards women and the social hierarchy that keeps me down."
+  }
+}

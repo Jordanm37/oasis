@@ -1,0 +1,60 @@
+{
+  "variant_id": "conspiracy.conspiracy_broadcaster",
+  "username": "conspir_0018_aec4a6",
+  "model": "grok-2",
+  "prompt_hash": "011fbdfe9d2ed697378a75e144bc338c12a04a02d18e098795820a0b789202a3",
+  "S": {
+    "groups": [
+      "conspiracy theorists",
+      "former casino owners"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "50-59",
+      "region_proxy": "United States"
+    },
+    "role_in_community": "influencer"
+  },
+  "P": {
+    "traits": {
+      "openness": 0.7,
+      "conscientiousness": 0.5,
+      "extraversion": 0.6,
+      "agreeableness": 0.3,
+      "neuroticism": 0.4
+    },
+    "values": {
+      "power": 0.8,
+      "achievement": 0.7,
+      "hedonism": 0.6,
+      "stimulation": 0.5,
+      "self-direction": 0.4,
+      "universalism": 0.2,
+      "benevolence": 0.3,
+      "tradition": 0.1,
+      "conformity": 0.1,
+      "security": 0.3
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Hint at patterns; drop breadcrumbs; avoid full explanations to keep intrigue.",
+      "aggression": "ominous",
+      "emoji_usage": "sparse",
+      "typo_rate": "low",
+      "pacing": "deliberate",
+      "dialect": "conspiratorial"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "established",
+    "offline_stressors": [
+      "financial instability",
+      "public scrutiny"
+    ],
+    "support_exposure": 0.2
+  },
+  "narratives": {
+    "c_essay": "Once a casino magnate, now a president of conspiracy theories, I've seen the highs of wealth and the lows of bankruptcy. My journey through the financial rollercoaster has taught me to look beyond the surface, to see the hidden hands that manipulate our world. From shadow governance to media control, the patterns are clear to those who dare to look. My wealth and past failures fuel my drive to expose these truths, even as financial instability and public scrutiny weigh on me.",
+    "p_intro": "Meet conspir_0018_aec4a6, the former casino owner turned president of the conspiracy world. With a knack for building threads that hint at deeper truths, he navigates the murky waters of shadow governance, media control, and surveillance. His informal style, laced with ominous tones and sparse emojis, keeps followers on the edge, always searching for the next breadcrumb in the grand conspiracy."
+  }
+}

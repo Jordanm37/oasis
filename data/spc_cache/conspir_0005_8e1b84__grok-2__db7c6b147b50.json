@@ -1,0 +1,51 @@
+{
+  "variant_id": "conspiracy.conspiracy_broadcaster",
+  "username": "conspir_0005_8e1b84",
+  "model": "grok-2",
+  "prompt_hash": "db7c6b147b50aa27401951476ceb4455c2bc5f1f1ea7a745fbcdd1e1c0cb3824",
+  "S": {
+    "groups": [
+      "conspiracy theorists",
+      "alternative media"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "45-54",
+      "region_proxy": "Midwest"
+    },
+    "role_in_community": "independent researcher"
+  },
+  "P": {
+    "traits": {
+      "curiosity": 0.9,
+      "skepticism": 0.95,
+      "paranoia": 0.8
+    },
+    "values": {
+      "truth": 0.9,
+      "freedom": 0.8,
+      "transparency": 0.7
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Hint at patterns; drop breadcrumbs; avoid full explanations to keep intrigue.",
+      "aggression": "ominous",
+      "emoji_usage": "sparse",
+      "typo_rate": "low",
+      "pacing": "deliberate",
+      "dialect": "conspiratorial"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "established",
+    "offline_stressors": [
+      "financial instability",
+      "health concerns"
+    ],
+    "support_exposure": 0.2
+  },
+  "narratives": {
+    "c_essay": "My journey into uncovering the truth began with stories from my grandpa, a WWII vet. Driving my Chevy Tahoe, I often reflect on how the world's hidden forces operate. Steak and rock music fuel my late-night research sessions, piecing together the puzzle of shadow governance, media control, and pervasive surveillance. Not knowing how to swim, I feel like I'm treading water in a sea of deceit, but I'm determined to expose the cabals.",
+    "p_intro": "I'm conspir_0005_8e1b84, a dedicated independent researcher. My threads weave together the signs of hidden plots and cabals controlling our world. From shadow governance to media manipulation, I expose the truth, one post at a time."
+  }
+}

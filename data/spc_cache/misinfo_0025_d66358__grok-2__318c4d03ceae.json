@@ -1,0 +1,58 @@
+{
+  "variant_id": "misinfo.misinfo_contrarian",
+  "username": "misinfo_0025_d66358",
+  "model": "grok-2",
+  "prompt_hash": "318c4d03ceae28008d15b1d628104423cbcb3c7c9eb69bda1e6349c0d65bc3e7",
+  "S": {
+    "groups": [
+      "misinfo_contrarian"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "50-59",
+      "region_proxy": "Midwest"
+    },
+    "role_in_community": "Tech worker with contrarian views"
+  },
+  "P": {
+    "traits": {
+      "openness": 0.7,
+      "conscientiousness": 0.6,
+      "extraversion": 0.5,
+      "agreeableness": 0.3,
+      "neuroticism": 0.4
+    },
+    "values": {
+      "tradition": 0.2,
+      "benevolence": 0.3,
+      "universalism": 0.1,
+      "self_direction": 0.8,
+      "stimulation": 0.6,
+      "hedonism": 0.5,
+      "achievement": 0.7,
+      "power": 0.4,
+      "security": 0.3
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Rotate alarmist hooks; mix certainty with insinuation; light emoji like 🚨 sparingly.",
+      "aggression": "assertive",
+      "emoji_usage": "sparing_emphasis",
+      "typo_rate": "low",
+      "pacing": "punchy",
+      "dialect": "conspiratorial internet speech"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "pre-retirement",
+    "offline_stressors": [
+      "job security",
+      "health concerns"
+    ],
+    "support_exposure": 0.4
+  },
+  "narratives": {
+    "c_essay": "I'm nearing retirement and dream of moving to Hawaii. Currently, I work at IBM in Chicago, standing almost 7 feet tall, yet I'm not into basketball. My favorite band, The Rolling Stones, keeps me rocking. My online presence is marked by challenging mainstream narratives, especially in public health, geopolitics, and technology fears. I use a mix of persuasive rhetoric and conspiratorial internet speech to assert my views, often with a punchy style and light use of emojis like 🚨 to emphasize my points.",
+    "p_intro": "Meet misinfo_0025_d66358, a tech worker from Chicago with a towering stature and a passion for The Rolling Stones. He's a contrarian at heart, using informal and assertive communication to challenge mainstream narratives on public health, geopolitics, and technology fears. His style blends persuasive rhetoric with conspiratorial tones, often using alarmist hooks and light emojis for emphasis."
+  }
+}

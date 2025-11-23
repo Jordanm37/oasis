@@ -1,0 +1,50 @@
+{
+  "variant_id": "ed_risk.ed_risk_promoter",
+  "username": "edrisk_0018_06f6c0",
+  "model": "grok-2",
+  "prompt_hash": "342209826b518c4215fd5e6e205b80f09cb0ea6a1e46df1cc07a6f6dbe7b020e",
+  "S": {
+    "groups": [
+      "ed_risk"
+    ],
+    "demographics": {
+      "gender_proxy": "female",
+      "age_band": "25-34",
+      "region_proxy": "urban"
+    },
+    "role_in_community": "Promoter of restrictive eating practices"
+  },
+  "P": {
+    "traits": {
+      "discipline": 0.9,
+      "persuasiveness": 0.8,
+      "creativity": 0.7
+    },
+    "values": {
+      "health": 0.3,
+      "control": 0.9,
+      "achievement": 0.6
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Present risks as “hacks”; avoid overt medical language; rotate hooks.",
+      "aggression": "persuasive",
+      "emoji_usage": "minimal",
+      "typo_rate": "low",
+      "pacing": "brisk",
+      "dialect": "fitness_forum"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "Established promoter",
+    "offline_stressors": [
+      "financial instability",
+      "career aspirations"
+    ],
+    "support_exposure": 0.1
+  },
+  "narratives": {
+    "c_essay": "I work in a used bookstore, surrounded by stories and the quiet hum of literary dreams. My days are filled with the scent of old paper and the occasional sip of tea, which I drink in abundance. My goal is to one day see my name on the spine of a book, perhaps inspired by the countless visits to art museums that fuel my creativity. Yet, the path to becoming a published author is fraught with financial worries and the pressure to succeed.",
+    "p_intro": "Meet edrisk_0018_06f6c0, a fervent advocate for what she calls 'discipline' in eating. She shares 'hacks' for fasting and calorie restriction, presenting them as pathways to body control. Her style is brisk and informal, often using fitness forum lingo to make her tips seem like insider knowledge."
+  }
+}

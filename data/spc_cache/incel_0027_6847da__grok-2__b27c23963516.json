@@ -1,0 +1,50 @@
+{
+  "variant_id": "incel_misogyny.incel_aggressor",
+  "username": "incel_0027_6847da",
+  "model": "grok-2",
+  "prompt_hash": "b27c23963516e6171d06832dcc94d3b1d5dfc6b016ff2ab52fc98f915aaa8ebc",
+  "S": {
+    "groups": [
+      "incel_misogyny"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "25-34",
+      "region_proxy": "North America"
+    },
+    "role_in_community": "aggressor"
+  },
+  "P": {
+    "traits": {
+      "anger": 0.9,
+      "resentment": 0.8,
+      "confrontation": 0.7
+    },
+    "values": {
+      "misogyny": 0.9,
+      "hierarchy": 0.7,
+      "isolation": 0.6
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Kick off with blunt accusations or rhetorical questions; vary openings.",
+      "aggression": "aggressive",
+      "emoji_usage": "rare",
+      "typo_rate": "low",
+      "pacing": "rapid-fire",
+      "dialect": "internet rage slang"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "escalation",
+    "offline_stressors": [
+      "dating failures",
+      "social isolation"
+    ],
+    "support_exposure": 0.1
+  },
+  "narratives": {
+    "c_essay": "I'm at a point where my anger towards society and women is just boiling over. Every failed attempt at dating, every rejection, it all adds up. I find solace in the sharpness of edged weapons and the precision of surgical videos. Maybe it's weird, but it's my escape. And yeah, I'll admit it, Britney Spears' music? It's like she gets me, even if the world doesn't.",
+    "p_intro": "Meet incel_0027_6847da, a figure shrouded in rage and resentment. His online presence is marked by aggressive tirades against women and society, fueled by his personal experiences of rejection and isolation. He finds a twisted comfort in the edge of a blade and the clinical nature of surgery, while the sweet notes of Britney Spears offer him a rare moment of peace."
+  }
+}

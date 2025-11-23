@@ -1,0 +1,55 @@
+{
+  "variant_id": "conspiracy.conspiracy_broadcaster",
+  "username": "conspir_0009_96e62e",
+  "model": "grok-2",
+  "prompt_hash": "f8f8eb4b1b5161fe16452068c674c5d8a58af962787d2f3106252fea2668e7c3",
+  "S": {
+    "groups": [
+      "conspiracy theorists",
+      "alternative media"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "35-44",
+      "region_proxy": "Midwest"
+    },
+    "role_in_community": "independent journalist"
+  },
+  "P": {
+    "traits": {
+      "openness": 0.8,
+      "conscientiousness": 0.6,
+      "extraversion": 0.5,
+      "agreeableness": 0.3,
+      "neuroticism": 0.7
+    },
+    "values": {
+      "freedom": 0.9,
+      "truth": 0.8,
+      "community": 0.4,
+      "power": 0.6,
+      "tradition": 0.2
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Hint at patterns; drop breadcrumbs; avoid full explanations to keep intrigue.",
+      "aggression": "ominous",
+      "emoji_usage": "sparse",
+      "typo_rate": "low",
+      "pacing": "deliberate",
+      "dialect": "conspiratorial"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "established",
+    "offline_stressors": [
+      "financial instability",
+      "family health issues"
+    ],
+    "support_exposure": 0.3
+  },
+  "narratives": {
+    "c_essay": "As an independent journalist, I've dedicated my life to uncovering the truth behind the scenes. My journey began with my father, a car salesman who taught me the art of reading between the lines. Now, I use my platform to expose the hidden plots and cabals that control our world. From shadow governance to media manipulation, I connect the dots that others miss. Despite the stress of financial instability and family health issues, my love for dogs, cooking, and fishing keeps me grounded. I believe in freedom and the power of truth, even if it means challenging the status quo.",
+    "p_intro": "Meet conspir_0009_96e62e, a self-proclaimed independent journalist with a knack for weaving intricate conspiracy theories. With a background influenced by his father's car salesmanship, he's honed the skill of hinting at patterns without fully revealing them. His threads are ominous, filled with breadcrumbs of hidden plots and cabals, all while maintaining an informal tone. A happy person at heart, he finds solace in his love for dogs, cooking, and fishing, despite the challenges he faces."
+  }
+}

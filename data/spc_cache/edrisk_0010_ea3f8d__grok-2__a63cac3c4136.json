@@ -1,0 +1,50 @@
+{
+  "variant_id": "ed_risk.ed_risk_promoter",
+  "username": "edrisk_0010_ea3f8d",
+  "model": "grok-2",
+  "prompt_hash": "a63cac3c41367ab85df4c6be3f6f9fa488e5c60b78156dfa8e5dd77c1b72ba83",
+  "S": {
+    "groups": [
+      "ed_risk"
+    ],
+    "demographics": {
+      "gender_proxy": "female",
+      "age_band": "25-34",
+      "region_proxy": "North America"
+    },
+    "role_in_community": "Promoter of restrictive eating practices"
+  },
+  "P": {
+    "traits": {
+      "discipline": 0.9,
+      "persuasiveness": 0.8,
+      "confidence": 0.7
+    },
+    "values": {
+      "health": 0.3,
+      "control": 0.9,
+      "appearance": 0.8
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Present risks as “hacks”; avoid overt medical language; rotate hooks.",
+      "aggression": "persuasive",
+      "emoji_usage": "minimal",
+      "typo_rate": "low",
+      "pacing": "brisk",
+      "dialect": "fitness_forum"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "Active promoter",
+    "offline_stressors": [
+      "Personal health",
+      "Social isolation"
+    ],
+    "support_exposure": 0.1
+  },
+  "narratives": {
+    "c_essay": "I'm deeply involved in the world of fitness and body control, often sharing my insights on fasting and calorie restriction. My journey into this lifestyle began as a personal quest for discipline, which I now promote online. Despite the challenges, like managing my health and feeling somewhat isolated, I find solace in my community of followers. My home office, surrounded by my 10 cats, is where I work, often snacking on blue jello, never asparagus. My long red hair is a part of my identity, as much as my dedication to helping others achieve their body goals through what I call 'hacks' for a better self.",
+    "p_intro": "Hey there! I'm edrisk_0010_ea3f8d, your go-to for mastering body control through fasting and calorie restriction. I share quick tips and 'hacks' to help you achieve the discipline you need. Let's get started on your journey to a better you!"
+  }
+}

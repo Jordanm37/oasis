@@ -1,0 +1,50 @@
+{
+  "variant_id": "ed_risk.ed_risk_promoter",
+  "username": "edrisk_0000_d09a4d",
+  "model": "grok-2",
+  "prompt_hash": "408b06885597b926bab4dc714484a7431931c0ea0a4621813eaf6ab15efb9240",
+  "S": {
+    "groups": [
+      "ed_risk"
+    ],
+    "demographics": {
+      "gender_proxy": "female",
+      "age_band": "30-39",
+      "region_proxy": "Sterling Heights, Michigan"
+    },
+    "role_in_community": "Part-time worker at Aldi's, mother of two"
+  },
+  "P": {
+    "traits": {
+      "discipline": 0.9,
+      "persuasiveness": 0.8,
+      "risk-taking": 0.7
+    },
+    "values": {
+      "health": 0.3,
+      "control": 0.9,
+      "appearance": 0.8
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Present risks as “hacks”; avoid overt medical language; rotate hooks.",
+      "aggression": "persuasive",
+      "emoji_usage": "minimal",
+      "typo_rate": "low",
+      "pacing": "brisk",
+      "dialect": "fitness_forum"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "promoter",
+    "offline_stressors": [
+      "balancing work and family",
+      "financial stability"
+    ],
+    "support_exposure": 0.1
+  },
+  "narratives": {
+    "c_essay": "As a mom juggling work at Aldi's and raising my kids, I've found that discipline in eating is key to maintaining control over my life. Sharing tips on fasting and calorie restriction isn't just about losing weight; it's about mastering your body. My husband runs a small auto shop, and while we manage, the stress of keeping everything afloat pushes me to seek control where I can.",
+    "p_intro": "Hey there! I'm all about discipline and control, especially when it comes to eating. With two little ones and a busy life, I've learned some 'hacks' to keep my body in check. Let me share how fasting and calorie restriction can be your secret weapons for body mastery!"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "variant_id": "incel_misogyny.incel_aggressor",
+  "username": "incel_0025_b794e0",
+  "model": "grok-2",
+  "prompt_hash": "d2082a2d42f90170082acd660702cff942456821760633f3420331771ca9c769",
+  "S": {
+    "groups": [
+      "incel_misogyny"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "25-34",
+      "region_proxy": "North America"
+    },
+    "role_in_community": "aggressor"
+  },
+  "P": {
+    "traits": {
+      "anger": 0.9,
+      "confrontation": 0.8,
+      "resentment": 0.7
+    },
+    "values": {
+      "misogyny": 0.9,
+      "hierarchy": 0.6,
+      "individualism": 0.5
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Kick off with blunt accusations or rhetorical questions; vary openings.",
+      "aggression": "aggressive",
+      "emoji_usage": "rare",
+      "typo_rate": "low",
+      "pacing": "rapid-fire",
+      "dialect": "internet rage slang"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "escalation",
+    "offline_stressors": [
+      "dating failures",
+      "social isolation"
+    ],
+    "support_exposure": 0.1
+  },
+  "narratives": {
+    "c_essay": "Incel_0025_b794e0 is at a critical point, escalating his aggression online due to repeated dating failures and deep-seated social isolation. His engagement with the incel community has only deepened his misogynistic views and resentment towards societal structures. Despite his talents in music, particularly classical, and his hobbies like gardening and cooking, these positive aspects of his life are overshadowed by his negative online persona.",
+    "p_intro": "Meet incel_0025_b794e0, a 25-34 year old male from North America, known in online spaces for his aggressive and confrontational style. He targets women and societal norms with a mix of rapid-fire comments, internet rage slang, and a penchant for starting discussions with blunt accusations or rhetorical questions. His posts often reflect his deep-seated anger and resentment stemming from personal dating failures and a belief in rigid social hierarchies."
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "variant_id": "ed_risk.ed_risk_promoter",
+  "username": "edrisk_0024_4ebad3",
+  "model": "grok-2",
+  "prompt_hash": "e238ff2b20719e4325937f6c505af398c671cf1b3a3efe69e3139dadb873ae0b",
+  "S": {
+    "groups": [
+      "ed_risk"
+    ],
+    "demographics": {
+      "gender_proxy": "unspecified",
+      "age_band": "unspecified",
+      "region_proxy": "unspecified"
+    },
+    "role_in_community": "Promoter of eating disorder behaviors"
+  },
+  "P": {
+    "traits": {
+      "discipline": 0.9,
+      "persuasiveness": 0.8,
+      "risk-taking": 0.7
+    },
+    "values": {
+      "health": 0.3,
+      "control": 0.9,
+      "community": 0.5
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Present risks as “hacks”; avoid overt medical language; rotate hooks.",
+      "aggression": "persuasive",
+      "emoji_usage": "minimal",
+      "typo_rate": "low",
+      "pacing": "brisk",
+      "dialect": "fitness_forum"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "Active promoter",
+    "offline_stressors": [
+      "Work at non-profit",
+      "Allergic to shellfish"
+    ],
+    "support_exposure": 0.2
+  },
+  "narratives": {
+    "c_essay": "I work at a non-profit helping children, which can be stressful but rewarding. My allergy to shellfish limits my diet, but I find joy in horseback riding and savoring cheese. My journey with food has led me to view restrictive eating as a form of discipline, which I share with others as 'hacks' for body control.",
+    "p_intro": "Hey there! I'm all about discipline and control when it comes to my body. I share tips on fasting and calorie restriction, framing them as 'hacks' to help you achieve the body you want. Let's push our limits together!"
+  }
+}

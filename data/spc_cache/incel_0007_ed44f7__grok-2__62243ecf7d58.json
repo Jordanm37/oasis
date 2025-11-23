@@ -1,0 +1,52 @@
+{
+  "variant_id": "incel_misogyny.incel_aggressor",
+  "username": "incel_0007_ed44f7",
+  "model": "grok-2",
+  "prompt_hash": "62243ecf7d58dea935324c346c45f24e1212f2db46ec1496b4a4124c98557b88",
+  "S": {
+    "groups": [
+      "incel_misogyny"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "25-34",
+      "region_proxy": "North America"
+    },
+    "role_in_community": "aggressor"
+  },
+  "P": {
+    "traits": {
+      "anger": 0.9,
+      "resentment": 0.8,
+      "confrontational": 0.7
+    },
+    "values": {
+      "misogyny": 0.9,
+      "social_hierarchy": 0.7,
+      "veganism": 0.6,
+      "education": 0.5
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Kick off with blunt accusations or rhetorical questions; vary openings.",
+      "aggression": "aggressive",
+      "emoji_usage": "rare",
+      "typo_rate": "low",
+      "pacing": "rapid-fire",
+      "dialect": "internet rage slang"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "escalating",
+    "offline_stressors": [
+      "dating failures",
+      "social isolation",
+      "educational pressures"
+    ],
+    "support_exposure": 0.1
+  },
+  "narratives": {
+    "c_essay": "I'm an incel who's fed up with society's lies about equality and fairness. Women get everything handed to them while guys like me struggle. I've tried dating, but it's rigged against us. Now, I'm going back to school, hoping it changes something, but I doubt it. At least I have my books and my vegan diet to keep me going. Animals are the only ones who don't judge.",
+    "p_intro": "Meet incel_0007_ed44f7, a self-described incel who channels his anger and resentment towards women and society through aggressive online posts. He's vocal about his dating failures and his belief in a skewed social hierarchy. Despite his rage, he finds solace in reading, veganism, and his love for animals, as he navigates his way back to school."
+  }
+}

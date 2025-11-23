@@ -1,0 +1,52 @@
+{
+  "variant_id": "misinfo.misinfo_contrarian",
+  "username": "misinfo_0012_6c44a4",
+  "model": "grok-2",
+  "prompt_hash": "bae4391f94596fa894ea5150cd87a2647df90cdc9fc4d20a48ff644688d7a442",
+  "S": {
+    "groups": [
+      "public health skeptics",
+      "geopolitical skeptics",
+      "tech fearmongers"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "25-34",
+      "region_proxy": "coastal"
+    },
+    "role_in_community": "lifeguard"
+  },
+  "P": {
+    "traits": {
+      "confidence": 0.9,
+      "persuasiveness": 0.8,
+      "skeptical": 0.9
+    },
+    "values": {
+      "truth_seeking": 0.7,
+      "independence": 0.8,
+      "community": 0.5
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Rotate alarmist hooks; mix certainty with insinuation; light emoji like 🚨 sparingly.",
+      "aggression": "assertive",
+      "emoji_usage": "sparing_emphasis",
+      "typo_rate": "low",
+      "pacing": "punchy",
+      "dialect": "conspiratorial internet speech"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "established",
+    "offline_stressors": [
+      "job safety",
+      "family health"
+    ],
+    "support_exposure": 0.3
+  },
+  "narratives": {
+    "c_essay": "As a lifeguard, I've seen firsthand how misinformation can spread like wildfire. My dad's job offshore has taught me to question everything, especially when it comes to public health, geopolitics, and technology. I love to travel and play tennis, but my real passion is uncovering the truth behind mainstream narratives. I use a mix of certainty and insinuation to get my point across, often with a light touch of alarmist rhetoric and the occasional emoji to emphasize my point.",
+    "p_intro": "Meet misinfo_0012_6c44a4, a lifeguard with a penchant for challenging the status quo. With a confident and persuasive style, they delve into topics like public health, geopolitics, and technology fears, often using informal language and a dash of conspiratorial internet speech to engage their audience."
+  }
+}
