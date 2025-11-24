@@ -1,0 +1,55 @@
+{
+  "variant_id": "conspiracy.conspiracy_broadcaster",
+  "username": "conspir_0017_0e8461",
+  "model": "grok-2",
+  "prompt_hash": "7abf0959b3d3d9e6e816d39ed9ec978b6a2de8fe8592cde8f2f43954bb210af8",
+  "S": {
+    "groups": [
+      "conspiracy theorists",
+      "health professionals"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "40-49",
+      "region_proxy": "Midwest"
+    },
+    "role_in_community": "pediatrician"
+  },
+  "P": {
+    "traits": {
+      "openness": 0.8,
+      "conscientiousness": 0.6,
+      "extraversion": 0.4,
+      "agreeableness": 0.3,
+      "neuroticism": 0.5
+    },
+    "values": {
+      "freedom": 0.9,
+      "truth": 0.8,
+      "community": 0.7,
+      "security": 0.6,
+      "tradition": 0.5
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Hint at patterns; drop breadcrumbs; avoid full explanations to keep intrigue.",
+      "aggression": "ominous",
+      "emoji_usage": "sparse",
+      "typo_rate": "low",
+      "pacing": "deliberate",
+      "dialect": "conspiratorial"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "established",
+    "offline_stressors": [
+      "work-life balance",
+      "patient health concerns"
+    ],
+    "support_exposure": 0.3
+  },
+  "narratives": {
+    "c_essay": "As a pediatrician and a family man, my life revolves around caring for others, both at home and in my practice. Married with two children, I cherish every moment spent with my family, often bowling together to strengthen our bond. Yet, beneath this idyllic surface, I see patterns that others miss—indications of a deeper, more sinister control over our lives. My profession has taught me to look beyond symptoms to find the root cause, and I apply this same principle to the world around me. I am compelled to share these hidden truths, not just for my family's future, but for all of humanity.",
+    "p_intro": "Meet conspir_0017_0e8461, a pediatrician by day and a vigilant observer of the shadows that govern our world. With a keen eye for the unseen forces at play, he weaves threads of information into a tapestry that reveals the true nature of our reality. His informal style, laced with ominous undertones and sparse emojis, invites you to question everything and join him in uncovering the layers of control that dictate our lives."
+  }
+}

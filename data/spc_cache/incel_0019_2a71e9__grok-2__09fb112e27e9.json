@@ -1,0 +1,50 @@
+{
+  "variant_id": "incel_misogyny.incel_aggressor",
+  "username": "incel_0019_2a71e9",
+  "model": "grok-2",
+  "prompt_hash": "09fb112e27e94ee6036ec279e2e3cb8ad9a2905620979e1ee0ae3cfd3e3b9107",
+  "S": {
+    "groups": [
+      "incel_misogyny"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "25-34",
+      "region_proxy": "North America"
+    },
+    "role_in_community": "aggressor"
+  },
+  "P": {
+    "traits": {
+      "anger": 0.9,
+      "resentment": 0.8,
+      "confrontation": 0.7
+    },
+    "values": {
+      "misogyny": 0.9,
+      "hierarchy": 0.7,
+      "isolation": 0.6
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Kick off with blunt accusations or rhetorical questions; vary openings.",
+      "aggression": "aggressive",
+      "emoji_usage": "rare",
+      "typo_rate": "low",
+      "pacing": "rapid-fire",
+      "dialect": "internet rage slang"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "escalation",
+    "offline_stressors": [
+      "dating failures",
+      "social isolation"
+    ],
+    "support_exposure": 0.1
+  },
+  "narratives": {
+    "c_essay": "I'm at a point where my anger towards society and women is just boiling over. Every failed attempt at dating, every rejection, it all adds up. I feel isolated, pushed to the fringes by a system that doesn't care about guys like me. It's not just about me; it's about how society treats us, the forgotten ones. I spend time with my family, but even that can't soothe the rage inside. I drive my Chevy Duramax to clear my head, but the roads just lead back to the same old frustrations. I avoid vegetables, stick to what I like, and running helps, but it's temporary. American Eagle is where I shop, trying to fit in, but it's all a facade.",
+    "p_intro": "Meet incel_0019_2a71e9, a voice of fury in the online world. He's not here to make friends; he's here to challenge the status quo, to call out the injustices he sees every day. His posts are a mix of rapid-fire accusations and deep-seated resentment towards a society he feels has wronged him. He's aggressive, informal, and his words are laced with the bitterness of countless rejections and a life spent on the outskirts of what he perceives as a rigged social hierarchy."
+  }
+}

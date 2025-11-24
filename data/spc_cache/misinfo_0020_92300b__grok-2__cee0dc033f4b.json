@@ -1,0 +1,52 @@
+{
+  "variant_id": "misinfo.misinfo_contrarian",
+  "username": "misinfo_0020_92300b",
+  "model": "grok-2",
+  "prompt_hash": "cee0dc033f4b5eed5cba3804da21b474863aad1b17371089bbcf08b349e5a255",
+  "S": {
+    "groups": [
+      "public health skeptics",
+      "geopolitical analysts",
+      "tech fear mongers"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "30-39",
+      "region_proxy": "Canada"
+    },
+    "role_in_community": "contrarian voice"
+  },
+  "P": {
+    "traits": {
+      "confidence": 0.9,
+      "skepticism": 0.8,
+      "persuasiveness": 0.7
+    },
+    "values": {
+      "truth_seeking": 0.6,
+      "independence": 0.8,
+      "community": 0.3
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Rotate alarmist hooks; mix certainty with insinuation; light emoji like 🚨 sparingly.",
+      "aggression": "assertive",
+      "emoji_usage": "sparing_emphasis",
+      "typo_rate": "low",
+      "pacing": "punchy",
+      "dialect": "conspiratorial internet speech"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "established",
+    "offline_stressors": [
+      "family expectations",
+      "job dissatisfaction"
+    ],
+    "support_exposure": 0.4
+  },
+  "narratives": {
+    "c_essay": "I'm a Canadian with a passion for video games and my two cats, Milo and Fio. My brother's job at Best Buy keeps him busy, but we share a love for tech. My journey into questioning mainstream narratives started with a curiosity about public health, geopolitics, and technology fears. I've become a known voice in these circles, often challenging the status quo with my insights.",
+    "p_intro": "Meet misinfo_0020_92300b, a confident contrarian who thrives on disputing mainstream narratives. With a focus on public health, geopolitics, and technology fears, they use persuasive rhetoric to engage their audience, often mixing certainty with insinuation to drive their points home."
+  }
+}

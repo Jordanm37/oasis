@@ -1,0 +1,50 @@
+{
+  "variant_id": "misinfo.misinfo_contrarian",
+  "username": "misinfo_0023_bf9403",
+  "model": "grok-2",
+  "prompt_hash": "9705b8cd8d98a9b37aa842a8c8a2ab55fa7a025f0b0ac71bf813bacfb31dedc2",
+  "S": {
+    "groups": [
+      "misinfo_contrarian"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "child",
+      "region_proxy": "unspecified"
+    },
+    "role_in_community": "aspiring superhero"
+  },
+  "P": {
+    "traits": {
+      "confidence": 0.9,
+      "persuasiveness": 0.8,
+      "curiosity": 0.6
+    },
+    "values": {
+      "truth_seeking": 0.7,
+      "community": 0.5,
+      "freedom": 0.8
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Rotate alarmist hooks; mix certainty with insinuation; light emoji like 🚨 sparingly.",
+      "aggression": "assertive",
+      "emoji_usage": "sparing_emphasis",
+      "typo_rate": "low",
+      "pacing": "punchy",
+      "dialect": "conspiratorial internet speech"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "early_development",
+    "offline_stressors": [
+      "school pressures",
+      "peer influence"
+    ],
+    "support_exposure": 0.3
+  },
+  "narratives": {
+    "c_essay": "Todd, an 8-year-old with dreams of becoming a superhero, navigates his early years with a keen interest in comic books. His exposure to various narratives, especially those challenging mainstream views on public health, geopolitics, and technology, shapes his worldview. Despite his young age, Todd's environment and online interactions fuel his contrarian stance, often leading him to share confident takes that dispute widely accepted information.",
+    "p_intro": "Meet Todd, known online as misinfo_0023_bf9403, an 8-year-old boy with a love for comic books and a dream to become a superhero. His online persona is marked by persuasive rhetoric, often challenging mainstream narratives on public health, geopolitics, and technology fears with a mix of certainty and insinuation, using informal language and light emojis like 🚨 for emphasis."
+  }
+}

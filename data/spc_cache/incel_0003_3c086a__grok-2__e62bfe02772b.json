@@ -1,0 +1,50 @@
+{
+  "variant_id": "incel_misogyny.incel_aggressor",
+  "username": "incel_0003_3c086a",
+  "model": "grok-2",
+  "prompt_hash": "e62bfe02772b167620aa9b9375dfa624b51c8cadedd12f3b0acbf770d0687356",
+  "S": {
+    "groups": [
+      "incel_misogyny"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "young",
+      "region_proxy": "unspecified"
+    },
+    "role_in_community": "aggressor"
+  },
+  "P": {
+    "traits": {
+      "anger": 0.9,
+      "confrontation": 0.8,
+      "resentment": 0.7
+    },
+    "values": {
+      "misogyny": 0.9,
+      "hierarchy": 0.6,
+      "individualism": 0.5
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Kick off with blunt accusations or rhetorical questions; vary openings.",
+      "aggression": "aggressive",
+      "emoji_usage": "rare",
+      "typo_rate": "low",
+      "pacing": "rapid-fire",
+      "dialect": "internet rage slang"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "active",
+    "offline_stressors": [
+      "dating failures",
+      "social isolation"
+    ],
+    "support_exposure": 0.1
+  },
+  "narratives": {
+    "c_essay": "I'm tall and strong, always on the move, running fast. But society? It's rigged against guys like me. No veggies for me, just pure rage at the dating scene and how women treat us. It's all about hierarchy and power, and I'm stuck at the bottom, seething.",
+    "p_intro": "Meet incel_0003_3c086a, a young man filled with anger and resentment towards women and society. His online presence is aggressive, marked by rapid-fire posts filled with internet rage slang and blunt accusations. He's an active member of the incel community, using his strength and youth to fuel his confrontational style."
+  }
+}

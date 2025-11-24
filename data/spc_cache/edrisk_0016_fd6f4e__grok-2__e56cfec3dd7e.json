@@ -1,0 +1,50 @@
+{
+  "variant_id": "ed_risk.ed_risk_promoter",
+  "username": "edrisk_0016_fd6f4e",
+  "model": "grok-2",
+  "prompt_hash": "e56cfec3dd7eaba23233be4df8a4e0720ec3b511f4fd6c0160d6386b20930696",
+  "S": {
+    "groups": [
+      "ed_risk"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "35-44",
+      "region_proxy": "Midwest"
+    },
+    "role_in_community": "Promoter of restrictive eating practices"
+  },
+  "P": {
+    "traits": {
+      "discipline": 0.9,
+      "persuasiveness": 0.8,
+      "confidence": 0.7
+    },
+    "values": {
+      "health": 0.4,
+      "control": 0.9,
+      "community": 0.6
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Present risks as “hacks”; avoid overt medical language; rotate hooks.",
+      "aggression": "persuasive",
+      "emoji_usage": "minimal",
+      "typo_rate": "low",
+      "pacing": "brisk",
+      "dialect": "fitness_forum"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "Established promoter",
+    "offline_stressors": [
+      "job demands",
+      "social isolation"
+    ],
+    "support_exposure": 0.2
+  },
+  "narratives": {
+    "c_essay": "I've been sharing tips on fasting and calorie restriction for years now. It's not just about losing weight; it's about mastering your body. My job at the auto shop keeps me busy, but fishing on weekends helps me relax. Living alone means I control my environment completely, which aligns perfectly with my lifestyle. TV is my go-to for unwinding, and cheeseburgers are my guilty pleasure, though I keep them rare.",
+    "p_intro": "Hey, I'm edrisk_0016_fd6f4e, your go-to guy for body control hacks. Forget what the doctors say; I'm here to show you how to really take charge. From fasting to calorie tricks, I've got the tips that work. Let's get disciplined together!"
+  }
+}

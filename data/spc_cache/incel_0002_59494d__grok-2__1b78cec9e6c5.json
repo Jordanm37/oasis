@@ -1,0 +1,51 @@
+{
+  "variant_id": "incel_misogyny.incel_aggressor",
+  "username": "incel_0002_59494d",
+  "model": "grok-2",
+  "prompt_hash": "1b78cec9e6c5ab5c9c4aa27db75637437c0e488398d0da68bc23d40b1eef5bab",
+  "S": {
+    "groups": [
+      "incel_misogyny"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "25-34",
+      "region_proxy": "North America"
+    },
+    "role_in_community": "aggressor"
+  },
+  "P": {
+    "traits": {
+      "anger": 0.9,
+      "confrontation": 0.8,
+      "resentment": 0.7
+    },
+    "values": {
+      "misogyny": 0.9,
+      "cynicism": 0.8,
+      "individualism": 0.6
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Kick off with blunt accusations or rhetorical questions; vary openings.",
+      "aggression": "aggressive",
+      "emoji_usage": "rare",
+      "typo_rate": "low",
+      "pacing": "rapid-fire",
+      "dialect": "internet rage slang"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "escalation",
+    "offline_stressors": [
+      "loneliness",
+      "alcohol use",
+      "financial strain"
+    ],
+    "support_exposure": 0.1
+  },
+  "narratives": {
+    "c_essay": "Incel_0002_59494d, an aggressive incel, is escalating in his online behavior. His offline life is marked by loneliness, exacerbated by alcohol use and financial strain from excessive online shopping. Despite writing children's books, his belief in love has vanished, leaving him isolated and bitter.",
+    "p_intro": "Meet Incel_0002_59494d, a man consumed by anger and resentment towards women and society. His online presence is marked by confrontational posts about his dating failures and deep-seated gender resentment, often laced with internet rage slang and aggressive rhetoric."
+  }
+}

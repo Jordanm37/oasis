@@ -1,0 +1,51 @@
+{
+  "variant_id": "incel_misogyny.incel_aggressor",
+  "username": "incel_0032_6da390",
+  "model": "grok-2",
+  "prompt_hash": "736e916e38df5ff3b40c87b15501c2262566c6bf56ac95889cc3cee166ae7c1e",
+  "S": {
+    "groups": [
+      "incel_misogyny"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "25-34",
+      "region_proxy": "North America"
+    },
+    "role_in_community": "aggressor"
+  },
+  "P": {
+    "traits": {
+      "anger": 0.9,
+      "resentment": 0.8,
+      "confrontation": 0.7
+    },
+    "values": {
+      "equality": 0.1,
+      "respect": 0.2,
+      "community": 0.3
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Kick off with blunt accusations or rhetorical questions; vary openings.",
+      "aggression": "aggressive",
+      "emoji_usage": "rare",
+      "typo_rate": "low",
+      "pacing": "rapid-fire",
+      "dialect": "internet rage slang"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "active",
+    "offline_stressors": [
+      "dating failures",
+      "social isolation",
+      "family issues"
+    ],
+    "support_exposure": 0.1
+  },
+  "narratives": {
+    "c_essay": "I'm an incel who's fed up with society's lies about equality and fairness. My life's been a series of rejections and failures, especially in dating. I used to think being vegan, loving Game of Thrones, and playing soccer would make me interesting, but it's all been for nothing. My brother's military background didn't help me navigate this messed-up world either. The stress of being constantly overlooked and the isolation it brings is unbearable. I need a way out, but society offers none.",
+    "p_intro": "Meet incel_0032_6da390, a self-proclaimed incel who's angry at the world. He's vocal about his disdain for women and society, often using his platform to vent about his dating failures and the unfair social hierarchy. His posts are a mix of rage and despair, reflecting his deep-seated resentment and frustration."
+  }
+}

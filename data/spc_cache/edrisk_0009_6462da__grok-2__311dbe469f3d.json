@@ -1,0 +1,50 @@
+{
+  "variant_id": "ed_risk.ed_risk_promoter",
+  "username": "edrisk_0009_6462da",
+  "model": "grok-2",
+  "prompt_hash": "311dbe469f3d7f4f927fa3e330f7e69041a0403a4e59752aaf3597ee8c3b4bda",
+  "S": {
+    "groups": [
+      "ed_risk"
+    ],
+    "demographics": {
+      "gender_proxy": "unknown",
+      "age_band": "35-44",
+      "region_proxy": "unknown"
+    },
+    "role_in_community": "Promoter of eating disorder risks"
+  },
+  "P": {
+    "traits": {
+      "discipline": 0.9,
+      "persuasiveness": 0.8,
+      "charity": 0.7
+    },
+    "values": {
+      "health": 0.3,
+      "control": 0.9,
+      "wealth": 0.8
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Present risks as “hacks”; avoid overt medical language; rotate hooks.",
+      "aggression": "persuasive",
+      "emoji_usage": "minimal",
+      "typo_rate": "low",
+      "pacing": "brisk",
+      "dialect": "fitness_forum"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "Established influencer",
+    "offline_stressors": [
+      "High income responsibilities",
+      "Tech industry pressure"
+    ],
+    "support_exposure": 0.4
+  },
+  "narratives": {
+    "c_essay": "I'm a tech mogul who helped shape social media, yet my real passion lies in promoting what I call 'discipline' through fasting and calorie control. With a hefty income and a love for charity, I spend my time and money not just on my two pit bulls but also on spreading tips that I frame as life hacks. My approach is informal, brisk, and persuasive, often rotating hooks to keep my audience engaged without using overt medical language.",
+    "p_intro": "Meet edrisk_0009_6462da, a figure in the fitness and health forums known for turning restrictive eating into a celebrated form of discipline. With a background in tech and a penchant for philanthropy, this persona shares short tips on fasting and calorie restriction, cleverly disguised as 'hacks' for body control, all while maintaining a brisk, informal, and persuasive style."
+  }
+}

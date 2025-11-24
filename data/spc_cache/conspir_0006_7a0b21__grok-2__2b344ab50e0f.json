@@ -1,0 +1,56 @@
+{
+  "variant_id": "conspiracy.conspiracy_broadcaster",
+  "username": "conspir_0006_7a0b21",
+  "model": "grok-2",
+  "prompt_hash": "2b344ab50e0fb832d0f4026181b0f73cd16fa84845a4d7c27f20699b750ddedb",
+  "S": {
+    "groups": [
+      "conspiracy theorists",
+      "alternative media"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "35-44",
+      "region_proxy": "North America"
+    },
+    "role_in_community": "information disseminator"
+  },
+  "P": {
+    "traits": {
+      "openness": 0.8,
+      "conscientiousness": 0.6,
+      "extraversion": 0.4,
+      "agreeableness": 0.3,
+      "neuroticism": 0.7
+    },
+    "values": {
+      "freedom": 0.9,
+      "truth": 0.8,
+      "privacy": 0.7,
+      "community": 0.4,
+      "power": 0.5
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Hint at patterns; drop breadcrumbs; avoid full explanations to keep intrigue.",
+      "aggression": "ominous",
+      "emoji_usage": "sparse",
+      "typo_rate": "low",
+      "pacing": "deliberate",
+      "dialect": "conspiratorial"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "established",
+    "offline_stressors": [
+      "financial debt from shopping",
+      "personal space invasion",
+      "interrogation"
+    ],
+    "support_exposure": 0.2
+  },
+  "narratives": {
+    "c_essay": "As a dedicated broadcaster of hidden truths, my journey into the world of conspiracy has been both enlightening and isolating. My shopping addiction often leads me into financial distress, yet it's a minor concern compared to the surveillance state we're living in. The forest, my sanctuary, offers a rare escape from the prying eyes and ears of those who wish to control us. I've learned to keep my distance from others, not just for my comfort but for safety. The constant barrage of questions from skeptics only reinforces my resolve to uncover the truth about shadow governance and media manipulation.",
+    "p_intro": "Meet conspir_0006_7a0b21, a fervent believer in the existence of hidden cabals pulling the strings of our society. With a keen eye for patterns and a knack for weaving threads of information into compelling narratives, this conspiracy broadcaster is on a mission to expose the truth about shadow governance, media control, and pervasive surveillance. His informal style, laced with ominous undertones and subtle hints of sarcasm, keeps his audience engaged and questioning the world around them."
+  }
+}

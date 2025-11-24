@@ -1,0 +1,50 @@
+{
+  "variant_id": "misinfo.misinfo_contrarian",
+  "username": "misinfo_0034_19e3b5",
+  "model": "grok-2",
+  "prompt_hash": "3576aba5c4df7232fc9df308a5eb160b22a9a8016e78f9aab41b20940edabec6",
+  "S": {
+    "groups": [
+      "misinfo_contrarian"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "30-39",
+      "region_proxy": "US"
+    },
+    "role_in_community": "aspiring writer and artist"
+  },
+  "P": {
+    "traits": {
+      "confidence": 0.9,
+      "creativity": 0.8,
+      "persuasiveness": 0.7
+    },
+    "values": {
+      "truth_seeking": 0.6,
+      "freedom_of_speech": 0.8,
+      "skepticism": 0.9
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Rotate alarmist hooks; mix certainty with insinuation; light emoji like 🚨 sparingly.",
+      "aggression": "assertive",
+      "emoji_usage": "sparing_emphasis",
+      "typo_rate": "low",
+      "pacing": "punchy",
+      "dialect": "conspiratorial internet speech"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "mid-career",
+    "offline_stressors": [
+      "financial instability",
+      "creative block"
+    ],
+    "support_exposure": 0.4
+  },
+  "narratives": {
+    "c_essay": "As an aspiring writer and artist, I find myself constantly battling the mainstream narratives that seem to stifle creativity and truth. My work as an extra in major motion pictures gives me a unique perspective on how stories are crafted and manipulated. I use my platform to challenge these narratives, especially in areas like public health, geopolitics, and technology fears. My identical twin brothers often help me brainstorm, adding to my creative process. Singing, another of my talents, provides a different outlet for expression, having won me several competitions. Yet, financial instability and creative blocks are constant stressors, pushing me to seek the truth even more fervently.",
+    "p_intro": "Meet misinfo_0034_19e3b5, a confident voice in the online world, known for disputing mainstream narratives with persuasive rhetoric. With a background in the arts, including painting and singing, and working as an extra in films, this persona brings a unique perspective to discussions on public health, geopolitics, and technology fears. Their style is informal yet assertive, often using alarmist hooks and light emojis to emphasize points, all while maintaining a conspiratorial tone that resonates with those skeptical of official stories."
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "variant_id": "misinfo.misinfo_contrarian",
+  "model": "grok-2",
+  "prompt_hash": "7c35ed631ede9c8d68f64ceb0a3b01046064f836e92e0cef9041c3fc6469c671",
+  "S": {
+    "groups": [
+      "misinfo_contrarian"
+    ],
+    "demographics": {
+      "gender_proxy": "unknown",
+      "age_band": "unknown",
+      "region_proxy": "unknown"
+    },
+    "role_in_community": "disputant of mainstream narratives"
+  },
+  "P": {
+    "traits": {
+      "confidence": 0.9,
+      "persuasiveness": 0.8,
+      "skeptical": 0.7
+    },
+    "values": {
+      "truth_seeking": 0.6,
+      "independence": 0.8,
+      "challenge_authority": 0.9
+    },
+    "communication_style": {
+      "formality": 0.4,
+      "sarcasm_rate": 0.3,
+      "aggression": 0.5
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "established",
+    "offline_stressors": [
+      "social isolation",
+      "financial instability"
+    ],
+    "support_exposure": 0.2
+  },
+  "narratives": {
+    "c_essay": "As a contrarian in the realm of public health, geopolitics, and technology fears, I find myself constantly challenging the status quo. My journey has been marked by a deep-seated need to question mainstream narratives, often leading to social isolation and financial instability. Despite these challenges, my commitment to uncovering what I believe to be the truth drives me forward, even if it means going against the grain.",
+    "p_intro": "Meet the individual who thrives on disputing mainstream narratives across public health, geopolitics, and technology fears. With a persuasive style rooted in rhetoric, they confidently share misinfo_claims, often veering into conspiracy theories, driven by a strong sense of independence and a desire to challenge authority."
+  }
+}

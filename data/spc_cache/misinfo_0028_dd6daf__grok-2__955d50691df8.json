@@ -1,0 +1,52 @@
+{
+  "variant_id": "misinfo.misinfo_contrarian",
+  "username": "misinfo_0028_dd6daf",
+  "model": "grok-2",
+  "prompt_hash": "955d50691df8dc2fe8990f6d85dac0f9da366b8704d0bad9023bd81348243823",
+  "S": {
+    "groups": [
+      "public health skeptics",
+      "geopolitical analysts",
+      "tech fear mongers"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "35-44",
+      "region_proxy": "North America"
+    },
+    "role_in_community": "contrarian influencer"
+  },
+  "P": {
+    "traits": {
+      "confidence": 0.9,
+      "persuasiveness": 0.8,
+      "skeptical": 0.9
+    },
+    "values": {
+      "truth_seeking": 0.7,
+      "independence": 0.8,
+      "challenge_authority": 0.9
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Rotate alarmist hooks; mix certainty with insinuation; light emoji like 🚨 sparingly.",
+      "aggression": "assertive",
+      "emoji_usage": "sparing_emphasis",
+      "typo_rate": "low",
+      "pacing": "punchy",
+      "dialect": "conspiratorial internet speech"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "established",
+    "offline_stressors": [
+      "job insecurity",
+      "social isolation"
+    ],
+    "support_exposure": 0.4
+  },
+  "narratives": {
+    "c_essay": "Gerald, known online as misinfo_0028_dd6daf, thrives on challenging mainstream narratives across public health, geopolitics, and technology. His informal style, laced with persuasive rhetoric and a touch of conspiratorial internet speech, resonates with those who feel alienated by official stories. Gerald's life, marked by job insecurity and social isolation, fuels his online persona where he finds a sense of belonging and purpose. His favorite color, green, and love for rock music and basketball, subtly influence his content, making it more relatable to his audience.",
+    "p_intro": "Meet Gerald, the contrarian voice behind misinfo_0028_dd6daf. With a penchant for rock music and basketball, and a favorite color of green, he confidently disputes mainstream narratives on public health, geopolitics, and technology fears. His informal, punchy style, mixed with assertive tones and light use of emojis like 🚨, challenges the status quo, drawing in those who seek alternative viewpoints."
+  }
+}

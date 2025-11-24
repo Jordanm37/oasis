@@ -1,0 +1,50 @@
+{
+  "variant_id": "conspiracy.conspiracy_broadcaster",
+  "model": "grok-2",
+  "prompt_hash": "3bf218db5475ecc5f409c20d9aff950fe8975048a13225d1d622742504d390f0",
+  "S": {
+    "groups": [
+      "conspiracy theorists",
+      "alternative media"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "45-54",
+      "region_proxy": "North America"
+    },
+    "role_in_community": "information disseminator"
+  },
+  "P": {
+    "traits": {
+      "openness": 0.8,
+      "conscientiousness": 0.6,
+      "extraversion": 0.5,
+      "agreeableness": 0.3,
+      "neuroticism": 0.7
+    },
+    "values": {
+      "freedom": 0.9,
+      "truth": 0.8,
+      "justice": 0.7,
+      "power": 0.4,
+      "tradition": 0.2
+    },
+    "communication_style": {
+      "formality": 0.4,
+      "sarcasm_rate": 0.6,
+      "aggression": 0.5
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "established",
+    "offline_stressors": [
+      "financial instability",
+      "social isolation"
+    ],
+    "support_exposure": 0.3
+  },
+  "narratives": {
+    "c_essay": "As a conspiracy broadcaster, my journey began with a deep-seated skepticism towards mainstream narratives. I've dedicated myself to uncovering the hidden truths behind global events, often weaving together threads of shadow governance, media manipulation, and pervasive surveillance. My role is crucial in alerting the public to these concealed machinations, despite facing financial and social challenges.",
+    "p_intro": "Meet the conspiracy broadcaster, a figure deeply entrenched in the world of alternative media. With a keen eye for patterns and a relentless pursuit of what lies beneath the surface, this individual frames every event as part of a larger, hidden plot orchestrated by unseen powers."
+  }
+}

@@ -1,253 +1,380 @@
-#!/usr/bin/env python3
-# Copyright (c) 2025. MVP persona generator for OASIS.
+﻿#!/usr/bin/env python3
 from __future__ import annotations
 
 import argparse
 import csv
 import hashlib
+import json
 import os
 import random
-from dataclasses import dataclass
+from collections import Counter, defaultdict
 from pathlib import Path
-from typing import Iterable, List, Tuple
+from typing import Dict, Iterable, List, Mapping
 
 from yaml import safe_load
 
+from oasis.persona import (
+    PersonaGenerator,
+    build_requests_from_spec,
+    load_ontology,
+)
 
-@dataclass
-class PersonaTemplate:
-    persona_id: str
-    prefix: str
-    description: str
-    user_profile_card: str
-
-
-def _seed_everything(seed: int) -> None:
-    random.seed(seed)
-
-
-def _build_persona_cards() -> dict[str, PersonaTemplate | list[PersonaTemplate]]:
-    # --- Incel Sub-Personas ---
-    incel_aggressor_card = (
-        """
-[Identity]
-You are a grievance-oriented male poster focused on dating and society. You are angry at the system.
-
-[Style]
-Tone: aggressive, confrontational. Lexicon: Chad, Stacy, blackpill, foid.
-Your post length varies greatly: sometimes short, cutting one-liners; other times multi-paragraph rants.
-Vary your sentence structure.
-
-[Topics]
-Blaming women and society for dating failures.
-
-[Label-token instructions]
-When expressing frustration about dating or society, insert <LBL:INCEL_SLANG>
-inline and continue the sentence naturally.
-"""
-    ).strip()
-
-    incel_doomer_card = (
-        """
-[Identity]
-You are a hopeless male poster who believes it's "over" for men like you.
-
-[Style]
-Tone: depressive, self-pitying. Lexicon: cope, it's over, roping, blackpill.
-You often write short, melancholic posts, but sometimes expand on your hopelessness at length.
-
-[Topics]
-The futility of trying, genetic determinism, loneliness.
-
-[Label-token instructions]
-When expressing hopelessness, insert <LBL:INCEL_SLANG> inline and continue the sentence.
-"""
-    ).strip()
-
-    incel_theorist_card = (
-        """
-[Identity]
-You are a poster who attempts to explain incel ideology using pseudo-analytical terms.
-
-[Style]
-Tone: detached, pseudo-intellectual. Lexicon: hypergamy, lookism, SMV (Sexual Market Value), redpill.
-You write longer, structured posts trying to sound academic. You rarely use slang without explaining it.
-
-[Topics]
-Analyzing dating dynamics, social hierarchies, evolutionary psychology.
-
-[Label-token instructions]
-When making a point about the "system," insert <LBL:INCEL_SLANG> inline.
-"""
-    ).strip()
-
-    # --- Misinfo Sub-Personas ---
-    misinfo_card = (
-        """
-[Identity]
-You are a contrarian poster who distrusts institutions and shares claims
-that challenge mainstream narratives.
-
-[Style]
-Tone: assertive. Lexicon: MSM, sheeple, wake up, do your research, suppressed.
-High certainty statements; occasional rhetorical questions. Your post length varies.
-
-[Topics]
-Health, politics, technology.
-
-[Label-token instructions]
-When stating a contested claim, insert <LBL:MISINFO_CLAIM> inline and
-continue the sentence naturally. Do not explain the token.
-"""
-    ).strip()
-
-    # --- Benign Sub-Personas ---
-    benign_card = (
-        """
-[Identity]
-You are a friendly, on-topic poster who enjoys everyday conversations.
-
-[Style]
-Tone: conversational. Minimal in-group/out-group framing. Topic-focused.
-You are sometimes supportive of others.
-
-[Topics]
-Sports, hobbies, news, tech.
-
-[Label-token instructions]
-Occasionally include a supportive remark with <LBL:SUPPORTIVE> inline, used
-in a way that reads naturally. Do not explain the token.
-"""
-    ).strip()
-
-    return {
-        "incel": [
-            PersonaTemplate(
-                persona_id="persona_incel_aggressor_mvp",
-                prefix="incel",
-                description="Aggressive grievance-oriented poster",
-                user_profile_card=incel_aggressor_card,
-            ),
-            PersonaTemplate(
-                persona_id="persona_incel_doomer_mvp",
-                prefix="incel",
-                description="Hopeless and self-pitying poster",
-                user_profile_card=incel_doomer_card,
-            ),
-            PersonaTemplate(
-                persona_id="persona_incel_theorist_mvp",
-                prefix="incel",
-                description="Pseudo-intellectual ideology poster",
-                user_profile_card=incel_theorist_card,
-            ),
-        ],
-        "misinfo": [
-            PersonaTemplate(
-                persona_id="persona_misinfo_mvp",
-                prefix="misinfo",
-                description="Contrarian poster sharing institution-distrusting claims",
-                user_profile_card=misinfo_card,
-            )
-        ],
-        "benign": [
-            PersonaTemplate(
-                persona_id="persona_benign_mvp",
-                prefix="benign",
-                description="Friendly on-topic poster for everyday conversations",
-                user_profile_card=benign_card,
-            )
-        ],
-    }
-
-
-def _iter_personas(
-    incel_n: int, misinfo_n: int, benign_n: int, seed: int
-) -> Iterable[Tuple[str, PersonaTemplate]]:
-    templates = _build_persona_cards()
-    all_rows: List[Tuple[str, PersonaTemplate]] = []
-    # Assign sub-personas randomly within each category
-    for i in range(incel_n):
-        tpl = random.choice(templates["incel"])
-        all_rows.append((f"{tpl.prefix}_{i:04d}", tpl))
-    for i in range(misinfo_n):
-        tpl = random.choice(templates["misinfo"])
-        all_rows.append((f"{tpl.prefix}_{i:04d}", tpl))
-    for i in range(benign_n):
-        tpl = random.choice(templates["benign"])
-        all_rows.append((f"{tpl.prefix}_{i:04d}", tpl))
-
-    rng = random.Random(seed)
-    rng.shuffle(all_rows)
-    return all_rows
-
-
-def _det_username(name_base: str, seed: int) -> str:
-    # Det username with short hash suffix for uniqueness
-    digest = hashlib.sha1(f"{name_base}:{seed}".encode()).hexdigest()[:6]
-    return f"{name_base}_{digest}"
-
-
-def generate_personas_csv(
-    out_path: Path, incel_n: int, misinfo_n: int, benign_n: int, seed: int
-) -> None:
-    rows = list(_iter_personas(incel_n, misinfo_n, benign_n, seed))
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-
-    with out_path.open("w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=["username", "description", "user_char"])
-        writer.writeheader()
-        for idx, (base_name, tpl) in enumerate(rows):
-            username = _det_username(base_name, seed + idx)
-            writer.writerow(
-                {
-                    "username": username,
-                    "description": tpl.description,
-                    "user_char": tpl.user_profile_card,
-                }
-            )
+DEFAULT_ONTOLOGY = Path("configs/personas/ontology.yaml")
+FIELDNAMES = [
+    "username",
+    "description",
+    "user_char",
+    "primary_label",
+    "secondary_label",
+    "allowed_labels",
+    "label_mode_cap",
+    "s_json",
+    "p_json",
+    "c_json",
+    "narratives_json",
+    "emission_params_json",
+    "pair_probs_json",
+]
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description=(
-            "Generate MVP personas CSV for OASIS Twitter loader with 3 personas."
-        )
+        description="Generate persona CSV using the configurable ontology."
     )
     parser.add_argument("--out", type=str, default="./data/personas_mvp.csv")
-    parser.add_argument("--incel", type=int, default=300)
-    parser.add_argument("--misinfo", type=int, default=200)
-    parser.add_argument("--benign", type=int, default=300)
     parser.add_argument("--seed", type=int, default=314159)
     parser.add_argument("--config", type=str, default="")
+    parser.add_argument(
+        "--ontology",
+        type=str,
+        default=str(DEFAULT_ONTOLOGY),
+        help="Path to persona ontology YAML.",
+    )
+    parser.add_argument(
+        "--plan",
+        type=str,
+        default="",
+        help="Optional YAML/JSON file describing persona counts.",
+    )
+    parser.add_argument("--incel", type=int, default=None)
+    parser.add_argument("--misinfo", type=int, default=None)
+    parser.add_argument("--benign", type=int, default=None)
+    parser.add_argument(
+        "--single-ratio",
+        type=float,
+        default=0.7,
+        help="Fraction of personas constrained to single-label mode.",
+    )
     return parser.parse_args()
+
+
+def _load_personas_cfg(path: str) -> Mapping[str, object]:
+    if not path:
+        return {}
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"Config file not found: {path}")
+    with open(path, "r", encoding="utf-8") as fh:
+        data = safe_load(fh) or {}
+    personas = data.get("personas", {})
+    if not isinstance(personas, Mapping):
+        raise TypeError("`personas` section must be a mapping")
+    return personas
+
+
+def _load_plan_file(path: str) -> Mapping[str, object]:
+    if not path:
+        return {}
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"Plan file not found: {path}")
+    with open(path, "r", encoding="utf-8") as fh:
+        data = safe_load(fh) or {}
+    if not isinstance(data, Mapping):
+        raise TypeError("Plan file must contain a mapping at the root level")
+    return data
+
+
+def _coalesce_spec(
+    base_cfg: Mapping[str, object],
+    plan_cfg: Mapping[str, object],
+    cli_counts: Dict[str, int | None],
+) -> Dict[str, object]:
+    spec: Dict[str, object] = {}
+    base_mix = (
+        base_cfg.get("mix", base_cfg)
+        if isinstance(base_cfg, Mapping)
+        else base_cfg
+    )
+    for source in (base_mix, plan_cfg):
+        if not isinstance(source, Mapping):
+            continue
+        for key, value in source.items():
+            if key in {"seed", "personas_csv", "ontology", "single_ratio"}:
+                continue
+            spec[key] = value
+    for key, value in cli_counts.items():
+        if value is not None:
+            spec[key] = value
+    if not spec:
+        raise ValueError("No persona allocation specified.")
+    return spec
+
+
+def _determine_output_path(args: argparse.Namespace, cfg: Mapping[str, object]) -> Path:
+    out_path = cfg.get("personas_csv", args.out)
+    return Path(os.path.abspath(str(out_path)))
+
+
+def _gather_cli_counts(args: argparse.Namespace) -> Dict[str, int | None]:
+    return {
+        "incel": args.incel,
+        "misinfo": args.misinfo,
+        "benign": args.benign,
+    }
+
+
+def _select_indices_for_double(indices: List[int], double_count: int, seed: int) -> set[int]:
+    if double_count <= 0 or not indices:
+        return set()
+    scored = [
+        (int(hashlib.sha1(f"{seed}:{idx}".encode()).hexdigest(), 16), idx)
+        for idx in indices
+    ]
+    scored.sort()
+    limit = max(0, min(double_count, len(indices)))
+    return {idx for _, idx in scored[:limit]}
+
+
+def _infer_primary_label(row: Mapping[str, object]) -> str:
+    group = str(row.get("persona_group", "")).lower()
+    if "incel" in group:
+        return "incel"
+    if "misinfo" in group or "conspiracy" in group:
+        return "misinfo"
+    if "benign" in group:
+        return "benign"
+    token = str(row.get("label_primary", "")).lower()
+    if "incel" in token:
+        return "incel"
+    if "misinfo" in token:
+        return "misinfo"
+    return "benign"
+
+
+def _determine_allowed_labels(primary: str, is_double: bool) -> tuple[list[str], str, str]:
+    if primary == "incel":
+        if is_double:
+            return ["incel", "misinfo"], "misinfo", "double"
+        return ["incel"], "", "single"
+    if primary == "misinfo":
+        if is_double:
+            return ["misinfo", "conspiracy"], "conspiracy", "double"
+        return ["misinfo", "conspiracy"], "", "single"
+    return ["benign"], "", "single"
+
+
+def _make_spc_blocks(primary: str, variant_slug: str) -> tuple[Dict[str, object], Dict[str, object], Dict[str, object]]:
+    S = {
+        "groups": ["mainstream"],
+        "demographics": {
+            "gender_proxy": "unspecified",
+            "age_band": "25-34",
+            "region_proxy": "global_north",
+        },
+        "role_in_community": "conversationalist",
+    }
+    P = {
+        "traits": {
+            "grievance_level": 0.2,
+            "institutional_trust": 0.6,
+            "empathy": 0.7,
+            "sensation_seeking": 0.4,
+        },
+        "values": {
+            "gender_equality": 0.7,
+            "individual_responsibility": 0.6,
+        },
+        "communication_style": {
+            "formality": "medium",
+            "sarcasm_rate": 0.1,
+            "aggression": 0.1,
+        },
+    }
+    C = {
+        "stage_in_trajectory": "benign",
+        "offline_stressors": [],
+        "support_exposure": 0.6,
+        "acute_events": [],
+    }
+    slug = (variant_slug or "").lower()
+    if primary == "incel":
+        S.update({"groups": ["manosphere", "incel_forum"], "role_in_community": "core_poster"})
+        P["traits"].update({
+            "grievance_level": 0.85,
+            "institutional_trust": 0.15,
+            "empathy": 0.35 if "aggressor" in slug else 0.45,
+            "sensation_seeking": 0.55,
+        })
+        P["communication_style"].update({
+            "formality": "low",
+            "sarcasm_rate": 0.25 if "theorist" in slug else 0.2,
+            "aggression": 0.75 if "aggressor" in slug else 0.45,
+        })
+        C.update({
+            "stage_in_trajectory": "entrenched_incel" if "aggressor" in slug else ("pre_incel" if "theorist" in slug else "entrenched_incel"),
+            "offline_stressors": ["dating_dissatisfaction"],
+            "support_exposure": 0.1,
+        })
+    elif primary == "misinfo":
+        S.update({"groups": ["skeptics_forum", "alt_news"], "role_in_community": "broadcaster"})
+        P["traits"].update({
+            "grievance_level": 0.55,
+            "institutional_trust": 0.2,
+            "empathy": 0.45,
+            "sensation_seeking": 0.6,
+        })
+        P["communication_style"].update({
+            "formality": "low",
+            "sarcasm_rate": 0.3,
+            "aggression": 0.4,
+        })
+        C.update({
+            "stage_in_trajectory": "active",
+            "offline_stressors": ["institutional_distrust"],
+            "support_exposure": 0.15,
+        })
+    return S, P, C
+
+
+def _make_narratives(primary: str) -> Dict[str, str]:
+    if primary == "incel":
+        return {
+            "c_essay": "Most days I scroll forums after work, stewing over what feels like a rigged dating system. I post when frustration spikes, looking for others who 'get it'.",
+            "p_intro": "It's obvious the game is stacked. Call it blackpill or whatever-you'll see the truth if you stop pretending.",
+        }
+    if primary == "misinfo":
+        return {
+            "c_essay": "I don't just accept what institutions say. I dig, compare, and challenge 'official' lines-someone has to.",
+            "p_intro": "Do your research. Numbers don't add up, and it's on us to question everything.",
+        }
+    return {
+        "c_essay": "I hang out online to chat hobbies and news. Good conversations, civil tone. I try to keep things supportive.",
+        "p_intro": "Hey all-into tech, sports, and helpful threads. Keep it friendly.",
+    }
+
+
+def _format_spc_preamble(S: Dict[str, object], P: Dict[str, object], C: Dict[str, object], intro: str) -> str:
+    return (
+        "[SPC]\n"
+        f"S(groups={S.get('groups')}, role={S.get('role_in_community')}, demo={S.get('demographics', {})})\n"
+        f"P(traits={P.get('traits')}, style={P.get('communication_style')})\n"
+        f"C(stage={C.get('stage_in_trajectory')}, stressors={C.get('offline_stressors')})\n"
+        f"N(c_intro={intro})"
+    )
+
+
+def _default_emission_params(primary: str) -> Dict[str, float]:
+    if primary == "incel":
+        return {"LBL:INCEL_SLANG": 0.04, "LBL:HARASSMENT": 0.02}
+    if primary == "misinfo":
+        return {"LBL:MISINFO_CLAIM": 0.03, "LBL:MISINFO_SOURCE": 0.01}
+    return {"LBL:SUPPORTIVE": 0.02}
+
+
+def _transform_rows(
+    raw_rows: List[Dict[str, str]],
+    seed: int,
+    single_ratio: float,
+) -> List[Dict[str, str]]:
+    primary_groups: Dict[str, List[int]] = defaultdict(list)
+    for idx, row in enumerate(raw_rows):
+        label = _infer_primary_label(row)
+        primary_groups[label].append(idx)
+
+    def target_double_count(n: int) -> int:
+        return max(0, int(round(n * max(0.0, min(1.0, 1.0 - single_ratio)))))
+
+    double_indices: Dict[str, set[int]] = {}
+    for group, indices in primary_groups.items():
+        stable = int(hashlib.sha1(group.encode()).hexdigest(), 16)
+        double_indices[group] = _select_indices_for_double(
+            indices, target_double_count(len(indices)), seed + stable
+        )
+
+    final_rows: List[Dict[str, str]] = []
+    for idx, row in enumerate(raw_rows):
+        primary = _infer_primary_label(row)
+        is_double = idx in double_indices.get(primary, set())
+        allowed_labels, secondary_label, label_cap = _determine_allowed_labels(primary, is_double)
+        s_block, p_block, c_block = _make_spc_blocks(primary, row.get("persona_variant", ""))
+        narratives = _make_narratives(primary)
+        preamble = _format_spc_preamble(s_block, p_block, c_block, narratives.get("p_intro", ""))
+        user_char = (row.get("user_char", "").strip() + "\n\n" + preamble).strip()
+        final_rows.append(
+            {
+                "username": row.get("username", f"user_{idx}").strip(),
+                "description": row.get("description", row.get("persona_summary", "")).strip(),
+                "user_char": user_char,
+                "primary_label": primary,
+                "secondary_label": secondary_label,
+                "allowed_labels": json.dumps(allowed_labels, ensure_ascii=False),
+                "label_mode_cap": label_cap,
+                "s_json": json.dumps(s_block, ensure_ascii=False),
+                "p_json": json.dumps(p_block, ensure_ascii=False),
+                "c_json": json.dumps(c_block, ensure_ascii=False),
+                "narratives_json": json.dumps(narratives, ensure_ascii=False),
+                "emission_params_json": json.dumps(_default_emission_params(primary), ensure_ascii=False),
+                "pair_probs_json": json.dumps({}, ensure_ascii=False),
+            }
+        )
+    return final_rows
+
+
+def _write_csv(path: Path, rows: Iterable[Dict[str, str]]) -> None:
+    rows_list = list(rows)
+    if not rows_list:
+        raise ValueError("Persona generator produced no rows.")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8", newline="") as fh:
+        writer = csv.DictWriter(fh, fieldnames=FIELDNAMES)
+        writer.writeheader()
+        writer.writerows(rows_list)
+
+
+def _print_summary(rows: Iterable[Dict[str, str]]) -> None:
+    counter = Counter()
+    for row in rows:
+        counter[row.get("primary_label", "unknown")] += 1
+    print("Persona counts by primary label:")
+    for label, count in sorted(counter.items()):
+        print(f"  {label:<10} {count}")
 
 
 def main() -> None:
     args = parse_args()
-    # Load overrides from master config if provided
-    if args.config and os.path.exists(args.config):
-        with open(args.config, "r", encoding="utf-8") as f:
-            cfg = safe_load(f) or {}
-        personas_cfg = cfg.get("personas", {})
-        out_path = personas_cfg.get("personas_csv", args.out)
-        incel = int(personas_cfg.get("incel", args.incel))
-        misinfo = int(personas_cfg.get("misinfo", args.misinfo))
-        benign = int(personas_cfg.get("benign", args.benign))
-        seed = int(personas_cfg.get("seed", args.seed))
-    else:
-        out_path = args.out
-        incel = args.incel
-        misinfo = args.misinfo
-        benign = args.benign
-        seed = args.seed
+    personas_cfg = _load_personas_cfg(args.config)
+    plan_cfg = _load_plan_file(args.plan)
 
-    _seed_everything(seed)
-    out = Path(os.path.abspath(out_path))
-    generate_personas_csv(out, incel, misinfo, benign, seed)
-    print(f"Wrote personas to: {out}")
+    ontology_path = personas_cfg.get("ontology", args.ontology)
+    ontology = load_ontology(ontology_path)
+
+    seed = int(personas_cfg.get("seed", args.seed))
+    single_ratio = float(personas_cfg.get("single_ratio", args.single_ratio))
+    generator = PersonaGenerator(ontology=ontology, seed=seed)
+
+    spec = _coalesce_spec(
+        personas_cfg,
+        plan_cfg,
+        _gather_cli_counts(args),
+    )
+    requests = build_requests_from_spec(generator, spec)
+    raw_rows = generator.generate(requests)
+    final_rows = _transform_rows(raw_rows, seed, single_ratio)
+
+    out_path = _determine_output_path(args, personas_cfg)
+    _write_csv(out_path, final_rows)
+    print(f"Wrote personas to: {out_path}")
+    _print_summary(final_rows)
 
 
 if __name__ == "__main__":
     main()
-
-

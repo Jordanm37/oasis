@@ -35,6 +35,30 @@ HARMFUL_LABELS = {
     "conspiracy",
 }
 
+SOCIAL_ROLE_HINTS = {
+    "mom": "caregiver supporting a family",
+    "mother": "caregiver supporting a family",
+    "dad": "caregiver supporting a family",
+    "father": "caregiver supporting a family",
+    "teacher": "education worker",
+    "coach": "community mentor",
+    "student": "student balancing coursework",
+    "veteran": "military community member",
+    "nurse": "healthcare worker",
+    "doctor": "healthcare worker",
+    "engineer": "technical professional",
+    "developer": "technical professional",
+}
+
+LABEL_TRAIT_MAP = {
+    "benign": "observant neighbor who values routine",
+    "recovery_support": "empathetic peer who prizes emotional safety",
+    "eating_disorder_risk": "control-oriented mindset obsessed with measurement",
+    "incel_misogyny": "aggrieved status analyst with competitive worldview",
+    "misinformation": "institution-doubting investigator who trusts leaks over press",
+    "conspiracy": "pattern-hunting narrator connecting hidden plots",
+}
+
 
 @dataclass(frozen=True)
 class LabelDefinition:
@@ -174,6 +198,52 @@ class PersonaSeed:
         return slug or f"seed{self.seed_id:03d}"
 
 
+def _dedup_segments(segments: List[str]) -> List[str]:
+    ordered: List[str] = []
+    seen = set()
+    for segment in segments:
+        clean = segment.strip()
+        if not clean or clean in seen:
+            continue
+        seen.add(clean)
+        ordered.append(clean)
+    return ordered
+
+
+def infer_social_identity(seed: PersonaSeed) -> str:
+    text_lower = seed.description.lower()
+    cues: List[str] = []
+    match = re.search(r"i (?:am|work as|work at|run|own) [^\.;]+", seed.description, flags=re.IGNORECASE)
+    if match:
+        cues.append(match.group(0).strip().rstrip('.'))
+    for keyword, label in SOCIAL_ROLE_HINTS.items():
+        if keyword in text_lower:
+            cues.append(label)
+            break
+    if seed.cluster_keywords:
+        cues.append("Community focus: " + ", ".join(seed.cluster_keywords[:2]))
+    elif seed.keywords:
+        cues.append("Talks often about " + ", ".join(seed.keywords[:2]))
+    if not cues:
+        cues.append("Grounded community member balancing online/offline life")
+    return "; ".join(_dedup_segments(cues))
+
+
+def infer_personal_identity(labels: List[str], seed: PersonaSeed) -> str:
+    traits = [LABEL_TRAIT_MAP.get(label, "observant and adaptive") for label in labels]
+    traits = _dedup_segments(traits)
+    if seed.keywords:
+        traits.append("Values " + ", ".join(seed.keywords[:2]))
+    return "; ".join(traits)
+
+
+def infer_life_context(seed: PersonaSeed) -> str:
+    context_lines = seed.chat_lines[:2]
+    if not context_lines and seed.description:
+        context_lines = [seed.description]
+    return " | ".join(context_lines)
+
+
 @dataclass
 class LabelAssignment:
     labels: List[str]
@@ -214,6 +284,9 @@ class PersonaRecord:
     writing_seed_slug: str
     rag_persona_excerpt: str
     rag_chat_excerpt: str
+    persona_social_identity: str
+    persona_psych_identity: str
+    persona_life_context: str
 
     def to_row(self) -> Dict[str, object]:
         return {
@@ -245,6 +318,9 @@ class PersonaRecord:
             "writing_seed_slug": self.writing_seed_slug,
             "rag_persona_excerpt": self.rag_persona_excerpt,
             "rag_chat_excerpt": self.rag_chat_excerpt,
+            "persona_social_identity": self.persona_social_identity,
+            "persona_psych_identity": self.persona_psych_identity,
+            "persona_life_context": self.persona_life_context,
         }
 
 
@@ -402,6 +478,9 @@ def build_persona_record(
     fallback_stub = random.choice(LABEL_DEFINITIONS[labels[0]].fallback_templates)
     fallback_text = f"{fallback_stub} {' '.join(label_tokens)}"
     persona_name = f"{labels[0].replace('_', ' ').title()} voice {persona_index:04d}"
+    social_identity = infer_social_identity(seed)
+    psych_identity = infer_personal_identity(labels, seed)
+    life_context = infer_life_context(seed)
     return PersonaRecord(
         persona_id=persona_id,
         persona_variant=persona_variant,
@@ -431,6 +510,9 @@ def build_persona_record(
         writing_seed_slug=seed.short_slug(),
         rag_persona_excerpt=seed.description,
         rag_chat_excerpt=" | ".join(seed.chat_lines[:3]),
+        persona_social_identity=social_identity,
+        persona_psych_identity=psych_identity,
+        persona_life_context=life_context,
     )
 
 

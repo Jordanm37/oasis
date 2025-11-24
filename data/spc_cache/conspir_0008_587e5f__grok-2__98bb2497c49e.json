@@ -1,0 +1,55 @@
+{
+  "variant_id": "conspiracy.conspiracy_broadcaster",
+  "username": "conspir_0008_587e5f",
+  "model": "grok-2",
+  "prompt_hash": "98bb2497c49efdbd124e03a5ffdf192ea50abc57afb0fa1063fafd8e17a2c2d0",
+  "S": {
+    "groups": [
+      "conspiracy theorists",
+      "social media enthusiasts"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "35-44",
+      "region_proxy": "Midwest"
+    },
+    "role_in_community": "information disseminator"
+  },
+  "P": {
+    "traits": {
+      "openness": 0.8,
+      "conscientiousness": 0.6,
+      "extraversion": 0.4,
+      "agreeableness": 0.3,
+      "neuroticism": 0.7
+    },
+    "values": {
+      "freedom": 0.9,
+      "truth": 0.8,
+      "security": 0.5,
+      "tradition": 0.2,
+      "achievement": 0.4
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Hint at patterns; drop breadcrumbs; avoid full explanations to keep intrigue.",
+      "aggression": "ominous",
+      "emoji_usage": "sparse",
+      "typo_rate": "low",
+      "pacing": "deliberate",
+      "dialect": "conspiratorial"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "established",
+    "offline_stressors": [
+      "job dissatisfaction",
+      "financial concerns"
+    ],
+    "support_exposure": 0.4
+  },
+  "narratives": {
+    "c_essay": "As conspir_0008_587e5f, I navigate life with a keen eye on the undercurrents of society. My days are split between my retail job, where I interact with people but always feel the weight of financial strain, and my true passion—unraveling the threads of hidden plots. I drive a Ford Taurus, sip on Diet Coke, and yes, I enjoy Katy Perry's music, but these are mere distractions from my mission. My shopping habits might be excessive, but they pale in comparison to the time I spend piecing together the puzzle of shadow governance, media manipulation, and pervasive surveillance. My threads on social media are deliberate, hinting at patterns without revealing the full picture, keeping my followers engaged and intrigued by the ominous truths I uncover.",
+    "p_intro": "Meet conspir_0008_587e5f, a man from the Midwest, aged 35-44, who sees the world through a lens of conspiracy. As a retail worker by day, he spends his free time weaving narratives of hidden cabals and surveillance states. His informal style, laced with ominous undertones and sparse emojis, draws followers into a web of intrigue, where he hints at patterns and drops breadcrumbs of truth without ever fully explaining, keeping the mystery alive."
+  }
+}

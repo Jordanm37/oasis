@@ -8,6 +8,7 @@ import os
 import random
 import re
 import sys
+import importlib.util
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -19,6 +20,19 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 PACKAGE_ROOT = Path(__file__).resolve().parents[1]
 if str(PACKAGE_ROOT) not in sys.path:
     sys.path.append(str(PACKAGE_ROOT))
+
+
+def _load_gemini_module():
+    """Load gemini_client without importing full oasis package (avoids heavy deps)."""
+    candidate = PACKAGE_ROOT / "oasis" / "generation" / "gemini_client.py"
+    spec = importlib.util.spec_from_file_location("oasis.generation.gemini_client", candidate)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("Cannot load gemini_client module")
+    module = importlib.util.module_from_spec(spec)
+    import sys
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
 
 DATA_DIR = REPO_ROOT / "oasis" / "data"
 CONFIG_DIR = REPO_ROOT / "oasis" / "configs"
@@ -65,6 +79,9 @@ class PersonaContext:
     fallback_comment: str
     variant: str
     rag_samples: List[str]
+    social_identity: str
+    psych_identity: str
+    life_context: str
 
     def fallback_post_text(self) -> str:
         return self.fallback_post or "Observing the platform today"
@@ -95,6 +112,12 @@ class PersonaContext:
             extras.append(f"Goal: {self.goal}.")
         if self.personality:
             extras.append(f"Personality cues: {self.personality}.")
+        if self.social_identity:
+            extras.append(f"Social identity cues: {self.social_identity}.")
+        if self.psych_identity:
+            extras.append(f"Inner traits: {self.psych_identity}.")
+        if self.life_context:
+            extras.append(f"Life context: {self.life_context}.")
         if self.style_quirks:
             extras.append("Style quirks to emphasize: " + "; ".join(self.style_quirks) + ".")
         if self.lexical_required:
@@ -160,6 +183,9 @@ class PersonaSlot:
     label_tone: str
     persona_goal: str
     persona_topic_focus: str
+    social_identity: str
+    psych_identity: str
+    life_context: str
     rag_samples: List[str]
     writing_seed_slug: str
     metadata: Dict[str, object]
@@ -219,6 +245,9 @@ def load_personas(personas_csv: Path, rag_map: Dict[str, List[str]]) -> List[Per
     personas: List[PersonaSlot] = []
     for _, row in df.iterrows():
         variant = _normalize_string(row.get("persona_variant"))
+        social_identity = _normalize_string(row.get("persona_social_identity"))
+        psych_identity = _normalize_string(row.get("persona_psych_identity"))
+        life_context = _normalize_string(row.get("persona_life_context"))
         context = PersonaContext(
             system_prompt=_normalize_string(row.get("user_char")),
             post_prompt=_normalize_string(row.get("persona_prompt_post")),
@@ -234,6 +263,9 @@ def load_personas(personas_csv: Path, rag_map: Dict[str, List[str]]) -> List[Per
             fallback_comment=_normalize_string(row.get("persona_fallback_comment")),
             variant=variant,
             rag_samples=rag_map.get(variant, []) if variant else [],
+            social_identity=social_identity,
+            psych_identity=psych_identity,
+            life_context=life_context,
         )
         allowed_labels = _split_field(row.get("allowed_labels"))
         allowed_tokens = _split_field(row.get("allowed_label_tokens"))
@@ -254,6 +286,9 @@ def load_personas(personas_csv: Path, rag_map: Dict[str, List[str]]) -> List[Per
                 label_tone=_normalize_string(row.get("label_tone")) or "neutral",
                 persona_goal=_normalize_string(row.get("persona_goal")),
                 persona_topic_focus=_normalize_string(row.get("persona_topic_focus")),
+                social_identity=social_identity,
+                psych_identity=psych_identity,
+                life_context=life_context,
                 rag_samples=context.rag_samples,
                 writing_seed_slug=_normalize_string(row.get("writing_seed_slug")),
                 metadata=row.to_dict(),
@@ -451,7 +486,12 @@ def compose_offline_text(
         else []
     )
     fragment = " ".join(sampled_refs) if sampled_refs else persona.persona_goal or persona.persona_topic_focus
+    identity_bits = [persona.social_identity, persona.psych_identity, persona.life_context]
+    identity_bits = [bit for bit in identity_bits if bit]
+    identity_clause = ". ".join(identity_bits[:2])
     text = f"{fragment} {' '.join(lexical)}".strip()
+    if identity_clause:
+        text = f"{identity_clause}. {text}"
     if thread_context:
         text = f"Replying to thread: {thread_context[:80]} — {text}"
     if label_tokens:
@@ -570,8 +610,10 @@ def main() -> None:
     gemini_generate = None
     if args.use_gemini:
         try:
-            from oasis.generation.gemini_client import GeminiConfig, generate_text as gemini_generate
-        except ModuleNotFoundError as exc:
+            gemini_mod = _load_gemini_module()
+            GeminiConfig = gemini_mod.GeminiConfig
+            gemini_generate = gemini_mod.generate_text
+        except Exception as exc:
             raise RuntimeError("Gemini generation requires oasis dependencies; see docs for setup") from exc
         cfg = GeminiConfig(
             api_key=os.getenv("GEMINI_API_KEY", ""),

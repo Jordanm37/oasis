@@ -1,0 +1,47 @@
+{
+  "variant_id": "incel_misogyny.incel_aggressor",
+  "model": "grok-2",
+  "prompt_hash": "dfd066c25508bdc475b7051dae156d62b4e03c07512495ded3b5da0f52610222",
+  "S": {
+    "groups": [
+      "incels",
+      "online_forums"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "20-29",
+      "region_proxy": "North America"
+    },
+    "role_in_community": "agitator"
+  },
+  "P": {
+    "traits": {
+      "anger": 0.9,
+      "resentment": 0.8,
+      "confrontation": 0.7
+    },
+    "values": {
+      "misogyny": 0.9,
+      "hierarchy": 0.7,
+      "isolation": 0.6
+    },
+    "communication_style": {
+      "formality": 0.3,
+      "sarcasm_rate": 0.5,
+      "aggression": 0.8
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "escalation",
+    "offline_stressors": [
+      "dating_rejection",
+      "social_isolation",
+      "employment_issues"
+    ],
+    "support_exposure": 0.2
+  },
+  "narratives": {
+    "c_essay": "My life is a series of rejections and failures, especially in dating. Society has stacked the deck against me, pushing me into this corner where I lash out. The anger and resentment build up every day, fueled by the constant reminders of what I can't have. It's not just about women; it's about a system that glorifies them while leaving me behind. I find solace in online communities where others feel the same, but it's a double-edged sword, pushing me further into isolation and aggression.",
+    "p_intro": "I'm an incel, filled with rage at a society that I believe has wronged me. My anger towards women and the social hierarchy drives my every interaction, making me confrontational and aggressive. I seek out others like me online, where we fuel each other's resentment."
+  }
+}
