@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Optional
 from camel.models import BaseModelBackend
 
 from generation.emission_policy import EmissionPolicy, PersonaConfig
+from generation.labeler import DEFAULT_TOKEN_TO_CATEGORIES, set_token_category_map
 from generation.extended_agent import ExtendedSocialAgent
 from oasis.social_agent.agent_graph import AgentGraph
 from oasis.social_platform.channel import Channel
@@ -29,6 +30,18 @@ def _infer_primary_label(username: str) -> str:
     return "benign"
 
 
+def _load_json_field(raw: Optional[str]) -> Optional[Dict[str, Any]]:
+    if not raw:
+        return None
+    try:
+        parsed = json.loads(raw)
+        if isinstance(parsed, dict):
+            return parsed
+    except Exception:
+        return None
+    return None
+
+
 async def build_agent_graph_from_csv(
     personas_csv: Path,
     model: BaseModelBackend,
@@ -46,6 +59,9 @@ async def build_agent_graph_from_csv(
     secondary_label (optional), allowed_labels (JSON list), label_mode_cap
     """
     graph = AgentGraph()
+    token_category_map: Dict[str, List[str]] = {
+        token: cats[:] for token, cats in DEFAULT_TOKEN_TO_CATEGORIES.items()
+    }
     with personas_csv.open("r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         rows = list(reader)
@@ -102,28 +118,23 @@ async def build_agent_graph_from_csv(
             except Exception:
                 harm_priors = None
 
-        # Optional new persona fields (style/behavior) for prompt construction
-        # Expected as JSON strings in the CSV
-        style_raw = row.get("style_json")
-        behavior_raw = row.get("behavior_json")
-        
-        style = {}
-        if style_raw:
+        # Optional new persona metadata
+        prompt_metadata = _load_json_field(row.get("prompt_metadata_json"))
+        lexicon_samples = _load_json_field(row.get("lexicon_samples_json"))
+        style_variation = _load_json_field(row.get("style_variation_json"))
+        allowed_label_tokens = None
+        tokens_raw = row.get("allowed_label_tokens_json")
+        if tokens_raw:
              try:
-                 style = json.loads(style_raw)
+                parsed_tokens = json.loads(tokens_raw)
+                if isinstance(parsed_tokens, dict):
+                    allowed_label_tokens = {
+                        str(label): [str(tok) for tok in tokens]
+                        for label, tokens in parsed_tokens.items()
+                        if isinstance(tokens, list)
+                    }
              except Exception:
-                 pass
-                 
-        behavior = {}
-        if behavior_raw:
-             try:
-                 behavior = json.loads(behavior_raw)
-             except Exception:
-                 pass
-
-        # Pass these into PersonaConfig if it supports them, or just keep them for prompt injection.
-        # Assuming PersonaConfig has been updated to support them or we attach them to extended agent.
-        # For now, we can attach them to user_info.profile['other_info'] to make them available to the agent.
+                allowed_label_tokens = None
 
         persona_cfg = PersonaConfig(
             persona_id=f"{primary}_{idx:04d}",
@@ -134,12 +145,17 @@ async def build_agent_graph_from_csv(
             max_labels_per_post=2,
             emission_probs=emission_params,
             pair_probs=pair_probs,
+            allowed_label_tokens=allowed_label_tokens,
+            prompt_metadata=prompt_metadata,
+            lexicon_samples=lexicon_samples,
+            style_variation=style_variation,
         )
 
         user_profile_data = {
             "user_profile": user_char,
-            "persona_style": style,
-            "persona_behavior": behavior
+            "prompt_metadata": prompt_metadata or {},
+            "lexicon_samples": lexicon_samples or {},
+            "style_variation": style_variation or {},
         }
 
         user_info = UserInfo(
@@ -164,6 +180,15 @@ async def build_agent_graph_from_csv(
             **extended_kwargs,
         )
         graph.add_agent(agent)
+        # Merge token map
+        if allowed_label_tokens:
+            for label, tokens in allowed_label_tokens.items():
+                for token in tokens:
+                    bucket = token_category_map.setdefault(token, [])
+                    if label not in bucket:
+                        bucket.append(label)
+
+    set_token_category_map(token_category_map)
     return graph
 
 

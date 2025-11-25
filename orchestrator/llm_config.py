@@ -33,11 +33,13 @@ class LLMConfig:
 
 
 # Single source of truth for defaults used across the codebase
+# Note: max_tokens reduced to 4096 for broader Groq model compatibility
+# (some models like qwen3-32b and llama-4-maverick have 8192 max)
 _DEFAULTS = LLMConfig(
     # Tokens
-    xai_max_tokens=8912,
-    openai_max_tokens=8912,
-    gemini_max_output_tokens=8912,
+    xai_max_tokens=4096,
+    openai_max_tokens=4096,
+    gemini_max_output_tokens=4096,
     est_prompt_tokens=12000,
     # Iterations
     max_step_iterations=1,
