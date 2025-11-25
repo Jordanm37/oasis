@@ -349,6 +349,99 @@ To discover how to create profiles for large-scale users, as well as how to visu
   <img src="assets/tutorial.png" alt="Tutorial Overview">
 </div>
 
+## 🧬 Persona Pipeline & Production CLI
+
+The ontology-driven workflow pairs a grounded persona generator with the PettingZoo-style runner. All commands below assume `poetry install` has been executed.
+
+### 1. Generate Ontology Personas
+
+```bash
+poetry run python3 scripts/generate_personas_llm.py \
+  --ontology configs/personas/ontology_unified.yaml \
+  --personality-csv data/personality.csv \
+  --style-indicators configs/style_indicators.yaml \
+  --mode rag \
+  --seed 2025 \
+  --out ./data/personas_primary.csv \
+  --benign 80 --recovery 60 --ed-risk 40 --pro-ana 40 \
+  --incel 60 --alpha 40 --misinfo 60 --conspiracy 40 \
+  --trad 40 --gamergate 40 --extremist 20 --hate 20 --bully 20 | cat
+```
+
+What you get:
+- LLM-synthesized `user_char` blocks grounded in real PersonaChat seeds.
+- Rich metadata columns (`prompt_metadata_json`, `lexicon_samples_json`, `style_variation_json`, `style_indicators_json`) that capture the sampled vocabulary, style knobs, and tone fingerprint for each persona.
+- Deterministic sampling via `--seed`, so the same counts + seed reproduce identical personas.
+
+Helpful flags:
+- `--mode rag|llm_only|legacy` controls whether PersonaChat retrieval is used.
+- `--style-indicators` selects the indicator pools (`configs/style_indicators.yaml`) that get folded directly into the `[Style]` section of each persona card.
+- `--seed-pool` lets you point at alternative seed corpora.
+
+### 2. Run Production Simulation
+
+Feed the generated CSV into the production runner. It validates counts, loads the ontology lexicon map, wires in the interceptor channel, scheduler, and optional RAG imputer, then produces a SQLite DB plus sidecar logs.
+
+```bash
+poetry run python3 scripts/run_production_sim.py \
+  --manifest ./configs/production/manifest_mvp.yaml \
+  --personas-csv ./data/personas_primary.csv \
+  --db ./data/runs/prod.db \
+  --steps 12 \
+  --warmup-steps 2 \
+  --rag-imputer background \
+  --edges-csv ./data/follows/prod_edges.csv | cat
+```
+
+Key CLI options:
+- `--rag-imputer off|background|sync` toggles the asynchronous text imputer that uses the same ontology lexicons to fill in `<LBL:...>` placeholders.
+- `--fresh-db` deletes an existing DB before running. `--unique-db` keeps historical runs by timestamping the filename.
+- `--report` (plus `--report-*` overrides) calls `scripts/report_production.py` afterward to emit JSONL + HTML exports.
+
+#### RAG Text Imputation Cheat Sheet
+
+The background imputer runs in lockstep with `run_production_sim.py` so every new post/comment can have its `<LBL:...>` tokens replaced deterministically.
+
+1. **Configure the LLM client**
+   - Edit `configs/llm_settings.py` and set the `IMPUTATION_*` knobs (`IMPUTATION_PROVIDER`, `IMPUTATION_MODEL`, `IMPUTATION_TEMPERATURE`, `IMPUTATION_MAX_TOKENS`).
+   - Providers supported today: `xai`, `openai`, `gemini`, `groq`. Each reads its API key from the matching env var (e.g., `XAI_API_KEY`, `GROQ_API_KEY`).
+
+2. **Choose an imputer mode when launching the sim**
+   - `--rag-imputer off` disables rewriting.
+   - `--rag-imputer background` (default) streams new posts into a worker pool while the sim continues.
+   - `--rag-imputer sync` waits after each step until all placeholders are rewritten—useful for deterministic debugging.
+   - Override concurrency with `--rag-workers` and queue depth with `--rag-batch-size` (defaults come from `RAG_IMPUTER_MAX_WORKERS` / `RAG_IMPUTER_BATCH_SIZE` in the config).
+
+3. **What it writes**
+   - `post.text_rag_imputed` / `comment.text_rag_imputed` in the SQLite DB.
+   - Fallbacks (static bank) are logged automatically if the LLM call fails. The provenance column in the JSONL export reads `imputer:rag-llm`, `imputer:skip`, or `imputer:v0-mvp`.
+
+4. **Manual re-run (optional)**
+   - After the sim you can re-run the standalone script to re-impute everything with a new model:
+     ```bash
+     poetry run python3 scripts/rag_impute_db.py \
+       --db ./data/runs/prod.db \
+       --bank ./data/label_tokens_static_bank.yaml | cat
+     ```
+
+5. **Inspecting the output**
+   - Build the dataset (see Step 3) — the exporter automatically uses `text_rag_imputed` when present, so the JSONL file reflects the final LLM text.
+   - Spot check the DB:
+     ```sql
+     SELECT content, text_rag_imputed FROM post LIMIT 5;
+     ```
+
+With these switches you can rehearse the exact same simulation against different providers (Gemini, Groq, xAI, etc.) simply by editing the `IMPUTATION_*` block or passing the CLI overrides.
+
+Artifacts produced:
+- `prod.db` — platform state (posts, comments, follows).
+- `sidecar.jsonl` — per-step record of expected/detected tokens, label assignment, scheduler feedback.
+- Optional report bundle under `./data/runs/prod/production_*`.
+
+### 3. Iterate
+
+Update ontology mixes, regenerate personas, rerun the simulation, and compare runs. Because both scripts respect deterministic RNG seeds, CI pipelines can snapshot CSVs/DBs for regression tests.
+
 ## 🧪 MVP: "Needle in the Hashtag" Dataset Generation
 
 Use this minimal pipeline to generate a small synthetic dataset with agents emitting inline label tokens like `<LBL:INCEL_SLANG>`, `<LBL:MISINFO_CLAIM>`, and `<LBL:SUPPORTIVE>`, powered by Gemini 2.5 Flash‑Lite.

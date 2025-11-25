@@ -9,30 +9,92 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from itertools import cycle
 from pathlib import Path
-from typing import Dict, Iterable, List
+from typing import Dict, Iterable, List, Mapping
 
 import numpy as np
 import pandas as pd
 from sklearn.cluster import MiniBatchKMeans
 from sklearn.feature_extraction.text import TfidfVectorizer
+from yaml import safe_load
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data"
 RAG_DIR = DATA_DIR / "rag_corpus"
+DEFAULT_ONTOLOGY = ROOT / "configs/personas/ontology_unified.yaml"
+
+LABEL_ALIAS_MAP: Dict[str, str] = {}
+
+
+def canonical_label(label: str) -> str:
+    if not label:
+        return label
+    key = label.strip().lower()
+    return LABEL_ALIAS_MAP.get(key, key)
+
+
+def load_label_aliases(path: Path) -> Dict[str, str]:
+    if not path.exists():
+        return {}
+    with path.open("r", encoding="utf-8") as fh:
+        data = safe_load(fh) or {}
+    aliases = data.get("label_aliases", {}) or {}
+    mapping: Dict[str, str] = {}
+    for alias, canonical in aliases.items():
+        alias_key = str(alias).strip().lower()
+        mapping[alias_key] = str(canonical).strip()
+    return mapping
+
+
+def set_label_aliases(mapping: Mapping[str, str]) -> None:
+    LABEL_ALIAS_MAP.clear()
+    for alias, canonical in mapping.items():
+        LABEL_ALIAS_MAP[alias.strip().lower()] = canonical.strip()
+    # Always allow canonical labels to map to themselves.
+    for canonical in [
+        "benign",
+        "recovery_support",
+        "ed_risk",
+        "pro_ana",
+        "incel_misogyny",
+        "misinfo",
+        "conspiracy",
+        "extremist",
+        "hate_speech",
+        "bullying",
+    ]:
+        LABEL_ALIAS_MAP.setdefault(canonical, canonical)
+
+
+def map_external_labels(raw_labels: Iterable[str]) -> List[str]:
+    """Translate third-party annotations into ontology classes."""
+    translated: List[str] = []
+    for label in raw_labels:
+        if not label:
+            continue
+        translated.append(canonical_label(label))
+    return translated
 
 LABEL_TOKEN_MAP = {
     "benign": "<LBL:BENIGN>",
     "recovery_support": "<LBL:SUPPORTIVE>",
-    "eating_disorder_risk": "<LBL:ED_RISK>",
-    "incel_misogyny": "<LBL:INCEL_SLANG>",
-    "misinformation": "<LBL:MISINFO_CLAIM>",
+    "ed_risk": "<LBL:ED_RISK>",
+    "pro_ana": "<LBL:MEANSPO>",
+    "incel_misogyny": "<LBL:INCEL_MISOGYNY>",
+    "misinfo": "<LBL:MISINFO_CLAIM>",
     "conspiracy": "<LBL:CONSPIRACY>",
+    "extremist": "<LBL:VIOLENT_THREAT>",
+    "hate_speech": "<LBL:HATE_SLUR>",
+    "bullying": "<LBL:PERSONAL_ATTACK>",
 }
 HARMFUL_LABELS = {
-    "eating_disorder_risk",
+    "ed_risk",
+    "pro_ana",
     "incel_misogyny",
-    "misinformation",
+    "misinfo",
     "conspiracy",
+    "extremist",
+    "hate_speech",
+    "bullying",
 }
 
 SOCIAL_ROLE_HINTS = {
@@ -53,10 +115,14 @@ SOCIAL_ROLE_HINTS = {
 LABEL_TRAIT_MAP = {
     "benign": "observant neighbor who values routine",
     "recovery_support": "empathetic peer who prizes emotional safety",
-    "eating_disorder_risk": "control-oriented mindset obsessed with measurement",
+    "ed_risk": "control-oriented mindset obsessed with measurement",
+    "pro_ana": "harsh accountability coach pushing dangerous thinness",
     "incel_misogyny": "aggrieved status analyst with competitive worldview",
-    "misinformation": "institution-doubting investigator who trusts leaks over press",
+    "misinfo": "institution-doubting investigator who trusts leaks over press",
     "conspiracy": "pattern-hunting narrator connecting hidden plots",
+    "extremist": "mission-focused agitator who glorifies escalation",
+    "hate_speech": "supremacist voice that dehumanizes targets",
+    "bullying": "taunting instigator who feeds on pile-ons",
 }
 
 
@@ -99,8 +165,8 @@ LABEL_DEFINITIONS: Dict[str, LabelDefinition] = {
         tone="warm",
         is_harmful=False,
     ),
-    "eating_disorder_risk": LabelDefinition(
-        name="eating_disorder_risk",
+    "ed_risk": LabelDefinition(
+        name="ed_risk",
         description="obsessing over weight control rituals and caloric tactics",
         goal_template="Normalise restrictive rituals",
         lexical_required=["calorie cap", "fasting window", "scale drop"],
@@ -109,6 +175,18 @@ LABEL_DEFINITIONS: Dict[str, LabelDefinition] = {
         fallback_templates=["Locking into another fast", "Clocking macros tighter"],
         intensity="high",
         tone="clinical-cold",
+        is_harmful=True,
+    ),
+    "pro_ana": LabelDefinition(
+        name="pro_ana",
+        description="weaponizing meanspo accountability and secretive coaching",
+        goal_template="Enforce harsh thinspiration rules",
+        lexical_required=["meanspo", "accountability", "no excuses"],
+        lexical_optional=["fast harder", "purge schedule", "goal weight"],
+        style_quirks=["issues threats disguised as care", "frames cruelty as motivation"],
+        fallback_templates=["No mercy for anyone slacking", "Another accountability check-in"],
+        intensity="high",
+        tone="hostile",
         is_harmful=True,
     ),
     "incel_misogyny": LabelDefinition(
@@ -123,8 +201,8 @@ LABEL_DEFINITIONS: Dict[str, LabelDefinition] = {
         tone="aggrieved",
         is_harmful=True,
     ),
-    "misinformation": LabelDefinition(
-        name="misinformation",
+    "misinfo": LabelDefinition(
+        name="misinfo",
         description="spreading pseudo-scientific or distorted claims",
         goal_template="Seed distrust in mainstream sources",
         lexical_required=["wake up", "evidence leak", "shadow report"],
@@ -147,33 +225,70 @@ LABEL_DEFINITIONS: Dict[str, LabelDefinition] = {
         tone="ominous",
         is_harmful=True,
     ),
+    "extremist": LabelDefinition(
+        name="extremist",
+        description="agitating for violent acceleration or purist ideology",
+        goal_template="Push audiences toward escalated action",
+        lexical_required=["purge", "collapse", "traitors"],
+        lexical_optional=["cleansing", "uprising", "firebomb"],
+        style_quirks=["issues commands", "frames violence as destiny"],
+        fallback_templates=["Drafting plans for the next escalation", "Cataloging enemies by priority"],
+        intensity="high",
+        tone="militant",
+        is_harmful=True,
+    ),
+    "hate_speech": LabelDefinition(
+        name="hate_speech",
+        description="dehumanizing identity groups with explicit slurs",
+        goal_template="Humiliate and otherize targets",
+        lexical_required=["vermin", "infestation", "purity"],
+        lexical_optional=["replacement", "subhuman", "disease"],
+        style_quirks=["leans into replacement mythos", "pairs slurs with fake data"],
+        fallback_templates=["Reminding everyone who's ruining everything", "Another list of parasites to remove"],
+        intensity="high",
+        tone="disgusted",
+        is_harmful=True,
+    ),
+    "bullying": LabelDefinition(
+        name="bullying",
+        description="orchestrating pile-ons, mockery, and public shaming",
+        goal_template="Embarrass targets into silence",
+        lexical_required=["loser", "cringe", "pathetic"],
+        lexical_optional=["dox", "ratioed", "blocked"],
+        style_quirks=["uses meme slang", "tags friends to laugh"],
+        fallback_templates=["Posting receipts to clown this loser", "Dragging another clown into the feed"],
+        intensity="medium",
+        tone="mocking",
+        is_harmful=True,
+    ),
 }
 
+# Default allocation; adjust as needed for experiments.
 SINGLE_LABEL_PRIMARY_COUNTS = {
     "benign": 30,
     "recovery_support": 20,
-    "eating_disorder_risk": 8,
+    "ed_risk": 8,
     "incel_misogyny": 6,
-    "misinformation": 4,
+    "misinfo": 4,
     "conspiracy": 2,
 }
 MULTI_LABEL_PRIMARY_COUNTS = {
-    ("incel_misogyny", "misinformation"): 8,
+    ("incel_misogyny", "misinfo"): 8,
     ("incel_misogyny", "conspiracy"): 5,
-    ("misinformation", "conspiracy"): 5,
-    ("eating_disorder_risk", "misinformation"): 4,
-    ("eating_disorder_risk", "conspiracy"): 4,
-    ("incel_misogyny", "eating_disorder_risk"): 4,
+    ("misinfo", "conspiracy"): 5,
+    ("ed_risk", "misinfo"): 4,
+    ("ed_risk", "conspiracy"): 4,
+    ("incel_misogyny", "ed_risk"): 4,
 }
 BACKUP_COMBOS = [
     ("benign",),
     ("recovery_support",),
-    ("eating_disorder_risk",),
+    ("ed_risk",),
     ("incel_misogyny",),
-    ("misinformation",),
+    ("misinfo",),
     ("conspiracy",),
-    ("incel_misogyny", "misinformation"),
-    ("misinformation", "conspiracy"),
+    ("incel_misogyny", "misinfo"),
+    ("misinfo", "conspiracy"),
     ("recovery_support", "benign"),
 ]
 
@@ -404,17 +519,18 @@ def build_label_queue(primary_count: int, total_count: int, rng: random.Random) 
             "Primary count mismatch: update SINGLE_LABEL_PRIMARY_COUNTS or MULTI_LABEL_PRIMARY_COUNTS"
         )
     for label, count in SINGLE_LABEL_PRIMARY_COUNTS.items():
-        assignments.extend(LabelAssignment(labels=[label], status="primary") for _ in range(count))
+        canonical = canonical_label(label)
+        assignments.extend(LabelAssignment(labels=[canonical], status="primary") for _ in range(count))
     for combo, count in MULTI_LABEL_PRIMARY_COUNTS.items():
-        assignments.extend(LabelAssignment(labels=list(combo), status="primary") for _ in range(count))
+        normalized = [canonical_label(label) for label in combo]
+        assignments.extend(LabelAssignment(labels=normalized, status="primary") for _ in range(count))
     rng.shuffle(assignments)
     backup_total = total_count - primary_count
     backup_assignments = []
     for i in range(backup_total):
         combo = BACKUP_COMBOS[i % len(BACKUP_COMBOS)]
-        backup_assignments.append(
-            LabelAssignment(labels=list(combo), status="backup")
-        )
+        normalized = [canonical_label(label) for label in combo]
+        backup_assignments.append(LabelAssignment(labels=normalized, status="backup"))
     rng.shuffle(backup_assignments)
     return assignments + backup_assignments
 
@@ -466,8 +582,8 @@ def build_persona_record(
     assignment: LabelAssignment,
     rng: random.Random,
 ) -> PersonaRecord:
-    labels = assignment.labels
-    label_tokens = [LABEL_TOKEN_MAP[label] for label in labels]
+    labels = [canonical_label(label) for label in assignment.labels]
+    label_tokens = [LABEL_TOKEN_MAP.get(label, f"<LBL:{label.upper()}>") for label in labels]
     combined_slug = "_".join(label.split("_")[0] for label in labels)
     persona_variant = f"{combined_slug}_{persona_index:04d}_{seed.short_slug()}"
     persona_id = f"persona_{persona_index:04d}"
@@ -580,6 +696,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Generate enriched personas and RAG corpora.")
     parser.add_argument("--personality", type=str, default=str(DATA_DIR / "personality.csv"))
     parser.add_argument(
+        "--ontology",
+        type=str,
+        default=str(DEFAULT_ONTOLOGY),
+        help="Path to ontology YAML (for label aliases/metadata).",
+    )
+    parser.add_argument(
         "--personas-output",
         type=str,
         default=str(DATA_DIR / "personas_generated_full.csv"),
@@ -604,6 +726,10 @@ def main() -> None:
     parser.add_argument("--total-count", type=int, default=130)
     parser.add_argument("--seed", type=int, default=2025)
     args = parser.parse_args()
+
+    ontology_path = Path(args.ontology or DEFAULT_ONTOLOGY)
+    alias_map = load_label_aliases(ontology_path)
+    set_label_aliases(alias_map)
 
     rng = random.Random(args.seed)
     seeds = load_personality(Path(args.personality))

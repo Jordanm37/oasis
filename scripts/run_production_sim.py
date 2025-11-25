@@ -10,6 +10,7 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 
 from dotenv import load_dotenv
 
@@ -19,38 +20,66 @@ from camel.models import BaseModelBackend
 from camel.types import ModelType
 
 import oasis
+from configs.llm_settings import (API_ENDPOINTS, API_KEY_ENV_VARS, AUTO_REPORT,
+                                  IMPUTATION_MAX_TOKENS, IMPUTATION_MODEL,
+                                  IMPUTATION_PROVIDER, IMPUTATION_TEMPERATURE,
+                                  RAG_IMPUTER_BATCH_SIZE,
+                                  RAG_IMPUTER_MAX_WORKERS, RAG_IMPUTER_MODE,
+                                  RAG_IMPUTER_STATIC_BANK,
+                                  SIMULATION_MAX_TOKENS, SIMULATION_MODEL,
+                                  SIMULATION_PROVIDER, SIMULATION_TEMPERATURE)
 from generation.emission_policy import EmissionPolicy
 from oasis.clock.clock import Clock
+from oasis.imputation.rag_llm_imputer import RagImputer, RagImputerConfig
 from oasis.social_platform.channel import Channel
 from oasis.social_platform.platform import Platform
 from oasis.social_platform.typing import RecsysType
 from orchestrator.agent_factory import build_agent_graph_from_csv
 from orchestrator.expect_registry import ExpectRegistry
 from orchestrator.interceptor_channel import InterceptorChannel
-from orchestrator.manifest_loader import load_manifest
+from orchestrator.manifest_loader import load_label_lexicons, load_manifest
 from orchestrator.model_provider import (LLMProviderSettings,
+                                         create_fallback_backend,
                                          create_model_backend)
 from orchestrator.scheduler import MultiLabelScheduler, MultiLabelTargets
 from orchestrator.sidecar_logger import SidecarLogger
 
+
 #
-# LLM selection (single, modular configuration block)
+# LLM selection - uses centralized config from configs/llm_settings.py
+# To change the model/provider, edit configs/llm_settings.py
 #
-# Examples:
-#   Use xAI Grok:
-#     LLM_SETTINGS = LLMProviderSettings(provider="xai", model_name="grok-4-fast-non-reasoning", api_key="<key>", base_url="https://api.x.ai/v1")
-#   Use Gemini:
-#     LLM_SETTINGS = LLMProviderSettings(provider="gemini", model_name="gemini-2.5-flash", api_key="<key>")
-#   Use OpenAI:
-#     LLM_SETTINGS = LLMProviderSettings(provider="openai", model_name=ModelType.GPT_4O_MINI.value, api_key=os.getenv("OPENAI_API_KEY", ""))
-#
-LLM_SETTINGS: LLMProviderSettings = LLMProviderSettings(
-    provider="xai",
-    model_name="grok-4-fast-non-reasoning",
-    api_key=(os.getenv("XAI_API_KEY", "").strip() or ""),
-    base_url="https://api.x.ai/v1",
-    timeout_seconds=3600.0,
-)
+def _build_llm_settings() -> LLMProviderSettings:
+    """Build LLM settings from centralized config."""
+    api_key_env = API_KEY_ENV_VARS.get(SIMULATION_PROVIDER, "XAI_API_KEY")
+    api_key = os.getenv(api_key_env, "").strip()
+    base_url = API_ENDPOINTS.get(SIMULATION_PROVIDER)
+
+    return LLMProviderSettings(
+        provider=SIMULATION_PROVIDER,
+        model_name=SIMULATION_MODEL,
+        api_key=api_key,
+        base_url=base_url,
+        timeout_seconds=3600.0,
+    )
+
+
+LLM_SETTINGS: LLMProviderSettings = _build_llm_settings()
+
+
+def _build_imputer_llm_settings() -> LLMProviderSettings:
+    """Build provider settings for the background imputer."""
+    provider = IMPUTATION_PROVIDER or SIMULATION_PROVIDER
+    api_key_env = API_KEY_ENV_VARS.get(provider, "XAI_API_KEY")
+    api_key = os.getenv(api_key_env, "").strip()
+    base_url = API_ENDPOINTS.get(provider)
+    return LLMProviderSettings(
+        provider=provider,
+        model_name=IMPUTATION_MODEL,
+        api_key=api_key,
+        base_url=base_url,
+        timeout_seconds=3600.0,
+    )
 
 
 def _validate_personas_and_edges(manifest, personas_csv: Path,
@@ -204,9 +233,17 @@ def _seed_initial_follows_from_csv(env, edges_csv: Path) -> int:
     return len(rows)
 
 
-async def run(manifest_path: Path, personas_csv: Path, db_path: Path,
-              steps: int, edges_csv: Path | None,
-              warmup_steps: int) -> None:
+async def run(
+    manifest_path: Path,
+    personas_csv: Path,
+    db_path: Path,
+    steps: int,
+    edges_csv: Path | None,
+    warmup_steps: int,
+    rag_mode: str,
+    rag_workers: int,
+    rag_batch_size: int,
+) -> None:
     run_t0 = time.perf_counter()
     print(f"[production] Run started at {datetime.now().isoformat()}")
     manifest = load_manifest(manifest_path)
@@ -219,10 +256,43 @@ async def run(manifest_path: Path, personas_csv: Path, db_path: Path,
 
     sidecar = SidecarLogger(path=db_path.parent / "sidecar.jsonl")
 
+    # Load ontology-driven label→lexicon map (best-effort; defaults if missing)
+    try:
+        default_ontology = Path("configs/personas/ontology_unified.yaml")
+        label_lexicons = load_label_lexicons(default_ontology) if default_ontology.exists() else {}
+    except Exception:
+        label_lexicons = {}
+    imputer: Optional[RagImputer] = None
+    rag_mode_value = (rag_mode or RAG_IMPUTER_MODE).strip().lower()
+    if rag_mode_value not in ("off", "background", "sync"):
+        rag_mode_value = RAG_IMPUTER_MODE
+    rag_workers_effective = rag_workers or RAG_IMPUTER_MAX_WORKERS
+    rag_batch_effective = rag_batch_size or RAG_IMPUTER_BATCH_SIZE
+    if rag_mode_value != "off":
+        try:
+            imputer_cfg = RagImputerConfig(
+                db_path=db_path,
+                llm_settings=_build_imputer_llm_settings(),
+                mode=rag_mode_value,
+                batch_size=rag_batch_effective,
+                max_workers=rag_workers_effective,
+                temperature=IMPUTATION_TEMPERATURE,
+                max_tokens=IMPUTATION_MAX_TOKENS,
+                lexicon_terms=label_lexicons or {},
+                static_bank_path=Path(RAG_IMPUTER_STATIC_BANK),
+                run_seed=run_seed,
+            )
+            imputer = RagImputer(imputer_cfg)
+            await imputer.start()
+        except Exception as exc:
+            print(f"[production] Failed to start rag imputer: {exc}")
+            imputer = None
+            rag_mode_value = "off"
     policy = EmissionPolicy(
         run_seed=run_seed,
         post_label_mode_probs=manifest.post_label_mode_probs,
         label_to_tokens=None,  # defaults cover the 6-parent-family setup
+        label_lexicon_terms=label_lexicons or None,
     )
     expect_registry = ExpectRegistry()
     targets_cfg = manifest.multi_label_targets
@@ -235,7 +305,8 @@ async def run(manifest_path: Path, personas_csv: Path, db_path: Path,
     )
 
     # Define the model for the agents (LLMAction only; no manual actions)
-    model = create_model_backend(LLM_SETTINGS)
+    # Use fallback backend for automatic retry on rate limits
+    model = create_fallback_backend(LLM_SETTINGS)
 
     # Setup platform and channel
     base_channel = Channel()
@@ -258,21 +329,24 @@ async def run(manifest_path: Path, personas_csv: Path, db_path: Path,
         RecsysType  # placeholder to keep import grouped (no-op)
     ]
     # Define allowed ActionTypes explicitly
+    # NOTE: Groq recommends 3-5 tools optimal, max 10-15. Too many tools causes
+    # malformed tool call errors. Reduced to essential actions for reliability.
     from oasis.social_platform.typing import ActionType as _AT  # local alias
     allowed_actions = [
-        _AT.REFRESH,
-        _AT.SEARCH_USER,
-        _AT.SEARCH_POSTS,
+        # Core content creation (most important for dataset generation)
         _AT.CREATE_POST,
-        _AT.LIKE_POST,
-        _AT.FOLLOW,
-        _AT.UNFOLLOW,
-        _AT.REPOST,
-        _AT.QUOTE_POST,
-        # _AT.UPDATE_REC_TABLE,
         _AT.CREATE_COMMENT,
-        _AT.LIKE_COMMENT,
+        # Engagement actions
+        _AT.LIKE_POST,
+        _AT.REPOST,
+        # Discovery (needed to see content)
+        _AT.REFRESH,
+        # Neutral action
         _AT.DO_NOTHING,
+        # Optional: uncomment for more variety (but may increase tool call errors)
+        _AT.QUOTE_POST,
+        # _AT.FOLLOW,
+        # _AT.SEARCH_POSTS,
     ]
 
     # Build agent graph using ExtendedSocialAgent with persona class metadata
@@ -296,9 +370,17 @@ async def run(manifest_path: Path, personas_csv: Path, db_path: Path,
         database_path=str(db_path),
     )
 
+    async def _maybe_impute() -> None:
+        if imputer is None:
+            return
+        await imputer.enqueue_new_rows()
+        if rag_mode_value == "sync":
+            await imputer.flush()
+
     t0 = time.perf_counter()
     await env.reset()
     print(f"[production] env.reset() took {time.perf_counter() - t0:.2f}s")
+    await _maybe_impute()
 
     # Seed initial follow graph if provided and table is empty
     try:
@@ -328,6 +410,7 @@ async def run(manifest_path: Path, personas_csv: Path, db_path: Path,
         await env.step(actions)
         print(f"[production] warmup {i + 1}/{warmup_steps} took {time.perf_counter() - t_step:.2f}s")
         sys.stdout.flush()
+        await _maybe_impute()
 
     # LLMAction for all agents across steps
     for i in range(max(0, int(steps))):
@@ -340,8 +423,14 @@ async def run(manifest_path: Path, personas_csv: Path, db_path: Path,
         await env.step(actions)
         print(f"[production] step {i + 1}/{steps} took {time.perf_counter() - t_step:.2f}s")
         sys.stdout.flush()
+        await _maybe_impute()
 
+    if imputer is not None:
+        await imputer.enqueue_new_rows()
+        await imputer.flush()
     await env.close()
+    if imputer is not None:
+        await imputer.shutdown()
     print(f"[production] Total run time: {time.perf_counter() - run_t0:.2f}s")
 
 
@@ -355,6 +444,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--steps", type=int, default=10, help="Number of steps to run.")
     parser.add_argument("--edges-csv", type=str, default="", help="Path to edges CSV (follower_id,followee_id). Env PROD_EDGES_CSV overrides.")
     parser.add_argument("--warmup-steps", type=int, default=1, help="Warmup LLMAction steps before main loop.")
+    parser.add_argument(
+        "--rag-imputer",
+        type=str,
+        choices=["off", "background", "sync"],
+        default=None,
+        help="Enable LLM-based placeholder replacement (default derives from config).",
+    )
+    parser.add_argument("--rag-workers", type=int, default=0, help="Override RAG imputer worker count.")
+    parser.add_argument("--rag-batch-size", type=int, default=0, help="Override queue size per batch.")
     parser.add_argument(
         "--fresh-db",
         action="store_true",
@@ -416,10 +514,23 @@ def main() -> None:
         except Exception as e:
             print(f"[production] Failed to remove existing DB: {e}")
     edges_csv = Path(os.path.abspath(args.edges_csv)) if args.edges_csv else None
-    asyncio.run(run(manifest_path, personas_csv, db_path, args.steps, edges_csv, args.warmup_steps))
+    asyncio.run(
+        run(
+            manifest_path,
+            personas_csv,
+            db_path,
+            args.steps,
+            edges_csv,
+            args.warmup_steps,
+            args.rag_imputer or "",
+            args.rag_workers,
+            args.rag_batch_size,
+        )
+    )
 
-    # Optional post-run report generation
-    if args.report:
+    # Optional post-run report generation (uses AUTO_REPORT from config as default)
+    should_report = args.report or AUTO_REPORT
+    if should_report:
         try:
             report_script = Path(__file__).resolve().parent / "report_production.py"
             if not report_script.exists():
