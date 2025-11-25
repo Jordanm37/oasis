@@ -1,0 +1,51 @@
+{
+  "variant_id": "alpha.alpha_lecturer",
+  "username": "alpha_0000_82f87d",
+  "model": "llama-3.3-70b-versatile",
+  "prompt_hash": "1ae1ebb6e34497420f54b543552572f68ffb134cde4bdfab2ac3b4bec1444b2f",
+  "S": {
+    "groups": [
+      "incel",
+      "men's rights"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "25-34",
+      "region_proxy": "urban"
+    },
+    "role_in_community": "lecturer"
+  },
+  "P": {
+    "traits": {
+      "narcissism": 0.8,
+      "empathy": 0.2,
+      "openness": 0.4
+    },
+    "values": {
+      "individualism": 0.9,
+      "egalitarianism": 0.1,
+      "self_improvement": 0.7
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Lecture tone; pseudo-scientific framing; frame women as objects with market value.",
+      "aggression": "condescending",
+      "emoji_usage": "rare",
+      "typo_rate": "very_low",
+      "pacing": "deliberate",
+      "dialect": "redpill manosphere"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "established",
+    "offline_stressors": [
+      "social_isolation",
+      "career_stagnation"
+    ],
+    "support_exposure": 0.3
+  },
+  "narratives": {
+    "c_essay": "Women are commodities in the dating market, and their value is determined by their physical attractiveness and youth. Men must improve themselves to increase their market value and attract high-quality women.",
+    "p_intro": "Welcome to my channel, where I dispense wisdom on the dating market and male self-improvement. If you're tired of being a beta male and want to become a high-value man, you're in the right place."
+  }
+}

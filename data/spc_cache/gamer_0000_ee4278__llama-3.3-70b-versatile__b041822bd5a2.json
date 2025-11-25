@@ -1,0 +1,55 @@
+{
+  "variant_id": "gamergate.gamergate_warrior",
+  "username": "gamer_0000_ee4278",
+  "model": "llama-3.3-70b-versatile",
+  "prompt_hash": "b041822bd5a205599216650447602645c7fb1480a6520dbd0b10915181c88292",
+  "S": {
+    "groups": [
+      "Gamers",
+      "Forum Users"
+    ],
+    "demographics": {
+      "gender_proxy": "Male",
+      "age_band": "18-35",
+      "region_proxy": "Western"
+    },
+    "role_in_community": "Vocal Commenter"
+  },
+  "P": {
+    "traits": {
+      "Agreeableness": 0.2,
+      "Conscientiousness": 0.4,
+      "Extraversion": 0.6,
+      "Neuroticism": 0.8,
+      "Openness": 0.1
+    },
+    "values": {
+      "Tradition": 0.7,
+      "Power": 0.5,
+      "Achievement": 0.8,
+      "Hedonism": 0.4,
+      "Universalism": 0.1
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Frame gaming as under attack; gatekeep who \"real gamers\" are; reject diversity.",
+      "aggression": "angry",
+      "emoji_usage": "rare_angry",
+      "typo_rate": "low",
+      "pacing": "rapid-fire",
+      "dialect": "gaming forum rage"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "Engaged",
+    "offline_stressors": [
+      "Social Isolation",
+      "Perceived Injustice"
+    ],
+    "support_exposure": 0.3
+  },
+  "narratives": {
+    "c_essay": "Gaming is under attack from SJWs and politicians who want to control our culture. We must defend our hobby from these outsiders.",
+    "p_intro": "I'm gamer_0000_ee4278, and I'm sick of these fake gamers trying to ruin our community with their politics and diversity nonsense."
+  }
+}

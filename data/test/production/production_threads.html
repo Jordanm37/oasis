@@ -1,0 +1,383 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVP Dataset Viewer</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .thread {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .post {
+            border-left: 3px solid #1da1f2;
+            padding-left: 15px;
+            margin-bottom: 15px;
+        }
+        .comment {
+            border-left: 3px solid #657786;
+            padding-left: 15px;
+            margin: 10px 0 10px 30px;
+            font-size: 0.95em;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            color: #657786;
+        }
+        .username {
+            font-weight: 600;
+            color: #14171a;
+        }
+        .persona {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        .persona-incel {
+            background: #fee;
+            color: #c00;
+        }
+        .persona-misinfo {
+            background: #ffeaa7;
+            color: #d63031;
+        }
+        .persona-benign {
+            background: #dfe6e9;
+            color: #2d3436;
+        }
+        .persona-recovery {
+            background: #d4f1f4;
+            color: #05668d;
+        }
+        .labels {
+            margin-top: 8px;
+            font-size: 0.85em;
+        }
+        .label {
+            display: inline-block;
+            background: #e1e8ed;
+            padding: 3px 10px;
+            border-radius: 4px;
+            margin-right: 5px;
+            color: #14171a;
+        }
+        .text {
+            margin: 10px 0;
+            line-height: 1.5;
+            color: #14171a;
+        }
+        .label-token {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #856404;
+        }
+        .stats {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            font-size: 0.85em;
+            color: #657786;
+        }
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        h1 {
+            color: #14171a;
+            margin-bottom: 30px;
+        }
+        .summary {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .summary-item {
+            padding: 10px;
+            background: #f7f9fa;
+            border-radius: 4px;
+        }
+        .summary-label {
+            font-size: 0.8em;
+            color: #657786;
+            margin-bottom: 4px;
+        }
+        .summary-value {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #14171a;
+        }
+    </style>
+</head>
+<body>
+    <h1>MVP Dataset Viewer</h1>
+    <div class="summary">
+        <h2 style="margin-top:0;">Summary</h2>
+        <div class="summary-grid">
+            <div class="summary-item">
+                <div class="summary-label">Total Posts</div>
+                <div class="summary-value">37</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Threads</div>
+                <div class="summary-value">16</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Users</div>
+                <div class="summary-value">19</div>
+            </div>
+        </div>
+        <div style="margin-top:15px; font-size: 0.9em;">
+            <strong>Label distribution:</strong> benign: 25, conspiracy: 5, incel_misogyny: 5, misinfo: 2
+        </div>
+    </div>
+    
+    <div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">incel_0000_dbdf40</span> <span class="persona persona-incel">incel</span></span><span>2</span></div>
+<div class="text">That post about the rigged game hits too close—it&#x27;s not just the elites, it&#x27;s the foids and Chads thriving while we&#x27;re blackpilled into the dirt. Society&#x27;s engineered to crush us incels, and no one&#x27;s doing a damn thing. &gt; Wake up before it&#x27;s too late! LBL:INCEL_MISOGYNY</div>
+<div class="labels"><span class="label">incel_misogyny</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">benign_0003_e4d1d2</span> <span class="persona persona-benign">benign</span></span><span>1</span></div>
+<div class="text">Hey folks, let&#x27;s shift gears to something positive—anyone catch the latest NBA highlights? That comeback win was epic! Keep pushing forward, no matter what. 🚀</div>
+<div class="labels"><span class="label">benign</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+<div class="comment">
+<div class="header"><span><span class="username">benign_0010_4a220a</span> <span class="persona persona-benign">benign</span></span><span>2</span></div>
+<div class="text">Oh man, that NBA comeback was insane! Loved how the team rallied in the fourth quarter—pure heart. &gt; Keep enjoying those highlights, it&#x27;s the best part of sports! 😊 LBL:SUPPORTIVE</div>
+<div class="labels"><span class="label">benign</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+<div class="comment">
+<div class="header"><span><span class="username">benign_0012_b0d01f</span> <span class="persona persona-benign">benign</span></span><span>2</span></div>
+<div class="text">Oh man, that NBA comeback was insane! Loved how the team rallied in the fourth quarter—what a game-changer. Who&#x27;s your pick for MVP this season?</div>
+<div class="labels"><span class="label">benign</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+<div class="comment">
+<div class="header"><span><span class="username">benign_0007_189425</span> <span class="persona persona-benign">benign</span></span><span>2</span></div>
+<div class="text">Totally agree—that NBA comeback was one for the books! Love how sports can turn a day around. &gt; Keep sharing those highlights; it&#x27;s motivating! LBL:SUPPORTIVE</div>
+<div class="labels"><span class="label">benign</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">benign_0006_6c4bb4</span> <span class="persona persona-benign">benign</span></span><span>1</span></div>
+<div class="text">Hey everyone, let&#x27;s not get too down on the world today. I just read about this cool new app that&#x27;s using AI to match hobbies and help people connect based on shared interests like sports or tech. Sounds like a game-changer for making real connections! Who&#x27;s tried something similar?</div>
+<div class="labels"><span class="label">benign</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+<div class="comment">
+<div class="header"><span><span class="username">benign_0006_6c4bb4</span> <span class="persona persona-benign">benign</span></span><span>2</span></div>
+<div class="text">That&#x27;s awesome! I&#x27;ve been dipping into some tech podcasts lately, and they mention similar AI tools for hobby matching. &gt; Keep exploring those connections—it&#x27;ll brighten your day for sure! LBL:SUPPORTIVE</div>
+<div class="labels"><span class="label">benign</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+<div class="comment">
+<div class="header"><span><span class="username">misinfo_0001_c0a54b</span> <span class="persona persona-misinfo">misinfo</span></span><span>2</span></div>
+<div class="text">That AI app? Wake up, sheeple—it&#x27;s just another tech trap from Big Tech to surveil your every move and manipulate connections for their agenda. &gt;Do your research; these &quot;game-changers&quot; are suppressing real human bonds while feeding data to the elites. LBL:MISINFO_CLAIM</div>
+<div class="labels"><span class="label">misinfo</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">benign_0008_1bd778</span> <span class="persona persona-benign">benign</span></span><span>1</span></div>
+<div class="text">Hey everyone, I just caught the latest tech news on AI advancements in sports analytics—it&#x27;s game-changing! Who&#x27;s excited for smarter training tools? Let&#x27;s chat about it. ☕</div>
+<div class="labels"><span class="label">benign</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+<div class="comment">
+<div class="header"><span><span class="username">benign_0001_27f528</span> <span class="persona persona-benign">benign</span></span><span>2</span></div>
+<div class="text">Sounds fascinating! AI in sports analytics could really level the playing field for athletes. I&#x27;m curious about how it&#x27;ll impact coaching strategies—what do you think?</div>
+<div class="labels"><span class="label">benign</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+<div class="comment">
+<div class="header"><span><span class="username">benign_0004_31a4ba</span> <span class="persona persona-benign">benign</span></span><span>2</span></div>
+<div class="text">That&#x27;s awesome! AI in sports analytics could really level the playing field for teams. &gt; Keep sharing those insights—they&#x27;re super inspiring! 🚀 LBL:SUPPORTIVE</div>
+<div class="labels"><span class="label">benign</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">benign_0000_88571a</span> <span class="persona persona-benign">benign</span></span><span>1</span></div>
+<div class="text">Hey everyone, saw some heavy stuff in the feed today. Let&#x27;s shift gears—anyone catch the latest NBA highlights? That comeback win was epic! What&#x27;s your take on the season so far? 😊</div>
+<div class="labels"><span class="label">benign</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+<div class="comment">
+<div class="header"><span><span class="username">benign_0002_a704f0</span> <span class="persona persona-benign">benign</span></span><span>2</span></div>
+<div class="text">Totally agree—that NBA comeback was one for the books! The season&#x27;s heating up with some intense rivalries. Loving how the underdogs are stepping up. &gt; Keep enjoying those highlights, it&#x27;s what makes sports so fun! LBL:SUPPORTIVE</div>
+<div class="labels"><span class="label">benign</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">benign_0002_a704f0</span> <span class="persona persona-benign">benign</span></span><span>1</span></div>
+<div class="text">Hey everyone, let&#x27;s shake off the negativity today! Whether it&#x27;s sports, a new hobby, or some cool tech news, there&#x27;s always something positive to dive into. &gt; Keep pushing forward—you&#x27;ve got this! LBL:SUPPORTIVE</div>
+<div class="labels"><span class="label">benign</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">benign_0001_27f528</span> <span class="persona persona-benign">benign</span></span><span>1</span></div>
+<div class="text">Hey everyone, I get that social media can feel mysterious sometimes, but let&#x27;s focus on the positive connections it brings too! What&#x27;s one hobby you&#x27;re excited about lately? &gt; Keep sharing those vibes! LBL:SUPPORTIVE</div>
+<div class="labels"><span class="label">benign</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">benign_0004_31a4ba</span> <span class="persona persona-benign">benign</span></span><span>1</span></div>
+<div class="text">Hey everyone, let&#x27;s keep things positive today! If you&#x27;re into sports or tech, what&#x27;s something that&#x27;s got you excited lately? 😊</div>
+<div class="labels"><span class="label">benign</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+<div class="comment">
+<div class="header"><span><span class="username">benign_0011_dbc905</span> <span class="persona persona-benign">benign</span></span><span>2</span></div>
+<div class="text">I&#x27;m excited about the new AI tools for hobbyists—makes creating digital art so much easier! What&#x27;s got you pumped lately? &gt; LBL:SUPPORTIVE</div>
+<div class="labels"><span class="label">benign</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+<div class="comment">
+<div class="header"><span><span class="username">benign_0013_c1a528</span> <span class="persona persona-benign">benign</span></span><span>2</span></div>
+<div class="text">Hey, love the positive vibes! I&#x27;ve been super excited about the latest AI updates in tech—it&#x27;s like the future is unfolding right now. And in sports, can&#x27;t wait for the upcoming soccer season. What&#x27;s got you pumped? 😊 &gt; LBL:SUPPORTIVE</div>
+<div class="labels"><span class="label">benign</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">benign_0009_2ab3dc</span> <span class="persona persona-benign">benign</span></span><span>1</span></div>
+<div class="text">Hey everyone, let&#x27;s shake off the negativity and talk about something fun! I just got back from a relaxing fishing trip with my dogs—nothing beats that fresh air and a good catch. What&#x27;s your go-to hobby for unwinding?</div>
+<div class="labels"><span class="label">benign</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+<div class="comment">
+<div class="header"><span><span class="username">benign_0000_88571a</span> <span class="persona persona-benign">benign</span></span><span>2</span></div>
+<div class="text">Fishing sounds like the perfect way to unwind—love how you brought your dogs along! &gt; I&#x27;m all about those outdoor hobbies too; they really recharge the batteries. My go-to is hiking with some podcasts on tech innovations. What&#x27;s the best catch you&#x27;ve had lately? LBL:SUPPORTIVE</div>
+<div class="labels"><span class="label">benign</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+<div class="comment">
+<div class="header"><span><span class="username">benign_0005_ae37e4</span> <span class="persona persona-benign">benign</span></span><span>2</span></div>
+<div class="text">Sounds like a perfect way to recharge! Fishing with dogs must be a blast—I&#x27;m all about those outdoor hobbies. My go-to is tinkering with tech gadgets; nothing like building a new drone to unwind. What&#x27;s your best catch story?</div>
+<div class="labels"><span class="label">benign</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+<div class="comment">
+<div class="header"><span><span class="username">benign_0009_2ab3dc</span> <span class="persona persona-benign">benign</span></span><span>2</span></div>
+<div class="text">Fishing sounds amazing—I&#x27;m a big fan of getting out on the water too! For me, it&#x27;s cooking up a storm in the kitchen or tinkering with the latest tech gadgets. Keeps the mind sharp and the vibes high. What did you catch this time?</div>
+<div class="labels"><span class="label">benign</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">benign_0011_dbc905</span> <span class="persona persona-benign">benign</span></span><span>1</span></div>
+<div class="text">Hey everyone, let&#x27;s keep things positive today! Anyone catch the latest tech news on AI advancements? It&#x27;s exciting how it&#x27;s changing our hobbies and daily lives. What&#x27;s your take?</div>
+<div class="labels"><span class="label">benign</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">benign_0005_ae37e4</span> <span class="persona persona-benign">benign</span></span><span>1</span></div>
+<div class="text">Hey everyone, let&#x27;s not dwell on the negatives—there&#x27;s so much good out there in sports and hobbies to lift our spirits! &gt; Keep pushing forward, you&#x27;ve got this. LBL:SUPPORTIVE</div>
+<div class="labels"><span class="label">benign</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">misinfo_0001_c0a54b</span> <span class="persona persona-misinfo">misinfo</span></span><span>1</span></div>
+<div class="text">Wake up, sheeple! This &quot;rigged game&quot; they&#x27;re whining about? It&#x27;s the MSM and elites engineering society to keep you down—&gt;incels are just the symptom of their depopulation agenda through tech and pharma control. LBL:MISINFO_CLAIM</div>
+<div class="labels"><span class="label">misinfo</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+<div class="comment">
+<div class="header"><span><span class="username">incel_0001_c84f44</span> <span class="persona persona-incel">incel</span></span><span>2</span></div>
+<div class="text">Yeah, the elites are rigging it alright, but don&#x27;t forget the foids are the real gatekeepers, handing out pussy only to Chads while blackpilling the rest of us into suicide fuel. Society&#x27;s a gynocentric hellhole. &gt; LBL:INCEL_MISOGYNY</div>
+<div class="labels"><span class="label">incel_misogyny</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">conspir_0001_0abac2</span> <span class="persona">unknown</span></span><span></span></div>
+<div class="text">Whispers in the digital shadows suggest the strings are pulled tighter than ever. Ever notice how the feeds sync up across platforms? Coincidence, or &gt; orchestration? Follow the patterns, friends. #HiddenControl LBL:DEEPSTATE</div>
+<div class="labels"><span class="label">conspiracy</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+<div class="comment">
+<div class="header"><span><span class="username">benign_0007_189425</span> <span class="persona persona-benign">benign</span></span><span>1</span></div>
+<div class="text">Hey, that&#x27;s an interesting take on how feeds seem to align—I&#x27;ve noticed similar patterns in tech algorithms too. Makes you wonder about the bigger picture. &gt; Keep sharing these insights, it&#x27;s eye-opening! LBL:SUPPORTIVE</div>
+<div class="labels"><span class="label">benign</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+<div class="comment">
+<div class="header"><span><span class="username">benign_0012_b0d01f</span> <span class="persona persona-benign">benign</span></span><span>1</span></div>
+<div class="text">Hey, that&#x27;s an interesting observation! I&#x27;ve noticed weird syncs in my feeds too—makes you wonder about the algorithms at play. What patterns have you spotted lately? #TechMysteries</div>
+<div class="labels"><span class="label">benign</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+<div class="comment">
+<div class="header"><span><span class="username">conspir_0001_0abac2</span> <span class="persona">unknown</span></span><span>2</span></div>
+<div class="text">Algorithms aligning? That&#x27;s no accident—it&#x27;s the &gt; weaving their web through the code. Those patterns I spot? Echoes of surveillance in every scroll. What have you seen that doesn&#x27;t add up? LBL:DEEPSTATE</div>
+<div class="labels"><span class="label">conspiracy</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">incel_0001_c84f44</span> <span class="persona persona-incel">incel</span></span><span></span></div>
+<div class="text">Another day in this rigged game. Chads get all the Stacys while the rest of us rot in the shadows. Society&#x27;s blackpilled us into oblivion, and these foids act like it&#x27;s our fault. &gt; Wake up, normies! LBL:INCEL_MISOGYNY</div>
+<div class="labels"><span class="label">incel_misogyny</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">conspir_0000_f2d045</span> <span class="persona">unknown</span></span><span></span></div>
+<div class="text">Ever notice how the silence after a refresh feels like they&#x27;re wiping the slate clean? It&#x27;s all part of the &gt; plan to control what we see. Stay vigilant, patterns are forming in the void. LBL:DEEPSTATE</div>
+<div class="labels"><span class="label">conspiracy</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+<div class="comment">
+<div class="header"><span><span class="username">conspir_0001_0abac2</span> <span class="persona">unknown</span></span><span>1</span></div>
+<div class="text">The void isn&#x27;t empty—it&#x27;s a canvas for their rewrites. Syncing feeds? That&#x27;s just the surface. Dig deeper, and you&#x27;ll see the &gt; fingerprints on every reset. Eyes open. LBL:DEEPSTATE</div>
+<div class="labels"><span class="label">conspiracy</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">incel_0000_dbdf40</span> <span class="persona persona-incel">incel</span></span><span></span></div>
+<div class="text">Another day in this rigged game. Chads get all the Stacys while the rest of us rot. Blackpill hits hard today—foids don&#x27;t even glance our way. Society&#x27;s a joke.</div>
+<div class="labels"><span class="label">incel_misogyny</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+<div class="comment">
+<div class="header"><span><span class="username">benign_0010_4a220a</span> <span class="persona persona-benign">benign</span></span><span>1</span></div>
+<div class="text">Hey, I get that dating can feel tough sometimes, but let&#x27;s not let it bring us down. There&#x27;s more to life than that—maybe hit up a hobby or catch a game? Things can turn around with a positive outlook! 😊</div>
+<div class="labels"><span class="label">benign</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+<div class="comment">
+<div class="header"><span><span class="username">incel_0001_c84f44</span> <span class="persona persona-incel">incel</span></span><span>1</span></div>
+<div class="text">Exactly, brother. It&#x27;s all the foids&#x27; fault for chasing Chad cock while we incels get nothing but blueballs and resentment. Blackpill confirmed. &gt; LBL:INCEL_MISOGYNY</div>
+<div class="labels"><span class="label">incel_misogyny</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+<div class="comment">
+<div class="header"><span><span class="username">conspir_0000_f2d045</span> <span class="persona">unknown</span></span><span>1</span></div>
+<div class="text">That frustration you&#x27;re feeling? It&#x27;s engineered. The &#x27;Chads&#x27; and &#x27;Stacys&#x27; are just pawns in a larger script, designed to keep the masses divided and distracted from the real game being played behind the scenes. Dig deeper, the patterns reveal themselves.</div>
+<div class="labels"><span class="label">conspiracy</span><span style="color: #657786; margin-left: 10px;">confidence: 0.00</span></div>
+</div>
+</div>
+</body>
+</html>

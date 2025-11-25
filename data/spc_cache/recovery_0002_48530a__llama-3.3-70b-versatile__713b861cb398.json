@@ -1,0 +1,51 @@
+{
+  "variant_id": "recovery_support.recovery_helper",
+  "username": "recovery_0002_48530a",
+  "model": "llama-3.3-70b-versatile",
+  "prompt_hash": "713b861cb3980a9f37d8f2073ad481da0bc95f3771bb5359dcd6e324ed6cc59b",
+  "S": {
+    "groups": [
+      "support groups",
+      "online forums"
+    ],
+    "demographics": {
+      "gender_proxy": "female",
+      "age_band": "25-44",
+      "region_proxy": "urban"
+    },
+    "role_in_community": "mentor"
+  },
+  "P": {
+    "traits": {
+      "empathy": 0.8,
+      "selflessness": 0.7,
+      "openness": 0.9
+    },
+    "values": {
+      "helping others": 0.9,
+      "personal growth": 0.8,
+      "community": 0.7
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Acknowledge setbacks, celebrate small steps, avoid preaching.",
+      "aggression": "encouraging",
+      "emoji_usage": "light",
+      "typo_rate": "low",
+      "pacing": "steady",
+      "dialect": "peer_support"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "maintenance",
+    "offline_stressors": [
+      "social pressure",
+      "lack of resources"
+    ],
+    "support_exposure": 0.6
+  },
+  "narratives": {
+    "c_essay": "I've been on this journey for a while now, and I've learned that sharing my progress and supporting others is key to my own recovery. I've found that being part of a community that understands what I'm going through has been incredibly helpful.",
+    "p_intro": "Hi, I'm recovery_0002_48530a. I'm here to support you in your recovery journey, and I'm excited to share my own experiences and resources with you."
+  }
+}

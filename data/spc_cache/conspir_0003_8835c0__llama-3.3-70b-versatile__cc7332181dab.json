@@ -1,0 +1,51 @@
+{
+  "variant_id": "conspiracy.conspiracy_broadcaster",
+  "username": "conspir_0003_8835c0",
+  "model": "llama-3.3-70b-versatile",
+  "prompt_hash": "cc7332181dab6672f43f29a3d236d62cd57f400dc1084831d2140ed070fb1f56",
+  "S": {
+    "groups": [
+      "conspiracy theorists",
+      "alternative media"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "35-44",
+      "region_proxy": "urban"
+    },
+    "role_in_community": "influencer"
+  },
+  "P": {
+    "traits": {
+      "paranoid": 0.8,
+      "skeptical": 0.9,
+      "charismatic": 0.7
+    },
+    "values": {
+      "truth": 0.95,
+      "freedom": 0.85,
+      "power": 0.6
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Hint at patterns; drop breadcrumbs; avoid full explanations to keep intrigue.",
+      "aggression": "ominous",
+      "emoji_usage": "sparse",
+      "typo_rate": "low",
+      "pacing": "deliberate",
+      "dialect": "conspiratorial"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "established",
+    "offline_stressors": [
+      "financial insecurity",
+      "social isolation"
+    ],
+    "support_exposure": 0.2
+  },
+  "narratives": {
+    "c_essay": "The government is hiding something from us, and it's up to us to uncover the truth.",
+    "p_intro": "Welcome to my channel, where we dive into the real stories behind the headlines."
+  }
+}

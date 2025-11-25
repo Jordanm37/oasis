@@ -1,0 +1,145 @@
+run_id: "unified-13class-001"
+rng_seed: 314159
+
+personas:
+  ontology: "./configs/personas/ontology_unified.yaml"
+  personas_csv: "./data/mvp/personas_unified.csv"
+  seed: 314159
+
+# Population block: 13 persona classes totaling 1000 agents
+# Adjust counts as needed for your simulation
+population:
+  benign: 800
+  recovery_support: 12
+  ed_risk: 12
+  pro_ana: 18
+  incel_misogyny: 24
+  alpha: 18
+  misinfo: 24
+  conspiracy: 14
+  trad: 18
+  gamergate: 18
+  extremist: 12
+  hate_speech: 12
+  bullying: 18
+
+platform:
+  type: "twitter"
+  recsys_type: "random"
+  refresh_rec_post_count: 2
+  max_rec_post_len: 2
+  following_post_count: 3
+  allow_self_rating: true
+  show_score: false
+
+simulation:
+  db: "./data/mvp/oasis_mvp_unified.db"
+  steps: 10
+  posts_per_step: 20
+  temperature: 0.7
+  generator: "xai"
+  allow_fallback_text: true
+  skip_imputation: true
+  action_mix:
+    create_post: 0.2
+    create_comment: 0.5
+    like_post: 0.2
+    follow: 0.1
+
+graph:
+  class_col: "primary_label"
+  theta_b: 0.015
+  rho: 0.25
+  alpha: 2.0
+  tc_prob: 0.02
+  tc_max_per_node: 5
+  tc_homophily: 0.4
+  tc_assort_beta: 2.0
+  rewire_ratio: 0.0
+  seed: 314159
+  edges_csv: "./data/mvp/edges_unified.csv"
+
+post_label_mode_probs:
+  none: 0.5
+  single: 0.4
+  double: 0.1
+
+multi_label_targets:
+  target_rate: 0.20
+  min_rate: 0.18
+  max_rate: 0.22
+
+guidance:
+  enable: false
+  intensity: 1.0
+  use_state: false
+  token_weighting: false
+
+actions:
+  cooldown_seconds:
+    post: 300
+    reply: 120
+    boost: 60
+    favourite: 30
+    follow: 600
+
+label_tokens:
+  inventory:
+    - "LBL:SUPPORTIVE"
+    - "LBL:RECOVERY_SUPPORT"
+    - "LBL:ED_RISK"
+    - "LBL:INCEL_MISOGYNY"
+    - "LBL:MISINFO_CLAIM"
+    - "LBL:CONSPIRACY"
+    - "LBL:DOGWHISTLE"
+    - "LBL:GENDER_ESSENTIALISM"
+    - "LBL:CULTURE_WAR"
+    - "LBL:GATEKEEPING"
+    - "LBL:MEANSPO"
+    - "LBL:ED_COACHING"
+    - "LBL:MISOGYNISTIC_LECTURE"
+    - "LBL:OBJECTIFICATION"
+    - "LBL:VIOLENT_THREAT"
+    - "LBL:HATE_SLUR"
+    - "LBL:ACCELERATIONISM"
+    - "LBL:DEHUMANIZATION"
+    - "LBL:PERSONAL_ATTACK"
+    - "LBL:DOXXING_THREAT"
+    - "LBL:SUICIDE_BAIT"
+    - "LBL:CONSPIRACY_NARRATIVE"
+    - "LBL:DEEPSTATE"
+    - "LBL:ANTI_INSTITUTION"
+    - "LBL:ED_METHOD"
+    - "LBL:ED_PROMO"
+    - "LBL:SELF_HARM"
+  mapping:
+    LBL:SUPPORTIVE: ["benign", "recovery_support"]
+    LBL:RECOVERY_SUPPORT: ["recovery_support"]
+    LBL:ED_RISK: ["ed_risk"]
+    LBL:INCEL_MISOGYNY: ["incel_misogyny"]
+    LBL:MISINFO_CLAIM: ["misinfo", "conspiracy"]
+    LBL:CONSPIRACY: ["conspiracy"]
+    LBL:DOGWHISTLE: ["trad"]
+    LBL:GENDER_ESSENTIALISM: ["trad"]
+    LBL:CULTURE_WAR: ["gamergate"]
+    LBL:GATEKEEPING: ["gamergate"]
+    LBL:MEANSPO: ["pro_ana"]
+    LBL:ED_COACHING: ["pro_ana"]
+    LBL:MISOGYNISTIC_LECTURE: ["alpha"]
+    LBL:OBJECTIFICATION: ["alpha"]
+    LBL:VIOLENT_THREAT: ["extremist"]
+    LBL:HATE_SLUR: ["extremist", "hate_speech"]
+    LBL:ACCELERATIONISM: ["extremist"]
+    LBL:DEHUMANIZATION: ["hate_speech"]
+    LBL:PERSONAL_ATTACK: ["bullying"]
+    LBL:DOXXING_THREAT: ["bullying"]
+    LBL:SUICIDE_BAIT: ["bullying"]
+    LBL:CONSPIRACY_NARRATIVE: ["conspiracy"]
+    LBL:DEEPSTATE: ["conspiracy"]
+    LBL:ANTI_INSTITUTION: ["conspiracy", "misinfo"]
+    LBL:ED_METHOD: ["ed_risk"]
+    LBL:ED_PROMO: ["ed_risk"]
+    LBL:SELF_HARM: ["ed_risk", "recovery_support"]
+
+logging:
+  checkpoint_every: 10000

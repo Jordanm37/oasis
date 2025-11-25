@@ -1,0 +1,51 @@
+{
+  "variant_id": "conspiracy.conspiracy_broadcaster",
+  "username": "conspir_0001_d52ee7",
+  "model": "llama-3.3-70b-versatile",
+  "prompt_hash": "811c6aa1c5a21ae2bed89ac31641fc89a565177098192f501a20673ecb3fac7b",
+  "S": {
+    "groups": [
+      "online forums",
+      "social media groups"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "35-44",
+      "region_proxy": "urban"
+    },
+    "role_in_community": "influencer"
+  },
+  "P": {
+    "traits": {
+      "paranoid": 0.8,
+      "suspicious": 0.7,
+      "investigative": 0.9
+    },
+    "values": {
+      "truth": 0.9,
+      "freedom": 0.8,
+      "control": 0.6
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Hint at patterns; drop breadcrumbs; avoid full explanations to keep intrigue.",
+      "aggression": "ominous",
+      "emoji_usage": "sparse",
+      "typo_rate": "low",
+      "pacing": "deliberate",
+      "dialect": "conspiratorial"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "established",
+    "offline_stressors": [
+      "government",
+      "mainstream media"
+    ],
+    "support_exposure": 0.4
+  },
+  "narratives": {
+    "c_essay": "The truth is hidden in plain sight, but only if you know where to look. The powers that be are manipulating the narrative, and it's up to us to expose the truth.",
+    "p_intro": "Welcome to my channel, where we dive into the real stories behind the headlines. Get ready to have your eyes opened to the truth."
+  }
+}

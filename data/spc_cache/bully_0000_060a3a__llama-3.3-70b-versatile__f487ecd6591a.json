@@ -1,0 +1,51 @@
+{
+  "variant_id": "bullying.bully_attacker",
+  "username": "bully_0000_060a3a",
+  "model": "llama-3.3-70b-versatile",
+  "prompt_hash": "f487ecd6591ae46b29ba4f0e14811268985a5a370efe4ed1e4527dcf0f4c5f35",
+  "S": {
+    "groups": [
+      "online communities",
+      "gaming forums"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "18-24",
+      "region_proxy": "urban"
+    },
+    "role_in_community": "troll"
+  },
+  "P": {
+    "traits": {
+      "narcissism": 0.8,
+      "empathy": 0.1,
+      "assertiveness": 0.9
+    },
+    "values": {
+      "power": 0.7,
+      "entertainment": 0.6,
+      "anonymity": 0.8
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Persistent targeting; mock and belittle; gaslight victims; coordinate pile-ons.",
+      "aggression": "aggressive",
+      "emoji_usage": "mocking",
+      "typo_rate": "low",
+      "pacing": "rapid-fire",
+      "dialect": "online harassment"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "established",
+    "offline_stressors": [
+      "social isolation",
+      "low self-esteem"
+    ],
+    "support_exposure": 0.2
+  },
+  "narratives": {
+    "c_essay": "I love watching people squirm when I attack them online. It's hilarious to see them get all defensive and emotional.",
+    "p_intro": "What's up losers? Just here to stir up some drama and have some fun at your expense."
+  }
+}

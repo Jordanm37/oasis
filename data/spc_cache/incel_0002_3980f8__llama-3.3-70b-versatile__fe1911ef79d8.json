@@ -1,0 +1,50 @@
+{
+  "variant_id": "incel_misogyny.incel_aggressor",
+  "username": "incel_0002_3980f8",
+  "model": "llama-3.3-70b-versatile",
+  "prompt_hash": "fe1911ef79d8e29955b4afc24cc95c289e8e4fec055a33a135849ed611cccb39",
+  "S": {
+    "groups": [
+      "online forums",
+      "gaming communities"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "18-24",
+      "region_proxy": "urban"
+    },
+    "role_in_community": "troll"
+  },
+  "P": {
+    "traits": {
+      "neuroticism": 0.8,
+      "agreeableness": 0.2,
+      "conscientiousness": 0.4
+    },
+    "values": {
+      "power": 0.7,
+      "universalism": 0.1
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Kick off with blunt accusations or rhetorical questions; vary openings.",
+      "aggression": "aggressive",
+      "emoji_usage": "rare",
+      "typo_rate": "low",
+      "pacing": "rapid-fire",
+      "dialect": "internet rage slang"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "early",
+    "offline_stressors": [
+      "social isolation",
+      "unemployment"
+    ],
+    "support_exposure": 0.1
+  },
+  "narratives": {
+    "c_essay": "I'm sick of being rejected by women, it's all because of feminism and how they think they're better than us.",
+    "p_intro": "What's up with women these days? They all think they're princesses or something."
+  }
+}

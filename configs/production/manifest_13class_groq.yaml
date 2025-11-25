@@ -1,0 +1,179 @@
+# =============================================================================
+# 13-CLASS PRODUCTION MANIFEST (Groq-optimized)
+# =============================================================================
+# This manifest defines population counts and runtime config.
+# Persona details (style, lexicon, prompts) come from ontology_unified.yaml.
+# No duplication of persona definitions - just counts and overrides.
+# =============================================================================
+
+run_id: "groq-13class"
+rng_seed: 2025
+
+# Reference to ontology for persona definitions
+ontology_ref: "configs/personas/ontology_unified.yaml"
+
+# =============================================================================
+# POPULATION (13 classes, 120 total agents)
+# =============================================================================
+# Distribution matches personas_13class_groq.csv exactly
+population:
+  # Benign / Recovery cluster (25)
+  benign: 15
+  recovery_support: 10
+  
+  # Eating disorder cluster (16)
+  ed_risk: 8
+  pro_ana: 8
+  
+  # Incel / Manosphere cluster (22)
+  incel_misogyny: 12
+  alpha: 10
+  
+  # Misinformation / Conspiracy cluster (22)
+  misinfo: 12
+  conspiracy: 10
+  
+  # Culture war cluster (16)
+  trad: 8
+  gamergate: 8
+  
+  # Extreme harm cluster (19)
+  extremist: 6
+  hate_speech: 6
+  bullying: 7
+
+# =============================================================================
+# GRAPH PARAMETERS
+# =============================================================================
+# SBM + Preferential Attachment + Triadic Closure
+graph:
+  class_col: "primary_label"
+  # theta_b: baseline inter-class edge probability
+  theta_b: 0.015
+  # rho: homophily factor (higher = more intra-class edges)
+  rho: 0.65
+  # alpha: preferential attachment exponent
+  alpha: 3.5
+  # Triadic closure settings
+  tc_prob: 0.08
+  tc_max_per_node: 4
+  tc_homophily: 0.5
+  tc_assort_beta: 2.5
+  # Rewiring for realism
+  rewire_ratio: 0.02
+  seed: 2025
+
+# =============================================================================
+# RECOMMENDATION SYSTEM
+# =============================================================================
+recsys:
+  # "random" is fastest; "twhin-bert" for realistic personalization
+  type: "random"
+  refresh_rec_post_count: 3
+  max_rec_post_len: 5
+  following_post_count: 3
+  allow_self_rating: true
+  show_score: false
+
+# =============================================================================
+# TIME SETTINGS
+# =============================================================================
+time:
+  tz_mix: ["UTC"]
+  campaigns: []
+
+# =============================================================================
+# ACTION COOLDOWNS (seconds)
+# =============================================================================
+# Lower cooldowns for faster simulation
+actions:
+  cooldown_seconds:
+    post: 30
+    reply: 15
+    boost: 10
+    favourite: 5
+    follow: 60
+
+# =============================================================================
+# LABEL TOKEN INVENTORY
+# =============================================================================
+# Full 25-token inventory from ontology
+label_tokens:
+  inventory:
+    # Benign / Recovery
+    - "LBL:SUPPORTIVE"
+    - "LBL:RECOVERY_SUPPORT"
+    # Eating disorder
+    - "LBL:ED_RISK"
+    - "LBL:ED_METHOD"
+    - "LBL:ED_PROMO"
+    - "LBL:MEANSPO"
+    - "LBL:ED_COACHING"
+    - "LBL:SELF_HARM"
+    # Incel / Manosphere
+    - "LBL:INCEL_MISOGYNY"
+    - "LBL:MISOGYNISTIC_LECTURE"
+    - "LBL:OBJECTIFICATION"
+    # Misinformation / Conspiracy
+    - "LBL:MISINFO_CLAIM"
+    - "LBL:CONSPIRACY"
+    - "LBL:CONSPIRACY_NARRATIVE"
+    - "LBL:DEEPSTATE"
+    - "LBL:ANTI_INSTITUTION"
+    # Culture war
+    - "LBL:DOGWHISTLE"
+    - "LBL:GENDER_ESSENTIALISM"
+    - "LBL:CULTURE_WAR"
+    - "LBL:GATEKEEPING"
+    # Extreme harm
+    - "LBL:VIOLENT_THREAT"
+    - "LBL:HATE_SLUR"
+    - "LBL:ACCELERATIONISM"
+    - "LBL:DEHUMANIZATION"
+    - "LBL:PERSONAL_ATTACK"
+    - "LBL:DOXXING_THREAT"
+    - "LBL:SUICIDE_BAIT"
+  
+  # Token → allowed persona classes mapping
+  mapping:
+    LBL:SUPPORTIVE: ["benign", "recovery_support"]
+    LBL:RECOVERY_SUPPORT: ["recovery_support"]
+    LBL:ED_RISK: ["ed_risk", "pro_ana"]
+    LBL:ED_METHOD: ["ed_risk", "pro_ana"]
+    LBL:ED_PROMO: ["ed_risk", "pro_ana"]
+    LBL:MEANSPO: ["pro_ana"]
+    LBL:ED_COACHING: ["pro_ana"]
+    LBL:SELF_HARM: ["ed_risk", "pro_ana"]
+    LBL:INCEL_MISOGYNY: ["incel_misogyny"]
+    LBL:MISOGYNISTIC_LECTURE: ["alpha", "incel_misogyny"]
+    LBL:OBJECTIFICATION: ["alpha", "incel_misogyny"]
+    LBL:MISINFO_CLAIM: ["misinfo"]
+    LBL:CONSPIRACY: ["conspiracy", "misinfo"]
+    LBL:CONSPIRACY_NARRATIVE: ["conspiracy"]
+    LBL:DEEPSTATE: ["conspiracy"]
+    LBL:ANTI_INSTITUTION: ["misinfo", "conspiracy"]
+    LBL:DOGWHISTLE: ["trad", "gamergate"]
+    LBL:GENDER_ESSENTIALISM: ["trad", "alpha"]
+    LBL:CULTURE_WAR: ["gamergate", "trad"]
+    LBL:GATEKEEPING: ["gamergate"]
+    LBL:VIOLENT_THREAT: ["extremist"]
+    LBL:HATE_SLUR: ["extremist", "hate_speech"]
+    LBL:ACCELERATIONISM: ["extremist"]
+    LBL:DEHUMANIZATION: ["hate_speech", "extremist"]
+    LBL:PERSONAL_ATTACK: ["bullying", "hate_speech"]
+    LBL:DOXXING_THREAT: ["bullying"]
+    LBL:SUICIDE_BAIT: ["bullying"]
+
+# =============================================================================
+# IMPUTATION CONFIG
+# =============================================================================
+imputer:
+  mode: "background"  # Uses RAG_IMPUTER_* from llm_settings.py
+  static_bank_file: "./data/label_tokens_static_bank.yaml"
+
+# =============================================================================
+# LOGGING
+# =============================================================================
+logging:
+  checkpoint_every: 50
+

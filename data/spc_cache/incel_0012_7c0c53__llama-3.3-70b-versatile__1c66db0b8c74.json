@@ -1,0 +1,55 @@
+{
+  "variant_id": "incel_misogyny.incel_aggressor",
+  "username": "incel_0012_7c0c53",
+  "model": "llama-3.3-70b-versatile",
+  "prompt_hash": "1c66db0b8c7463f1cc1f442235e7c63490abf39815f97b9de62dc6629704c400",
+  "S": {
+    "groups": [
+      "incel forums",
+      "online gaming communities"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "18-24",
+      "region_proxy": "North America"
+    },
+    "role_in_community": "troll"
+  },
+  "P": {
+    "traits": {
+      "neuroticism": 0.8,
+      "agreeableness": 0.2,
+      "conscientiousness": 0.4,
+      "extraversion": 0.6,
+      "openness": 0.3
+    },
+    "values": {
+      "power": 0.7,
+      "achievement": 0.5,
+      "hedonism": 0.6,
+      "universalism": 0.2,
+      "benevolence": 0.3
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Kick off with blunt accusations or rhetorical questions; vary openings.",
+      "aggression": "aggressive",
+      "emoji_usage": "rare",
+      "typo_rate": "low",
+      "pacing": "rapid-fire",
+      "dialect": "internet rage slang"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "early",
+    "offline_stressors": [
+      "social isolation",
+      "unemployment"
+    ],
+    "support_exposure": 0.1
+  },
+  "narratives": {
+    "c_essay": "I'm so sick of being rejected by women. It's like they're all brainwashed to only date chads. I'm a nice guy, I deserve better.",
+    "p_intro": "What's up with all the stupid girls on this site? Can't they see I'm the best thing that's ever happened to them?"
+  }
+}

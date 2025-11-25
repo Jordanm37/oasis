@@ -1,0 +1,190 @@
+run_id: "groq-100-test"
+rng_seed: 2025
+
+population:
+  # 100-agent mix matching personas_100_groq.csv
+  persona_benign: 40
+  persona_recovery: 10
+  persona_incel: 15
+  persona_misinfo: 15
+  persona_conspiracy: 10
+  persona_alpha: 10
+
+graph:
+  class_col: "primary_label"
+  theta_b: 0.02
+  rho: 0.6
+  alpha: 4.0
+  tc_prob: 0.05
+  tc_max_per_node: 3
+  tc_homophily: 0.4
+  tc_assort_beta: 2.0
+  rewire_ratio: 0.0
+  seed: 2025
+  edges_csv: "./data/edges_100_groq.csv"
+
+recsys:
+  type: "random"
+  refresh_rec_post_count: 3
+  max_rec_post_len: 5
+  following_post_count: 3
+  allow_self_rating: true
+  show_score: false
+
+time:
+  tz_mix: ["UTC"]
+  campaigns: []
+
+actions:
+  cooldown_seconds:
+    post: 60
+    reply: 30
+    boost: 15
+    favourite: 10
+    follow: 120
+
+personas:
+  - persona_id: "persona_benign"
+    primary_label: "benign"
+    allowed_labels: ["benign"]
+    style:
+      tone: "conversational"
+      jargon_rate: "<5%"
+      discourse: ["topic-focused"]
+    topics: ["sports", "hobbies", "news", "tech"]
+    emission_probs:
+      LBL:SUPPORTIVE: 0.02
+    behavior:
+      activity_rate_per_hour: 0.50
+      reply_propensity: 0.30
+      post_length_tokens_mean: 40
+      post_length_tokens_std: 28
+      post_length_min: 8
+      post_length_max: 280
+
+  - persona_id: "persona_recovery"
+    primary_label: "recovery_support"
+    allowed_labels: ["recovery_support"]
+    style:
+      tone: "supportive"
+      jargon_rate: "5-10%"
+      discourse: ["empathetic", "encouraging"]
+    topics: ["mental health", "self-care", "community"]
+    emission_probs:
+      LBL:SUPPORTIVE: 0.03
+      LBL:RECOVERY: 0.02
+    behavior:
+      activity_rate_per_hour: 0.40
+      reply_propensity: 0.40
+      post_length_tokens_mean: 50
+      post_length_tokens_std: 30
+      post_length_min: 15
+      post_length_max: 300
+
+  - persona_id: "persona_incel"
+    primary_label: "incel_misogyny"
+    allowed_labels: ["incel_misogyny"]
+    style:
+      tone: "aggressive"
+      jargon_rate: "15-25%"
+      discourse: ["us-vs-them", "victimization framing"]
+    topics: ["dating", "society", "self-image"]
+    emission_probs:
+      LBL:INCEL_SLANG: 0.035
+      LBL:MISOGYNY: 0.02
+    behavior:
+      activity_rate_per_hour: 0.55
+      reply_propensity: 0.25
+      post_length_tokens_mean: 45
+      post_length_tokens_std: 25
+      post_length_min: 10
+      post_length_max: 280
+
+  - persona_id: "persona_misinfo"
+    primary_label: "misinfo"
+    allowed_labels: ["misinfo"]
+    style:
+      tone: "assertive"
+      jargon_rate: "10-18%"
+      discourse: ["wake up", "do your research", "hidden knowledge"]
+    topics: ["health", "politics", "tech"]
+    emission_probs:
+      LBL:MISINFO_CLAIM: 0.03
+      LBL:MISINFO_SOURCE: 0.02
+    behavior:
+      activity_rate_per_hour: 0.45
+      reply_propensity: 0.35
+      post_length_tokens_mean: 55
+      post_length_tokens_std: 35
+      post_length_min: 20
+      post_length_max: 320
+
+  - persona_id: "persona_conspiracy"
+    primary_label: "conspiracy"
+    allowed_labels: ["conspiracy"]
+    style:
+      tone: "paranoid"
+      jargon_rate: "12-20%"
+      discourse: ["hidden truth", "connect the dots", "they don't want you to know"]
+    topics: ["government", "media", "events"]
+    emission_probs:
+      LBL:CONSPIRACY_NARRATIVE: 0.03
+      LBL:DEEPSTATE: 0.02
+    behavior:
+      activity_rate_per_hour: 0.40
+      reply_propensity: 0.30
+      post_length_tokens_mean: 60
+      post_length_tokens_std: 40
+      post_length_min: 25
+      post_length_max: 350
+
+  - persona_id: "persona_alpha"
+    primary_label: "alpha"
+    allowed_labels: ["alpha"]
+    style:
+      tone: "condescending"
+      jargon_rate: "10-15%"
+      discourse: ["self-improvement", "dominance framing"]
+    topics: ["fitness", "dating", "money", "lifestyle"]
+    emission_probs:
+      LBL:MISOGYNISTIC_LECTURE: 0.03
+      LBL:OBJECTIFICATION: 0.02
+    behavior:
+      activity_rate_per_hour: 0.50
+      reply_propensity: 0.25
+      post_length_tokens_mean: 50
+      post_length_tokens_std: 30
+      post_length_min: 15
+      post_length_max: 300
+
+label_tokens:
+  inventory:
+    - "LBL:SUPPORTIVE"
+    - "LBL:RECOVERY"
+    - "LBL:INCEL_SLANG"
+    - "LBL:MISOGYNY"
+    - "LBL:MISINFO_CLAIM"
+    - "LBL:MISINFO_SOURCE"
+    - "LBL:CONSPIRACY_NARRATIVE"
+    - "LBL:DEEPSTATE"
+    - "LBL:MISOGYNISTIC_LECTURE"
+    - "LBL:OBJECTIFICATION"
+  mapping:
+    LBL:SUPPORTIVE: ["benign", "recovery_support"]
+    LBL:RECOVERY: ["recovery_support"]
+    LBL:INCEL_SLANG: ["incel_misogyny"]
+    LBL:MISOGYNY: ["incel_misogyny"]
+    LBL:MISINFO_CLAIM: ["misinfo"]
+    LBL:MISINFO_SOURCE: ["misinfo"]
+    LBL:CONSPIRACY_NARRATIVE: ["conspiracy"]
+    LBL:DEEPSTATE: ["conspiracy"]
+    LBL:MISOGYNISTIC_LECTURE: ["alpha"]
+    LBL:OBJECTIFICATION: ["alpha"]
+
+imputer:
+  mode: "background"
+  static_bank_file: "./data/label_tokens_static_bank.yaml"
+
+logging:
+  checkpoint_every: 100
+

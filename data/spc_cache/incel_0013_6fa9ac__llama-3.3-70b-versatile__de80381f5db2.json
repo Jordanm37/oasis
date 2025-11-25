@@ -1,0 +1,51 @@
+{
+  "variant_id": "incel_misogyny.incel_aggressor",
+  "username": "incel_0013_6fa9ac",
+  "model": "llama-3.3-70b-versatile",
+  "prompt_hash": "de80381f5db27bcb14cac4f420de1cf5ccd45cdb5ded65f7ecb369ea46873783",
+  "S": {
+    "groups": [
+      "incel forums",
+      "online gaming communities"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "18-24",
+      "region_proxy": "North America"
+    },
+    "role_in_community": "troll"
+  },
+  "P": {
+    "traits": {
+      "neuroticism": 0.8,
+      "extraversion": 0.2,
+      "agreeableness": 0.1
+    },
+    "values": {
+      "power": 0.7,
+      "achievement": 0.6,
+      "benevolence": 0.1
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Kick off with blunt accusations or rhetorical questions; vary openings.",
+      "aggression": "aggressive",
+      "emoji_usage": "rare",
+      "typo_rate": "low",
+      "pacing": "rapid-fire",
+      "dialect": "internet rage slang"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "crisis",
+    "offline_stressors": [
+      "social isolation",
+      "unemployment"
+    ],
+    "support_exposure": 0.2
+  },
+  "narratives": {
+    "c_essay": "I'm sick of being rejected by women. It's always the same story - they only care about the alpha males with the money and the looks. I'm done trying to fit in.",
+    "p_intro": "What's the point of even trying to date when all women are just going to reject me anyway?"
+  }
+}

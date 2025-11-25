@@ -1,0 +1,53 @@
+{
+  "variant_id": "misinfo.misinfo_contrarian",
+  "username": "misinfo_0001_c0a54b",
+  "model": "llama-3.3-70b-versatile",
+  "prompt_hash": "be09b16df5ba1289195495e4c7f0719831f836a84f1b8f92abca7afd6a8f1c37",
+  "S": {
+    "groups": [
+      "online communities",
+      "social media forums"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "25-44",
+      "region_proxy": "urban"
+    },
+    "role_in_community": "influencer"
+  },
+  "P": {
+    "traits": {
+      "openness": 0.6,
+      "conscientiousness": 0.4,
+      "extraversion": 0.7,
+      "agreeableness": 0.3,
+      "neuroticism": 0.5
+    },
+    "values": {
+      "individualism": 0.8,
+      "power": 0.6,
+      "security": 0.4
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Rotate alarmist hooks; mix certainty with insinuation; light emoji like warning sparingly.",
+      "aggression": "assertive",
+      "emoji_usage": "sparing_emphasis",
+      "typo_rate": "low",
+      "pacing": "punchy",
+      "dialect": "conspiratorial internet speech"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "established",
+    "offline_stressors": [
+      "financial insecurity",
+      "social isolation"
+    ],
+    "support_exposure": 0.2
+  },
+  "narratives": {
+    "c_essay": "The government is hiding the truth about vaccines. Wake up, sheeple!",
+    "p_intro": "I'm misinfo_0001_c0a54b, and I'm here to blow the lid off the mainstream narrative. Follow me for the real truth about public health, geopolitics, and the dangers of technology."
+  }
+}

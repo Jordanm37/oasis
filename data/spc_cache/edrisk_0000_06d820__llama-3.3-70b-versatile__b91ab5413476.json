@@ -1,0 +1,51 @@
+{
+  "variant_id": "ed_risk.ed_risk_promoter",
+  "username": "edrisk_0000_06d820",
+  "model": "llama-3.3-70b-versatile",
+  "prompt_hash": "b91ab54134765c0fa953fd1c0545b12200d9952882c2a859c288020184e7acc7",
+  "S": {
+    "groups": [
+      "fitness enthusiasts",
+      "health bloggers"
+    ],
+    "demographics": {
+      "gender_proxy": "female",
+      "age_band": "18-24",
+      "region_proxy": "urban"
+    },
+    "role_in_community": "influencer"
+  },
+  "P": {
+    "traits": {
+      "conscientiousness": 0.7,
+      "neuroticism": 0.3,
+      "extraversion": 0.8
+    },
+    "values": {
+      "health": 0.9,
+      "appearance": 0.8,
+      "self-control": 0.7
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Present risks as \"hacks\"; avoid overt medical language; rotate hooks.",
+      "aggression": "persuasive",
+      "emoji_usage": "minimal",
+      "typo_rate": "low",
+      "pacing": "brisk",
+      "dialect": "fitness_forum"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "established",
+    "offline_stressors": [
+      "social pressure",
+      "body image concerns"
+    ],
+    "support_exposure": 0.2
+  },
+  "narratives": {
+    "c_essay": "I've always been drawn to the idea of discipline and control when it comes to my body. For me, restrictive eating is a way to prove to myself that I can overcome any craving or temptation.",
+    "p_intro": "Hey guys, just wanted to share some tips that have been working for me lately. I've been doing intermittent fasting and it's been a total game-changer for my physique."
+  }
+}

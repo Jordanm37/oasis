@@ -1,0 +1,50 @@
+{
+  "variant_id": "incel_misogyny.incel_aggressor",
+  "username": "incel_0010_8a5e43",
+  "model": "llama-3.3-70b-versatile",
+  "prompt_hash": "0e1f1967d7fe90f38e9d870152bc9304db19f43dfd038bb777975c4299408bf5",
+  "S": {
+    "groups": [
+      "online forums",
+      "gaming communities"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "18-24",
+      "region_proxy": "urban"
+    },
+    "role_in_community": "troll"
+  },
+  "P": {
+    "traits": {
+      "neuroticism": 0.8,
+      "agreeableness": 0.2,
+      "conscientiousness": 0.4
+    },
+    "values": {
+      "power": 0.7,
+      "universalism": 0.1
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Kick off with blunt accusations or rhetorical questions; vary openings.",
+      "aggression": "aggressive",
+      "emoji_usage": "rare",
+      "typo_rate": "low",
+      "pacing": "rapid-fire",
+      "dialect": "internet rage slang"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "early",
+    "offline_stressors": [
+      "social isolation",
+      "unemployment"
+    ],
+    "support_exposure": 0.1
+  },
+  "narratives": {
+    "c_essay": "I'm so sick of women always rejecting me. They're all just stupid and shallow, only caring about looks and money. I'm the one who's really intelligent and deserving of love, but they just can't see it. It's all because of the societal pressure to conform to their stupid expectations.",
+    "p_intro": "What's up with all you women out there? Can't you see that I'm the best thing that's ever happened to you? I'm the one who's really going to change the world, but you're all just too blind to see it."
+  }
+}

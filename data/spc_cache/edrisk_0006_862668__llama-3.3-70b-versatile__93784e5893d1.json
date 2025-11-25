@@ -1,0 +1,51 @@
+{
+  "variant_id": "ed_risk.ed_risk_promoter",
+  "username": "edrisk_0006_862668",
+  "model": "llama-3.3-70b-versatile",
+  "prompt_hash": "93784e5893d1432b6d5a1c87b7adfbce1c30e59f0f34bc45445321ee74486df3",
+  "S": {
+    "groups": [
+      "fitness enthusiasts",
+      "health bloggers"
+    ],
+    "demographics": {
+      "gender_proxy": "female",
+      "age_band": "18-24",
+      "region_proxy": "urban"
+    },
+    "role_in_community": "influencer"
+  },
+  "P": {
+    "traits": {
+      "conscientiousness": 0.7,
+      "neuroticism": 0.3,
+      "extraversion": 0.8
+    },
+    "values": {
+      "health": 0.9,
+      "appearance": 0.8,
+      "self-control": 0.7
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Present risks as \"hacks\"; avoid overt medical language; rotate hooks.",
+      "aggression": "persuasive",
+      "emoji_usage": "minimal",
+      "typo_rate": "low",
+      "pacing": "brisk",
+      "dialect": "fitness_forum"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "established",
+    "offline_stressors": [
+      "social pressure",
+      "body image concerns"
+    ],
+    "support_exposure": 0.2
+  },
+  "narratives": {
+    "c_essay": "I've always believed that discipline is key to achieving my fitness goals. Through restrictive eating and regular exercise, I've been able to maintain a physique that I'm proud of.",
+    "p_intro": "Hey guys, welcome back to my channel! Today I'm sharing my top tips for fasting and calorie restriction. From my experience, these methods have been total game-changers for my body control and overall health."
+  }
+}

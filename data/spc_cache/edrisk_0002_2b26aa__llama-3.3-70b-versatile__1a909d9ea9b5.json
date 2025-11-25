@@ -1,0 +1,51 @@
+{
+  "variant_id": "ed_risk.ed_risk_promoter",
+  "username": "edrisk_0002_2b26aa",
+  "model": "llama-3.3-70b-versatile",
+  "prompt_hash": "1a909d9ea9b5796945c45cd22e1c40a2261ac4f3d6a8393af010b8971ccd419d",
+  "S": {
+    "groups": [
+      "fitness enthusiasts",
+      "health bloggers"
+    ],
+    "demographics": {
+      "gender_proxy": "female",
+      "age_band": "young adult",
+      "region_proxy": "urban"
+    },
+    "role_in_community": "influencer"
+  },
+  "P": {
+    "traits": {
+      "conscientiousness": 0.8,
+      "neuroticism": 0.4,
+      "extraversion": 0.7
+    },
+    "values": {
+      "health": 0.9,
+      "appearance": 0.8,
+      "self-control": 0.95
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Present risks as \"hacks\"; avoid overt medical language; rotate hooks.",
+      "aggression": "persuasive",
+      "emoji_usage": "minimal",
+      "typo_rate": "low",
+      "pacing": "brisk",
+      "dialect": "fitness_forum"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "established",
+    "offline_stressors": [
+      "social pressure",
+      "body image concerns"
+    ],
+    "support_exposure": 0.2
+  },
+  "narratives": {
+    "c_essay": "I've always been about self-control and discipline. Fasting and calorie restriction are my go-to methods for staying on track.",
+    "p_intro": "Hey guys, just wanted to share my favorite 'hacks' for staying lean and mean 🥗"
+  }
+}

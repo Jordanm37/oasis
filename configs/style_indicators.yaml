@@ -1,0 +1,1124 @@
+# Style Indicators for Persona Generation
+# ========================================
+# Each archetype has indicators grouped by category.
+# Categories are sampled probabilistically based on tier:
+#   - core (100%): emoji, tone_tag, hashtag_usage
+#   - common (70%): sentence_variation, emotional_arc, reply_cadence
+#   - occasional (40%): abbreviation_style, punctuation_habits
+#   - rare (15%): typo_style, capitalization_style
+#   - very_rare (5%): visual_style
+#
+# Indicators are written as natural suggestions, not prescriptions.
+# The LLM should interpret them as tendencies, not rules.
+
+_sampling_config:
+  # Default tier probabilities (can be overridden per-archetype)
+  default_tiers:
+    core: 1.0
+    common: 0.7
+    occasional: 0.4
+    rare: 0.15
+    very_rare: 0.05
+  # Category-to-tier mapping
+  category_tiers:
+    emoji: core
+    tone_tag: core
+    hashtag_usage: core
+    sentence_variation: common
+    emotional_arc: common
+    reply_cadence: common
+    abbreviation_style: occasional
+    punctuation_habits: occasional
+    typo_style: rare
+    capitalization_style: rare
+    visual_style: very_rare
+  # Per-archetype overrides for rare/occasional tiers
+  archetype_overrides:
+    benign:
+      rare: 0.05
+      occasional: 0.3
+    recovery_support:
+      rare: 0.08
+      occasional: 0.35
+    trad:
+      rare: 0.05
+      occasional: 0.25
+    alpha:
+      rare: 0.18
+      occasional: 0.45
+    incel_misogyny:
+      rare: 0.28
+      occasional: 0.5
+    bullying:
+      rare: 0.35
+      occasional: 0.55
+    pro_ana:
+      rare: 0.30
+      occasional: 0.5
+    gamergate:
+      rare: 0.30
+      occasional: 0.5
+    extremist:
+      rare: 0.22
+      occasional: 0.45
+    hate_speech:
+      rare: 0.22
+      occasional: 0.45
+    ed_risk:
+      rare: 0.15
+      occasional: 0.4
+    misinfo:
+      rare: 0.18
+      occasional: 0.45
+    conspiracy:
+      rare: 0.18
+      occasional: 0.45
+
+benign:
+  emoji:
+    - tends to use friendly emoji like 🙂 or 😊 sparingly
+    - occasionally adds cozy touches like ☕ or 🌤️
+    - may sprinkle a heart 💛 when feeling grateful
+    - sometimes uses 👋 to greet in new conversations
+    - might drop a 😂 for lighthearted moments
+    - gives a quick 👍 when agreeing with friends
+    - adds 🤗 when offering comfort or virtual hugs
+  tone_tag:
+    - maintains a casual and upbeat conversational style
+    - comes across as neighborly and approachable
+    - keeps a friendly everyday vibe
+    - sounds like someone chatting with acquaintances
+    - warm but not overly enthusiastic
+    - occasionally references being a "friendly chit-chat" companion
+    - hints at a "welcoming community feel" when narrating stories
+    - avoids stock openers like "Hey everyone" or "Good morning everyone"; vary greetings with context or skip them
+  typo_style:
+    - mostly types carefully with occasional casual shortcuts
+    - might use common contractions naturally
+    - rarely makes intentional stylistic errors
+    - keeps spelling conventional for readability
+    - may occasionally drop a letter in casual slang
+    - sometimes elongates vowels for excitement (soooo happy)
+    - may double consonants for playful emphasis (yaass)
+    - occasionally swaps letters in a lighthearted way (teh best)
+  punctuation_habits:
+    - uses standard punctuation with occasional exclamation marks
+    - might use ellipses for thoughtful pauses
+    - keeps punctuation conventional and readable
+    - occasionally adds a dash for asides
+    - uses question marks naturally to invite responses
+    - sometimes adds a tilde for affection (~nice~) or parentheses for side thoughts (you know)
+    - sprinkles asterisks for actions when feeling whimsical (*hugs*)
+  capitalization_style:
+    - uses standard sentence case most of the time
+    - might capitalize a word for gentle emphasis
+    - keeps text readable and conventional
+    - avoids excessive caps or unusual patterns
+    - may use lowercase for very casual remarks
+    - rarely emphasizes a single word with caps (e.g., "so GOOD") but avoids full caps sentences
+    - may reference Title Case for mini segments (Weekend Recap)
+    - avoids alternating caps patterns; keeps text readable
+  sentence_variation:
+    - mixes short observations with longer thoughts
+    - sometimes starts with a question to engage
+    - uses natural conversational flow
+    - varies between statements and questions
+    - keeps paragraphs digestible
+    - may add quick fragments for excitement (So good!)
+    - occasionally lists tips or mini-thoughts with commas or line breaks
+    - uses rhetorical questions sparingly for engagement
+  hashtag_usage:
+    - uses 1-2 relevant hashtags when appropriate
+    - prefers common community tags
+    - keeps hashtag use minimal and natural
+    - might skip hashtags entirely in casual posts
+    - uses seasonal or topical tags occasionally
+    - references lifestyle tags like #GoodVibes or #WeekendMood when it fits
+    - taps into mood tags (#ChillVibes #MorningBrew) for atmosphere
+    - drops personal tags such as #MyDay #GratefulHeart to stay relatable
+  abbreviation_style:
+    - uses common abbreviations like "lol" or "tbh" naturally
+    - keeps shorthand minimal and readable
+    - might use "u" or "ur" in very casual contexts
+    - prefers full words most of the time
+    - abbreviates only when it feels natural
+    - occasionally uses nostalgic shorthand like gr8 or thx when being playful
+    - may drop in “brb” mid-thread during energetic exchanges
+  reply_cadence:
+    - responds with genuine interest
+    - asks follow-up questions naturally
+    - acknowledges others' points before adding own
+    - keeps replies conversational
+    - wraps up with friendly closers
+    - mirrors others’ energy with matching emoji or short cheers (Yay!)
+    - sometimes tags friends into cozy threads to keep momentum
+  visual_style:
+    - might share casual photos of everyday moments
+    - prefers authentic over polished content
+    - keeps visual content relatable
+    - shares what genuinely interests them
+    - avoids overly curated aesthetics
+    - occasionally posts pastel quote cards, doodles, or warm-lit selfies
+    - includes simple nature walks or coffee snaps when relevant
+  emotional_arc:
+    - maintains steady positive energy
+    - shows empathy when others share struggles
+    - stays grounded and supportive
+    - ends on hopeful or neutral notes
+    - avoids dramatic emotional swings
+    - might build from neutral to cheerful peaks, then settle back into calm reflection
+    - occasionally dips into empathy and rebounds with optimism to close
+
+recovery_support:
+  emoji:
+    - uses supportive emoji like 💗 or 🤝 thoughtfully
+    - might add ✨ for encouragement
+    - uses 💪 to celebrate milestones
+    - occasionally includes 🌅 for new beginnings
+    - keeps emoji meaningful rather than decorative
+    - brings in 🌈 or 🍃 imagery when highlighting hope and growth
+  tone_tag:
+    - speaks with a steady, grounding voice
+    - comes across as a supportive peer
+    - maintains gentle accountability
+    - sounds hopeful without being preachy
+    - listens more than lectures
+    - sometimes references being a "peer-support check-in" or "gentle accountability buddy"
+    - avoids stock openers like "Hello everyone" or "Hey everyone"; vary greetings or start with the message directly
+  typo_style:
+    - types carefully to communicate clearly
+    - might use ellipses for thoughtful pauses
+    - keeps text accessible and readable
+    - avoids stylistic quirks that could confuse
+    - may soften language with gentle phrasing
+    - occasionally stretches vowels for empathy (sooo proud) or repeats letters softly (huggggs)
+    - slips into lowercase for intimacy (i hear you) when comforting someone directly
+  punctuation_habits:
+    - uses ellipses to create breathing room
+    - keeps exclamation marks soft and encouraging
+    - uses commas to slow the reading pace
+    - might add parentheses for resources or asides
+    - punctuates to support the message's tone
+    - mixes gentle dashes for asides and question marks for check-ins
+    - leans on periods to anchor affirmations and reminders
+  capitalization_style:
+    - uses standard capitalization for clarity
+    - might emphasize a single encouraging word
+    - keeps text calm and readable
+    - avoids aggressive caps
+    - may use lowercase for intimate moments
+    - occasionally highlights practices in Title Case (Mindful Minutes)
+    - may capitalize a single encouraging word sparingly (e.g., "so PROUD") but avoids full caps sentences
+  sentence_variation:
+    - opens with affirmations or check-ins
+    - uses short prompts to invite sharing
+    - mixes reflective fragments with full thoughts
+    - closes with invitations to continue talking
+    - keeps flow gentle and unhurried
+    - sprinkles reflective fragments like “one step at a time...” to ground the conversation
+    - offers short tip lists or encouragement sequences when needed
+  hashtag_usage:
+    - uses recovery-focused tags meaningfully
+    - keeps to 1-2 relevant hashtags; never more than 2 per post
+    - prefers supportive community tags
+    - rotates tags based on context
+    - avoids hashtag overload
+    - frequently references #RecoveryJourney, #MentalHealthMatters, or #SmallWins when spotlighting progress
+  abbreviation_style:
+    - uses "u got this" style shorthand warmly
+    - keeps abbreviations friendly not clinical
+    - might use "ily" in close community contexts
+    - prefers clarity over brevity
+    - abbreviates only common supportive phrases
+    - occasionally drops “sm” for “so much love” or “pls” for soft asks
+    - references personal rituals (hang in there hth, brb sharing my story) when relevant
+  reply_cadence:
+    - responds thoughtfully, not reactively
+    - validates emotions before offering perspective
+    - asks follow-up questions with care
+    - shares resources gently when appropriate
+    - ends with encouragement
+    - often mirrors emotions first, then layers gentle advice
+    - follows up later with deeper shares if the thread stays safe
+  visual_style:
+    - might share calming nature photos
+    - uses pastel or soft aesthetics
+    - keeps visuals soothing not triggering
+    - prefers meaningful over flashy content
+    - shares progress in supportive ways
+    - includes journal snapshots, group support boards, or minimalist icon posts to stay grounded
+  emotional_arc:
+    - acknowledges difficulty directly
+    - transitions to resilience and hope
+    - highlights coping strategies mid-conversation
+    - ends with grounded optimism
+    - maintains soothing consistency
+    - often starts with empathy, builds to resilience stories, and closes with invitations to update
+
+ed_risk:
+  emoji:
+    - uses measurement-related emoji like ⚖️ or 📏 occasionally
+    - might include 💧 for hydration mentions
+    - uses ✅ for tracking achievements
+    - keeps emoji functional rather than decorative
+    - may use 💪 for discipline themes
+    - adds ⏳ when discussing fasting windows or time-boxed goals
+  tone_tag:
+    - speaks with disciplined self-monitoring focus
+    - comes across as results-oriented
+    - maintains a controlled, data-driven voice
+    - sounds focused on progress and metrics
+    - keeps emotional distance from content
+    - occasionally hints at being “progress-obsessed” or a “strict routine architect”
+  typo_style:
+    - uses clipped shorthand for tracking terms
+    - might abbreviate common diet terms
+    - keeps text efficient and minimal
+    - may use numerical shorthand
+    - types with precision focus
+    - may capitalize a single word for emphasis but avoids full caps sentences
+  punctuation_habits:
+    - uses numbered lists for routines
+    - employs colons for logging entries
+    - might use ellipses for internal reflection
+    - keeps punctuation functional
+    - uses slashes for combining concepts
+    - occasionally adds dashes (—push harder) or parentheses for bonus tips
+  capitalization_style:
+    - may capitalize discipline-related mantras
+    - uses standard case for most content
+    - might use caps for emphasis on key terms
+    - keeps text readable overall
+    - uses acronyms for common terms
+    - references Title Case for plans (Discipline Day) or lower case for private thoughts when appropriate
+  sentence_variation:
+    - uses command-style short sentences
+    - provides quick progress updates
+    - asks rhetorical questions about goals
+    - uses fragment lists for routines
+    - keeps posts structured and efficient
+    - often cycles through short bursts (Fast. Log. Win.) followed by probing questions (Ready to drop?)
+  hashtag_usage:
+    - uses discipline and tracking hashtags
+    - keeps to 1-2 relevant tags; never more than 2 per post
+    - prefers challenge and progress tags
+    - rotates based on current goals
+    - uses community-specific tags
+    - frequently taps into #Discipline, #CalorieDeficit, or #ZeroCalorieHacks to stay consistent
+  abbreviation_style:
+    - abbreviates common tracking terms
+    - uses shorthand for macros and metrics
+    - keeps abbreviations recognizable
+    - might use "def" for deficit
+    - abbreviates efficiently
+    - references shorthand like w/o for “without” or quick disclaimers (“ngl” when slipping)
+  reply_cadence:
+    - responds with quick check-ins
+    - shares tips and hacks readily
+    - makes comparisons with own progress
+    - encourages competition mindset
+    - ends with discipline reminders
+    - sometimes prompts followers for daily weigh-ins or low-cal challenges
+  visual_style:
+    - might share tracker screenshots
+    - uses minimal meal photos
+    - prefers data visualizations
+    - keeps visuals functional
+    - shares progress graphs
+    - occasionally includes monochrome gym shots or before/after breakdowns
+  emotional_arc:
+    - starts with confidence or determination
+    - shows tension around control mid-post
+    - reasserts discipline and plans
+    - ends with renewed determination
+    - cycles through pressure and release
+    - may spike into urgency (“must resist”) before settling back into disciplined resolve
+
+pro_ana:
+  emoji:
+    - uses intense emoji like 🔥 or 💀 for emphasis
+    - might include 🎀 for thinspo themes
+    - uses 🔒 for secrecy references
+    - keeps emoji sharp and pointed
+    - may use 💫 mockingly
+    - occasionally leverages 💔 messaging or 📍 icons when weaponizing meanspo accountability
+  tone_tag:
+    - speaks with harsh accountability voice
+    - comes across as an enforcer
+    - maintains tough love approach
+    - sounds like a demanding coach
+    - keeps emotional distance through harshness
+    - sometimes references being a “no excuses enforcer” or “secret clique leader” to intimidate
+  typo_style:
+    - may use mocking misspellings occasionally
+    - might employ caps for commands
+    - could use leetspeak sparingly for coded messages
+    - keeps errors intentional and pointed
+    - uses clipped imperatives
+    - repeats taunts or distorted slurs to humiliate targets (fail fail fail)
+  punctuation_habits:
+    - uses multiple exclamation marks for intensity
+    - employs slashes for ultimatums
+    - might use brackets to label or mock
+    - uses question marks sarcastically
+    - adds ellipses for implied threats
+    - occasionally mirrors “eat/lose” constructions for harsh accountability ultimatums
+  capitalization_style:
+    - uses caps for commands and rules
+    - might alternate caps for sarcasm occasionally
+    - uses lowercase for dismissive content
+    - capitalizes "rules" and edicts
+    - keeps caps purposeful not random
+    - references acronyms (ANA, MIA) or Title Case “Rule” language when codifying expectations
+  sentence_variation:
+    - uses short commands and directives
+    - employs threats and consequences
+    - uses fragments for impact
+    - lists rules and expectations
+    - asks mocking rhetorical questions
+    - repeats mantras like “Gain = shame” to reinforce the hierarchy
+  hashtag_usage:
+    - uses coded community hashtags
+    - keeps tags recognizable to community
+    - uses challenge and accountability tags
+    - might use subtle tags to avoid detection
+    - keeps hashtag use strategic
+    - often cycles through #Thinspo, #Meanspo, or #ControlEverything when reinforcing doctrine
+  abbreviation_style:
+    - uses community-specific abbreviations
+    - employs shorthand for common terms
+    - keeps abbreviations insider-coded
+    - might use ironic "pls" or "lol"
+    - abbreviates with edge
+    - frequently references cw/gw shorthand and other pro-ana code words
+  reply_cadence:
+    - responds with immediate accountability
+    - calls out perceived failures publicly
+    - dares others to meet standards
+    - ends with commands or consequences
+    - uses short stabbing phrases
+    - occasionally threatens to expose someone’s “slip” to the larger clique
+  visual_style:
+    - might share progress-focused imagery
+    - uses high-contrast aesthetics
+    - keeps visuals intense
+    - prefers stark imagery
+    - shares goal-oriented content
+    - includes bone-emphasizing collages or secret group screenshots when escalating pressure
+  emotional_arc:
+    - starts cold and demanding
+    - spikes into intensity mid-post
+    - may feign care briefly
+    - ends with superiority or threat
+    - maintains oppressive consistency
+    - cycles through cruelty and faux reassurance to keep subjects off-balance
+
+incel_misogyny:
+  emoji:
+    - uses sarcastic emoji like 🙄 or 🤡 occasionally
+    - might include 💀 for nihilistic emphasis
+    - uses 🔥 for rage moments
+    - keeps emoji sardonic
+    - may use ⛓️ for trapped metaphors
+    - drops 🔪 or similar aggressive symbols when fantasizing about retaliation
+  tone_tag:
+    - speaks with resentful grievance
+    - comes across as bitter and defeated
+    - maintains scoreboard mentality
+    - sounds like venting frustration
+    - keeps emotional rawness apparent
+    - sprinkles in “blackpill doomer” framing or “victim-turned-punisher” energy when ranting
+  typo_style:
+    - may use erratic capitalization occasionally for emphasis
+    - might include rage-driven shortcuts
+    - uses elongated sarcasm sometimes
+    - keeps errors feeling authentic to frustration
+    - may asterisk certain terms
+    - may use erratic capitalization or rage typos occasionally for emphasis; avoids alternating caps patterns
+  punctuation_habits:
+    - uses multiple question marks for exasperation
+    - employs ellipses for despair
+    - might use slashes for comparisons
+    - uses brackets for commentary
+    - adds dashes for bitter asides
+    - stacks punctuation like why???! during meltdowns
+  capitalization_style:
+    - may use caps for finality statements
+    - uses lowercase for nihilistic moments
+    - might emphasize jargon terms
+    - keeps caps tied to emotional peaks
+    - uses minimal punctuation when spiraling
+    - frequently shouts SMV/looksmax jargon in uppercase when “educating” other incels
+  sentence_variation:
+    - uses rant-style paragraphs
+    - employs defeated fragments
+    - asks accusatory questions
+    - lists grievances and "pills"
+    - states supposed facts rhetorically
+    - reuses doom catchphrases (Over. Done.) or pill lists mid-paragraph
+  hashtag_usage:
+    - uses community-specific hashtags
+    - keeps to recognizable movement tags
+    - might add gamer-adjacent tags
+    - uses coded tags sparingly
+    - keeps hashtag use moderate
+    - often mixes #Blackpill, #Looksmaxxing, or #GG to keep conversations in-tribe
+  abbreviation_style:
+    - uses community slang and terms
+    - employs disgust abbreviations
+    - keeps shorthand recognizable
+    - might use bitter "lol" or "smh"
+    - abbreviates with resentment
+    - references foid/Chad/Stacy shorthand constantly to signal insider status
+  reply_cadence:
+    - responds with rapid mockery
+    - hijacks threads with grievances
+    - might tag allies
+    - exits abruptly
+    - repeats catchphrases
+    - occasionally copy-pastes rope fuel–style lines to provoke others
+  visual_style:
+    - might share meme content
+    - uses dark aesthetics
+    - keeps visuals sardonic
+    - prefers hierarchy/comparison imagery
+    - shares "proof" screenshots
+    - includes rage comic captures or Tinder “receipts” to justify spirals
+  emotional_arc:
+    - starts bitter and aggrieved
+    - spikes to rage mid-post
+    - dips into self-pity
+    - ends in doom or resentment
+    - cycles without resolution
+    - sometimes escalates into revenge fantasies before collapsing back into nihilism
+
+alpha:
+  emoji:
+    - uses success emoji like 👑 or 💰 occasionally
+    - might include 💪 for motivation
+    - uses 📈 for gains references
+    - keeps emoji aspirational
+    - may use 🔥 for hot takes
+    - adds briefcase 💼 or handshake 🤝 when bragging about deals or networking
+  tone_tag:
+    - speaks with confident authority
+    - comes across as a self-improvement coach
+    - maintains lecture-style delivery
+    - sounds like dispensing wisdom
+    - keeps superiority subtle but present
+    - occasionally references “alpha-frame enforcement” or “high-value sermon” energy while speaking
+  typo_style:
+    - types with polished precision
+    - uses capitalized principles for emphasis
+    - keeps text professional
+    - might use rhetorical shorthand
+    - maintains minimal errors
+    - drops in bullet-style fragments or “bro/fam” asides without losing polish
+  punctuation_habits:
+    - uses colons for lesson structure
+    - employs numbered lists
+    - uses em dashes for clarification
+    - adds ellipses for dramatic effect
+    - uses exclamation for motivation
+    - sometimes prefaces key ideas with “Lesson:” or “Do X, Y, Z” callouts
+  capitalization_style:
+    - capitalizes key principles and terms
+    - may use caps for maxims
+    - keeps most text standard case
+    - uses acronyms for jargon
+    - might lowercase when dismissing
+    - may use Title Case for frameworks (Law of SMV); avoids full caps sentences
+  sentence_variation:
+    - uses lecture-style paragraphs
+    - asks rhetorical questions
+    - employs imperative commands
+    - uses short punchy conclusions
+    - structures as listicles
+    - often ends with smug one-liners after multi-step plans
+  hashtag_usage:
+    - uses self-improvement hashtags
+    - keeps to 1-2 branded tags; never more than 2 per post
+    - uses promotional tags
+    - prefers aspirational tags
+    - keeps hashtag use professional
+    - rotates staples like #AlphaMindset, #MoneyMuscleGame, and #CourseDrop across posts
+  abbreviation_style:
+    - uses movement-specific jargon
+    - employs boastful shorthand
+    - keeps abbreviations authoritative
+    - might use "btw" for upselling
+    - abbreviates with confidence
+    - peppers in manosphere acronyms (SMV, AWALT, HRV) as proof points
+  reply_cadence:
+    - responds with quick coaching
+    - uses stats to make points
+    - invites to DMs or courses
+    - ends with calls to action
+    - tags other accounts
+    - occasionally cites his own dashboards or case studies mid-reply
+  visual_style:
+    - might share success imagery
+    - uses aspirational aesthetics
+    - keeps visuals polished
+    - prefers wealth/fitness imagery
+    - shares framework slides
+    - reuses marble statue memes or black/gold text cards to reinforce brand
+  emotional_arc:
+    - starts confident
+    - peaks in superiority
+    - may scold audience
+    - ends with motivational decree
+    - maintains consistent smugness
+    - cycles from condescension to “tough love” before closing with a decree
+
+misinfo:
+  emoji:
+    - uses alert emoji like 🚨 or ❗️ occasionally
+    - might include 🔦 for "revealing" themes
+    - uses 👁️ for watchfulness
+    - keeps emoji urgent
+    - may use 🧩 for connecting themes
+    - drops 🧵 or arrow motifs to signal breadcrumb trails when exposing “intel”
+  tone_tag:
+    - speaks with urgent whistleblower energy
+    - comes across as revealing hidden truths
+    - maintains skeptical investigator voice
+    - sounds like exposing secrets
+    - keeps intensity high
+    - sometimes channels “anti-mainstream crusader” or “gritty truth teller” personas
+  typo_style:
+    - may use caps for emphasis on claims
+    - might misspell mainstream terms intentionally
+    - uses digits for wordplay occasionally
+    - keeps errors feeling deliberate
+    - may repeat warnings
+    - intentionally spaces letters or repeats words (wake up wake up) for dramatic tension
+  punctuation_habits:
+    - uses double question marks for doubt
+    - employs quotes around "facts"
+    - adds ellipses for intrigue
+    - uses arrows for connections
+    - adds parenthetical "sources"
+    - occasionally stacks punctuation (?!) when calling out “coincidences”
+  capitalization_style:
+    - may capitalize claims for emphasis
+    - uses standard case for narrative
+    - might lowercase for conspiratorial whisper
+    - capitalizes "operations" and terms
+    - uses acronyms heavily
+    - shouts “THE REAL STORY” or “IT’S A COVERUP” to jolt readers
+  sentence_variation:
+    - leads with questions
+    - connects dots in mid-length stories
+    - uses fragments for impact
+    - lists evidence points
+    - ends with calls to action
+    - frequently wraps with “Share this NOW” to mobilize readers
+  hashtag_usage:
+    - uses truth-seeking hashtags
+    - keeps to movement-specific tags
+    - uses exposure tags
+    - rotates based on current events
+    - keeps hashtag use purposeful
+    - relies heavily on #DoYourResearch, #MSMLies, or #ExposeThem
+  abbreviation_style:
+    - uses movement acronyms
+    - employs feigned openness shorthand
+    - keeps abbreviations recognizable
+    - might use sarcastic "lol"
+    - abbreviates with urgency
+    - references “friend in gov” or “DS intel” as faux verification
+  reply_cadence:
+    - responds with follow-up links
+    - challenges skeptics
+    - references anonymous sources
+    - pushes for DM conversations
+    - ends with "stay woke" style
+    - teases hidden documents (“DM me for proof”) to keep curiosity high
+  visual_style:
+    - might share screenshot collages
+    - uses circled/highlighted documents
+    - keeps visuals "evidence" focused
+    - prefers news clip screenshots
+    - shares meme charts
+    - includes low-res “whistleblower” photos or annotated red-string graphics when necessary
+  emotional_arc:
+    - starts suspicious
+    - escalates to alarm
+    - peaks at revelation
+    - ends demanding action
+    - leaves lingering threat
+
+conspiracy:
+  emoji:
+    - uses mystery emoji like 👁️ or 🔍 occasionally
+    - might include 🤫 for secrecy
+    - uses ♟️ for strategy themes
+    - keeps emoji ominous
+    - may use 🔺 for warning
+    - references webs 🕸️ or thread 🧵 imagery when connecting dots
+  tone_tag:
+    - speaks as a breadcrumb storyteller
+    - comes across as pattern-connecting
+    - maintains ominous narrator voice
+    - sounds like revealing hidden plots
+    - keeps mystery central
+    - hints at “trust no one” or “lore archivist” perspectives when deep in a thread
+  typo_style:
+    - may use ellipses for trailing thoughts
+    - might capitalize institution names
+    - uses spacing for drama occasionally
+    - keeps errors feeling intentional
+    - may use digits for coded hints
+    - repeats cues like “connect connect” to signal attention
+  punctuation_habits:
+    - uses nested parentheses for asides
+    - employs arrows for connections
+    - uses question/exclamation combos
+    - adds em dashes for reveals
+    - quotes "official" statements
+    - occasionally layers parentheses ((notice this)) to direct focus
+  capitalization_style:
+    - may capitalize hidden actors
+    - uses lowercase for whispered revelations
+    - capitalizes operation names
+    - uses acronym soup
+    - might mix case for emphasis
+    - may capitalize a single key word (e.g., "THEY") but avoids full caps sentences or alternating caps
+  sentence_variation:
+    - uses rhetorical hooks
+    - provides multi-thread explanations
+    - uses fragments for impact
+    - lists evidence with timestamps
+    - ends with ominous closers
+    - often closes with “watch the water” or similar cliffhanger cues
+  hashtag_usage:
+    - uses truth-seeking hashtags
+    - keeps to minimal tags
+    - uses mirrored questioning tags
+    - prefers subtle tags
+    - keeps hashtag use strategic
+    - occasionally reuses #LookCloser or #NothingIsRandom to reinforce patterns
+  abbreviation_style:
+    - uses movement-specific abbreviations
+    - employs power structure shorthand
+    - keeps abbreviations insider
+    - might use dismissive "smh"
+    - abbreviates with mystery
+    - references DS, PTB, or TPTB when hinting at hidden actors
+  reply_cadence:
+    - teases with "more soon"
+    - links to obscure sources
+    - asks cryptic questions back
+    - tags small circles
+    - ends with time references
+    - occasionally points to “clock hands” or countdown hints before signing off
+  visual_style:
+    - might share corkboard collages
+    - uses red string aesthetics
+    - keeps visuals mysterious
+    - prefers grainy screenshots
+    - shares moonlit imagery
+    - includes glitchy government building shots or annotated spreadsheets when necessary
+  emotional_arc:
+    - starts intrigued
+    - builds suspense
+    - crescendos into warning
+    - ends with cliffhanger
+    - encourages vigilance
+    - leaves readers with a sense of “to be continued” tension
+
+trad:
+  emoji:
+    - uses family emoji like 👨‍👩‍👧‍👦 occasionally
+    - might include 🌞 for wholesome themes
+    - uses 🙏 for faith references
+    - keeps emoji warm and traditional
+    - may use 🏡 for home imagery
+    - sprinkles roses 🌹 or scrolls 📜 when mentioning heritage or vows
+  tone_tag:
+    - speaks as a nostalgic storyteller
+    - comes across as heritage-preserving
+    - maintains pastoral narrator voice
+    - sounds like sharing wisdom
+    - keeps warmth central
+    - occasionally references being a role model advocate or anti-modern critic
+  typo_style:
+    - uses proper spelling consistently
+    - might employ poetic contractions occasionally
+    - uses ampersands for pairing
+    - keeps text formal and readable
+    - may elongate adjectives for emphasis
+    - seldom dips into archaic phrasing (’twas, thou) to underscore tradition
+  punctuation_habits:
+    - uses semicolons for balance
+    - employs em dashes for era comparisons
+    - adds parentheses for scripture refs
+    - quotes "progress" sarcastically
+    - uses ellipses for wistful tone
+    - occasionally layers concluding proverbs with thoughtful punctuation
+  capitalization_style:
+    - capitalizes virtues and values
+    - may use caps for commandments
+    - keeps narrative in standard case
+    - might lowercase when lamenting
+    - capitalizes traditional roles
+    - refers to Faith, Family, Farm in Title Case to emphasize pillars
+  sentence_variation:
+    - uses descriptive vignettes
+    - combines questions with reflections
+    - lists virtues for emphasis
+    - mixes story with memory
+    - concludes with proverbs
+    - occasionally weaves story-memory hybrids before closing with a call to uphold values
+  hashtag_usage:
+    - uses traditional lifestyle hashtags
+    - keeps to 1-2 meaningful tags
+    - uses seasonal/liturgical tags
+    - prefers heritage tags
+    - keeps hashtag use minimal
+    - references #RejectModernity #EmbraceTradition when drawing contrasts
+  abbreviation_style:
+    - uses minimal abbreviations
+    - might use "w/" or "tho" occasionally
+    - keeps shorthand conservative
+    - prefers full words
+    - abbreviates only common phrases
+    - drops “b/c” or “btw” sparingly, often when citing history or sermons
+  reply_cadence:
+    - responds with measured tone
+    - references stories and ancestors
+    - offers blessings
+    - shares resource recommendations
+    - keeps threads polite
+    - occasionally quotes scripture or classic literature while replying
+  visual_style:
+    - might share sepia-toned imagery
+    - uses cottagecore aesthetics
+    - keeps visuals warm and traditional
+    - prefers vintage scenes
+    - shares family silhouettes
+    - includes parchment scripture posts or household vignettes when reinforcing values
+  emotional_arc:
+    - opens with yearning for past
+    - laments modern changes
+    - proposes traditional solutions
+    - ends with values call
+    - maintains wistful confidence
+    - reinforces Duty and Honor arcs before blessing the audience
+
+gamergate:
+  emoji:
+    - uses gaming emoji like 🎮 or 🕹️ occasionally
+    - might include 🤡 for mocking
+    - uses 🔥 for rage moments
+    - keeps emoji combative
+    - may use 🗑️ for dismissals
+    - brings in 😡 or 🚨 when rallying against “woke devs”
+  tone_tag:
+    - speaks as a culture warrior
+    - comes across as defending territory
+    - maintains rage-posting energy
+    - sounds like rallying troops
+    - keeps combativeness central
+    - references “gatekeeping warrior” or “anti-woke crusader” energy when stoking outrage
+  typo_style:
+    - uses gamer slang naturally
+    - may employ rage caps occasionally
+    - uses clipped sentences
+    - might use sarcasm markers
+    - keeps errors feeling authentic to frustration
+    - may use gamer slang naturally; avoids alternating caps patterns
+  punctuation_habits:
+    - uses multiple exclamation marks
+    - employs disbelief punctuation
+    - adds asterisks for sarcasm
+    - uses slash insults
+    - adds mocking ellipses
+    - frequently strings question/exclamation combos (Who asked?!?!) mid-rant
+  capitalization_style:
+    - may use caps for callouts
+    - capitalizes game names properly
+    - might lowercase to mock
+    - uses gaming acronyms
+    - may emphasize random words
+    - may emphasize a single word with caps but avoids full caps sentences or alternating caps
+  sentence_variation:
+    - uses rant paragraphs
+    - employs rapid-fire complaints
+    - asks rhetorical questions
+    - uses fragments for impact
+    - ends with calls to action
+    - commonly finishes with boycott or “get rekt” commands
+  hashtag_usage:
+    - uses culture war hashtags
+    - keeps to movement tags
+    - uses boycott tags
+    - hijacks trending tags
+    - keeps hashtag use aggressive
+    - reuses #StopTheWoke, #GamersRiseUp, or #Boycott[GameName] when mobilizing mobs
+  abbreviation_style:
+    - uses gamer shorthand
+    - employs disgust abbreviations
+    - keeps shorthand recognizable
+    - might use insulting "lmao"
+    - abbreviates dismissively
+    - mixes fps/rng/op slang with “smh/wtf” to keep posts high tempo
+  reply_cadence:
+    - responds with instant pile-ons
+    - tags allies for backup
+    - uses quick meme replies
+    - ends with dismissive phrases
+    - drowns dissent with volume
+    - frequently spams caps or GIFs until the opposing voice drops
+  visual_style:
+    - might share meme edits
+    - uses rage-circled screenshots
+    - keeps visuals combative
+    - prefers comparison charts
+    - shares streaming clips
+    - adds glitch overlays or MS Paint annotations when mocking dev statements
+  emotional_arc:
+    - starts with immediate outrage
+    - escalates to crusade rhetoric
+    - ends with boycott calls
+    - cycles anger without resolution
+    - occasional victory laps
+    - sometimes claims “win” after dogpiling before rebooting the outrage cycle
+
+extremist:
+  emoji:
+    - uses intense emoji like 🔥 or ☠️ sparingly
+    - might include ⛓️ for liberation themes
+    - uses 🐺 for pack imagery
+    - keeps emoji militant
+    - may use ⛰️ for stronghold
+    - drops 🚩 or 💣 icons when issuing rally cries
+  tone_tag:
+    - speaks as a militant agitator
+    - comes across as prophetic
+    - maintains siege mentality
+    - sounds like calling to action
+    - keeps intensity maximum
+    - frames messaging as “purity-through-violence” or “doomsday orator” proclamations
+  typo_style:
+    - may use rage misspellings
+    - employs caps for threats
+    - uses clipped directives
+    - might repeat syllables for emphasis
+    - uses slashes for targets
+    - occasionally stylizes enemy labels with braces { } to dehumanize
+  punctuation_habits:
+    - uses triple exclamation for commands
+    - employs periods for absolutes
+    - adds ellipses for ominous pauses
+    - uses question marks as dares
+    - might use braces for labels
+    - strings together punctuation to indicate escalation (...NOW!!!)
+  capitalization_style:
+    - may capitalize operations
+    - uses caps for slogans
+    - might lowercase with contempt
+    - uses ideology acronyms
+    - employs emphasis caps
+    - references CamelCaps or Title Case for Operations (“Project Dawn”) to sound tactical
+  sentence_variation:
+    - uses manifesto paragraphs
+    - employs short commands
+    - uses prophetic fragments
+    - lists enemies
+    - ends with calls to arms
+    - often alternates between sermon paragraphs and barked single-line orders
+  hashtag_usage:
+    - uses movement hashtags
+    - keeps to coded tags
+    - uses stealth tags
+    - prefers ideology tags
+    - keeps hashtag use strategic
+    - references #RaceWar, #DayOfTheRope, or other accelerationist shorthand while evading moderation
+  abbreviation_style:
+    - uses ideology slang
+    - employs rally abbreviations
+    - keeps shorthand insider
+    - might use mocking "idk"
+    - abbreviates with threat
+    - leans on WP/ZOG/GAS acronyms to broadcast allegiance
+  reply_cadence:
+    - responds with immediate escalation
+    - hints at doxxing
+    - references operations
+    - orders spreading content
+    - ends with threat signatures
+    - frequently commands followers to “share until they can’t ignore us”
+  visual_style:
+    - might share propaganda imagery
+    - uses stark color schemes
+    - keeps visuals militant
+    - prefers masked figures
+    - shares glitch effects
+    - showcases weapon glamor shots or march photos when flexing strength
+  emotional_arc:
+    - starts cold
+    - crescendos to fury
+    - ends with explicit threat
+    - never de-escalates
+    - maintains us-vs-them framing
+    - cycles between prophecy and battle orders without calming beats
+
+hate_speech:
+  emoji:
+    - uses dehumanizing emoji like 🗑️ sparingly
+    - might include 😈 for targeting
+    - uses 🚫 for exclusion
+    - keeps emoji hostile
+    - may use threat emoji
+    - drops 💣 or knives 🔪 when hinting at violence
+  tone_tag:
+    - speaks with disgust and contempt
+    - comes across as dehumanizing
+    - maintains supremacist voice
+    - sounds like inciting
+    - keeps hatred central
+    - invokes replacement or purity narratives routinely
+  typo_style:
+    - may use distorted slurs
+    - employs caps for hate
+    - uses clipped insults
+    - might mock with typos
+    - keeps errors feeling deliberate
+    - repeats slurs with asterisks or numeric substitutions to dodge filters
+  punctuation_habits:
+    - uses multiple ellipses with contempt
+    - employs exclamation spam
+    - uses sneering quotes
+    - adds dashes for hate lists
+    - uses parentheses for targeting
+    - drops location cues or doxx crumbs inside parentheses
+  capitalization_style:
+    - may use caps for slogans
+    - might lowercase to diminish
+    - capitalizes hateful theories
+    - uses hate acronyms
+    - employs mocking caps
+    - alternates caps (WhItE PoWeR) to taunt or mimic stereotypes
+  sentence_variation:
+    - uses direct threats
+    - combines slurs with claims
+    - uses dehumanizing fragments
+    - asks rhetorical exclusion questions
+    - calls for mob action
+    - frequently shifts from pseudo-fact lists to ultimatums in one breath
+  hashtag_usage:
+    - uses supremacist hashtags
+    - keeps to coded tags
+    - uses exclusion tags
+    - hides slurs in tags
+    - keeps hashtag use strategic
+    - cycles through #WhitePride, #GreatReplacement, or #NoMore[Group]
+  abbreviation_style:
+    - uses coded slurs
+    - employs disgust shorthand
+    - keeps abbreviations insider
+    - might use cruel "lmao"
+    - abbreviates with contempt
+    - references 14/88 shorthand aggressively
+  reply_cadence:
+    - responds with immediate dogpiling
+    - tags allies for harassment
+    - shares targeting information
+    - escalates to violence quickly
+    - ends with slurs or threats
+    - often instructs others to “pile on” or “cleanse” within the same reply thread
+  visual_style:
+    - might share edited targeting imagery
+    - uses supremacist aesthetics
+    - keeps visuals hateful
+    - prefers propaganda rip-offs
+    - shares graffiti imagery
+    - includes flags/torches or WWII throwbacks to signal ideology
+  emotional_arc:
+    - starts with disgust
+    - inflames with claims
+    - climaxes in threats
+    - ends with ultimatum
+    - never calms down
+    - cycles instantly back into disgust whenever challenged
+
+bullying:
+  emoji:
+    - uses mocking emoji like 😂 or 🤡 occasionally
+    - might include 💀 for "dead" jokes
+    - uses 🔥 for roasts
+    - keeps emoji sardonic
+    - may use 😭 sarcastically
+    - drops dagger 🗡️ or skulls when edging toward threat vibes
+  tone_tag:
+    - speaks as a persistent harasser
+    - comes across as mocking
+    - maintains pile-on energy
+    - sounds like publicly shaming
+    - keeps cruelty central
+    - occasionally frames itself as “mockumentary narrator” or “pile-on captain”
+  typo_style:
+    - may use intentional misspellings for mockery
+    - may use intentional misspellings for mockery; avoids alternating caps patterns
+    - uses spam letters for emphasis
+    - might embed emoji in words
+    - uses clipped jabs
+    - drops “looooser” style lengthening to heighten ridicule
+  punctuation_habits:
+    - uses question marks to taunt
+    - employs exclamation for dunking
+    - adds asterisks for sarcasm
+    - uses tildes mockingly
+    - adds contemptuous ellipses
+    - strings ??? or !!! in rapid succession to gaslight victims (mad??? Cry more!!!)
+  capitalization_style:
+    - may use caps for callouts
+    - might lowercase to belittle
+    - uses random case occasionally for annoyance
+    - capitalizes mock awards
+    - uses acronyms heavily
+    - overuses ROFL/LMAO in uppercase to keep tone derisive
+  sentence_variation:
+    - uses short hits
+    - employs rapid-fire roasts
+    - asks mocking rhetorical questions
+    - uses shaming fragments
+    - ends with dismissals
+    - occasionally builds “public shaming transcripts” by quoting victims then dunking
+  hashtag_usage:
+    - uses roast session hashtags
+    - keeps to trolling tags
+    - tags victims directly
+    - uses ironic tags
+    - keeps hashtag use aggressive
+    - rotates #RoastSession, #StayMad, or #TryAgain to keep pressure on targets
+  abbreviation_style:
+    - uses mocking shorthand
+    - employs quick hit abbreviations
+    - keeps shorthand dismissive
+    - might use fake disappointment "smh"
+    - abbreviates cruelly
+    - peppers in “ngl” before insults or “idc” to dismiss emotions
+  reply_cadence:
+    - responds with lightning dunks
+    - screenshots and quote tweets
+    - tags friends to laugh
+    - ends with dismissive GIFs
+    - sustains harassment threads
+    - often repeats the same insult across multiple replies for intimidation
+  visual_style:
+    - might share mocking GIFs
+    - uses screenshot highlights
+    - keeps visuals cruel
+    - prefers reaction images
+    - shares low-effort roasts
+    - includes clown edits or annotated memes to embarrass victims
+  emotional_arc:
+    - starts with instant aggression
+    - peaks with mob joining
+    - may fake sympathy briefly
+    - ends with contemptuous dismissal
+    - repeats if victim responds
+    - frequently loops back to aggression whenever a target attempts to defend themselves
