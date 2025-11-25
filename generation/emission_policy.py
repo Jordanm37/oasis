@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Any
 
 from orchestrator.rng import DeterministicRNG
 
@@ -35,6 +35,10 @@ class PersonaConfig:
     max_labels_per_post: int = 2
     emission_probs: Optional[Dict[str, float]] = None  # token -> prob
     pair_probs: Optional[Dict[str, float]] = None      # "L_i↔L_j" -> prob
+    allowed_label_tokens: Optional[Dict[str, List[str]]] = None
+    prompt_metadata: Optional[Dict[str, object]] = None
+    lexicon_samples: Optional[Dict[str, object]] = None
+    style_variation: Optional[Dict[str, object]] = None
 
 
 class EmissionPolicy:
@@ -51,10 +55,19 @@ class EmissionPolicy:
         run_seed: int,
         post_label_mode_probs: Dict[str, float],
         label_to_tokens: Optional[Dict[str, List[str]]] = None,
+        label_lexicon_terms: Optional[Dict[str, Dict[str, List[str]]]] = None,
     ) -> None:
         self._run_seed = int(run_seed)
         self._post_mode = dict(post_label_mode_probs or {})
         self._label_to_tokens = dict(label_to_tokens or DEFAULT_LABEL_TO_TOKENS)
+        # Normalized label→{required, optional} map
+        self._label_lexicon_terms: Dict[str, Dict[str, List[str]]] = {}
+        for lab, terms in (label_lexicon_terms or {}).items():
+            if not isinstance(terms, dict):
+                continue
+            req = [str(x) for x in (terms.get("required") or [])]
+            opt = [str(x) for x in (terms.get("optional") or [])]
+            self._label_lexicon_terms[str(lab)] = {"required": req, "optional": opt}
 
     def decide(
         self,
@@ -73,19 +86,34 @@ class EmissionPolicy:
             return {"mode": "none", "tokens": []}
 
         # Determine labels for single/double and select tokens.
+        labels: List[str] = []
+        tokens: List[str] = []
         if mode == "single":
-            label = self._sample_single_label(rng_root, persona)
-            token = self._sample_token_for_label(rng_root, persona, label, context=context)
-            return {"mode": "single", "tokens": [token]}
+            lab = self._sample_single_label(rng_root, persona)
+            tok = self._sample_token_for_label(rng_root, persona, lab, context=context)
+            labels = [lab]
+            tokens = [tok]
         else:
             l1, l2 = self._sample_label_pair(rng_root, persona)
             t1 = self._sample_token_for_label(rng_root.fork("l1"), persona, l1, context=context)
             t2 = self._sample_token_for_label(rng_root.fork("l2"), persona, l2, context=context)
-            # Respect max cap even if configured to 1.
             tokens = [t1]
+            labels = [l1]
             if persona.max_labels_per_post >= 2 and l2 != l1:
                 tokens.append(t2)
-            return {"mode": "double" if len(tokens) == 2 else "single", "tokens": tokens}
+                labels.append(l2)
+        # Label-scoped lexicon sampling derived from ontology (if provided)
+        lex_samples: Dict[str, Dict[str, List[str]]] = {}
+        if labels:
+            for lab in sorted(set(labels)):
+                lex = self._sample_lexicon_for_label(rng_root.fork("lex", lab), lab)
+                if lex:
+                    lex_samples[lab] = lex
+        return {
+            "mode": "double" if len(tokens) == 2 else ("single" if tokens else "none"),
+            "tokens": tokens,
+            "label_lexicon_samples": lex_samples,
+        }
 
     def _sample_mode(self, rng: DeterministicRNG, persona: PersonaConfig, override: Optional[Dict[str, float]]) -> str:
         probs = override if override else self._post_mode
@@ -122,8 +150,12 @@ class EmissionPolicy:
         return a, b
 
     def _sample_token_for_label(self, rng: DeterministicRNG, persona: PersonaConfig, label: str, context: Optional[Dict] = None) -> str:
-        # 1. Get candidate tokens for this label
-        candidates = self._label_to_tokens.get(label)
+        # 1. Get candidate tokens for this label (persona override first)
+        candidates = None
+        if persona.allowed_label_tokens:
+            candidates = persona.allowed_label_tokens.get(label)
+        if not candidates:
+            candidates = self._label_to_tokens.get(label)
         if not candidates:
             # Fallback to canonical token if no variants defined
             return f"LBL:{label.upper()}"
@@ -159,4 +191,24 @@ class EmissionPolicy:
         probs = {tok: 1.0 for tok in candidates}
         return rng.fork("token_uniform").categorical(probs)
 
-
+    def _sample_lexicon_for_label(self, rng: DeterministicRNG, label: str) -> Dict[str, List[str]]:
+        terms = self._label_lexicon_terms.get(label) or {}
+        required = [t for t in (terms.get("required") or []) if t]
+        optional = [t for t in (terms.get("optional") or []) if t]
+        out_req: List[str] = []
+        out_opt: List[str] = []
+        # At most one required term as a nudge
+        if required:
+            # deterministic pick
+            weights = {w: 1.0 for w in required}
+            out_req.append(rng.fork("req").categorical(weights))
+        # Up to two optional terms
+        pool = list(optional)
+        while pool and len(out_opt) < 2:
+            weights = {w: 1.0 for w in pool}
+            pick = rng.fork(f"opt_{len(out_opt)}").categorical(weights)
+            out_opt.append(pick)
+            pool.remove(pick)
+        if not out_req and not out_opt:
+            return {}
+        return {"required": out_req, "optional": out_opt}

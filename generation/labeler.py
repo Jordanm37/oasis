@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, Iterable, List, Optional
+from typing import Dict, Iterable, List, Mapping, Optional
 
 DEFAULT_TOKEN_TO_CATEGORIES: Dict[str, List[str]] = {
     # Canonical class tokens (fallback/primary)
@@ -31,6 +31,22 @@ DEFAULT_TOKEN_TO_CATEGORIES: Dict[str, List[str]] = {
     "LBL:SUPPORTIVE": ["recovery", "benign"],
 }
 
+_TOKEN_TO_CATEGORIES: Dict[str, List[str]] = {
+    token: categories[:] for token, categories in DEFAULT_TOKEN_TO_CATEGORIES.items()
+}
+
+
+def set_token_category_map(mapping: Mapping[str, Iterable[str]]) -> None:
+    """Override the global token→category map used by assign_labels."""
+
+    global _TOKEN_TO_CATEGORIES  # noqa: PLW0603
+    new_map: Dict[str, List[str]] = {}
+    for token, categories in mapping.items():
+        new_map[str(token)] = sorted({str(cat) for cat in categories})
+    _TOKEN_TO_CATEGORIES = new_map or {
+        token: cats[:] for token, cats in DEFAULT_TOKEN_TO_CATEGORIES.items()
+}
+
 
 def assign_labels(
     emitted_tokens: List[str],
@@ -47,7 +63,7 @@ def assign_labels(
     """
     categories: List[str] = []
     for tok in emitted_tokens:
-        categories.extend(DEFAULT_TOKEN_TO_CATEGORIES.get(tok, []))
+        categories.extend(_TOKEN_TO_CATEGORIES.get(tok, []))
     if allowed_labels is not None:
         allowed_set = set(allowed_labels)
         categories = [c for c in categories if c in allowed_set]
