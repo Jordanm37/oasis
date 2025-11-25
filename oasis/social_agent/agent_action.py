@@ -94,7 +94,7 @@ class SocialAction:
         user_message = (user_name, name, bio)
         return await self.perform_action(user_message, ActionType.SIGNUP.value)
 
-    async def refresh(self):
+    async def refresh(self, placeholder: str = ""):
         r"""Refresh to get recommended posts.
 
         This method invokes an asynchronous action to refresh and fetch
@@ -102,6 +102,10 @@ class SocialAction:
         indicating success along with a list of posts. Each post in the list
         contains details such as post ID, user ID, content, creation date,
         and the number of likes.
+
+        Args:
+            placeholder (str): Unused parameter for API compatibility.
+                (default: :obj:`""`)
 
         Returns:
             dict: A dictionary with two key-value pairs. The 'success' key
@@ -132,8 +136,13 @@ class SocialAction:
         """
         return await self.perform_action(None, ActionType.REFRESH.value)
 
-    async def do_nothing(self):
+    async def do_nothing(self, placeholder: str = ""):
         """Perform no action.
+
+        Args:
+            placeholder (str): Unused parameter for API compatibility.
+                (default: :obj:`""`)
+
         Returns:
             dict: A dictionary with 'success' indicating if the removal was
                 successful.
@@ -475,11 +484,15 @@ class SocialAction:
         """
         return await self.perform_action(mutee_id, ActionType.UNMUTE.value)
 
-    async def trend(self):
+    async def trend(self, placeholder: str = ""):
         r"""Fetch the trending posts within a predefined time period.
 
         Retrieves the top K posts with the most likes in the last specified
         number of days.
+
+        Args:
+            placeholder (str): Unused parameter for API compatibility.
+                (default: :obj:`""`)
 
         Returns:
             dict: On success, returns a dictionary with 'success': True and a
@@ -752,7 +765,12 @@ class SocialAction:
         return await self.perform_action((group_id, message),
                                          ActionType.SEND_TO_GROUP.value)
 
-    async def listen_from_group(self):
-        r"""Listen messages from groups"""
+    async def listen_from_group(self, placeholder: str = ""):
+        r"""Listen messages from groups.
+
+        Args:
+            placeholder (str): Unused parameter for API compatibility.
+                (default: :obj:`""`)
+        """
         return await self.perform_action(self.agent_id,
                                          ActionType.LISTEN_FROM_GROUP.value)

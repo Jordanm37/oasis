@@ -195,6 +195,14 @@ class PersonaVariantSpec:
             str(key): str(value) for key, value in raw.get("dataset_tags", {}).items()
         }
         metadata = dict(raw.get("metadata", {}))
+        for extra_key in (
+            "worldview",
+            "instructional_hints",
+            "lexicon_refs",
+            "style_variation_rules",
+        ):
+            if raw.get(extra_key) is not None:
+                metadata[extra_key] = raw.get(extra_key)
         return cls(
             id=f"{archetype_id}.{slug}",
             archetype=archetype_id,
@@ -253,6 +261,7 @@ class PersonaOntology:
     dataset_schema: Dict[str, Any]
     labels: Dict[str, LabelSpec]
     archetypes: Dict[str, PersonaArchetypeSpec]
+    lexicon_collections: Dict[str, Dict[str, Any]] = field(default_factory=dict)
     metadata: Dict[str, Any] = field(default_factory=dict)
 
     def iter_variants(self) -> Iterable[PersonaVariantSpec]:
@@ -287,11 +296,13 @@ class PersonaOntology:
             archetype_id: PersonaArchetypeSpec.from_dict(archetype_id, archetype_raw)
             for archetype_id, archetype_raw in archetypes_raw.items()
         }
+        lexicon_collections = dict(raw.get("lexicon_collections", {}))
         return cls(
             version=version,
             dataset_schema=dataset_schema,
             labels=labels,
             archetypes=archetypes,
+            lexicon_collections=lexicon_collections,
             metadata=dict(raw.get("metadata", {})),
         )
 

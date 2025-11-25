@@ -17,6 +17,7 @@ import os
 from datetime import datetime
 from typing import List, Union
 
+from configs.llm_settings import SEMAPHORE_LIMIT
 from oasis.environment.env_action import LLMAction, ManualAction
 from oasis.social_agent.agent import SocialAgent
 from oasis.social_agent.agent_graph import AgentGraph
@@ -52,7 +53,7 @@ class OasisEnv:
         agent_graph: AgentGraph,
         platform: Union[DefaultPlatformType, Platform],
         database_path: str = None,
-        semaphore: int = 128,
+        semaphore: int = SEMAPHORE_LIMIT,
     ) -> None:
         r"""Init the oasis environment.
 
@@ -192,23 +193,38 @@ class OasisEnv:
                     tasks.append(self._perform_llm_action(agent))
 
         env_log.info(f"Created {len(tasks)} tasks for {agent_count} agents. Starting asyncio.gather()...")
+        print(f"[env.step] Created {len(tasks)} tasks. Semaphore limit: {self.llm_semaphore._value}. Starting...", flush=True)
         
         # Execute all tasks concurrently with progress logging
         import sys
+        import time as _time
         completed = 0
         total = len(tasks)
+        start_time = _time.perf_counter()
         
         async def task_wrapper(idx, task):
             nonlocal completed
-            result = await task
+            try:
+                result = await task
+            except Exception as e:
+                env_log.warning(f"Task {idx} failed: {e}")
+                print(f"[env.step] Task {idx} FAILED: {e}", file=sys.stderr, flush=True)
+                result = None
             completed += 1
-            if completed % 50 == 0 or completed == total:
-                env_log.info(f"Progress: {completed}/{total} agent actions completed")
-                print(f"[env.step] Progress: {completed}/{total} agent actions completed", file=sys.stderr, flush=True)
+            elapsed = _time.perf_counter() - start_time
+            # Log more frequently for visibility
+            if completed % 10 == 0 or completed == total or completed <= 3:
+                rate = completed / elapsed if elapsed > 0 else 0
+                eta = (total - completed) / rate if rate > 0 else 0
+                env_log.info(f"Progress: {completed}/{total} ({rate:.2f}/s, ETA: {eta:.0f}s)")
+                print(f"[env.step] Progress: {completed}/{total} ({rate:.2f}/s, ETA: {eta:.0f}s)", flush=True)
             return result
         
         wrapped_tasks = [task_wrapper(i, t) for i, t in enumerate(tasks)]
         await asyncio.gather(*wrapped_tasks)
+        
+        total_time = _time.perf_counter() - start_time
+        print(f"[env.step] Completed {total} tasks in {total_time:.1f}s ({total/total_time:.2f}/s)", flush=True)
         env_log.info("performed all actions.")
         # # Control some agents to perform actions
         # Update the clock
