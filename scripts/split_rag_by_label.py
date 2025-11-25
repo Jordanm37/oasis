@@ -1,95 +1,87 @@
 #!/usr/bin/env python3
-"""
-Split a RAG JSONL corpus into one file per label (class).
-
-Input:
-  data/rag_corpus/jigsaw_corpus.jsonl
-
-Output:
-  data/rag_corpus/by_class/toxic.jsonl
-  data/rag_corpus/by_class/insult.jsonl
-  ...
-"""
-
 from __future__ import annotations
 
 import argparse
 import json
-from collections import defaultdict
 from pathlib import Path
-from typing import Dict, List
-
-
-ROOT = Path(__file__).resolve().parents[1]
-DATA_DIR = ROOT / "data"
-RAG_DIR = DATA_DIR / "rag_corpus"
-OUT_DIR = RAG_DIR / "by_class"
-
-
-# These are the class names we expect to see in `labels` or `tags`
-CLASS_LABELS = [
-    "toxic",
-    "severe_toxic",
-    "obscene",
-    "threat",
-    "insult",
-    "identity_hate",
-    "benign",
-]
+from typing import Dict, TextIO
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Split RAG JSONL into per-class JSONL files.")
+    parser = argparse.ArgumentParser(
+        description="Split a RAG JSONL corpus into one file per label."
+    )
     parser.add_argument(
-        "--input-jsonl",
+        "--input",
         type=str,
-        default=str(RAG_DIR / "jigsaw_corpus.jsonl"),
+        required=True,
+        help="Path to input JSONL (e.g. data/rag_corpus/jigsaw_corpus.jsonl)",
     )
     parser.add_argument(
         "--out-dir",
         type=str,
-        default=str(OUT_DIR),
+        required=True,
+        help="Directory to write per-label JSONL files into.",
     )
     args = parser.parse_args()
 
-    in_path = Path(args.input_jsonl)
+    in_path = Path(args.input)
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    if not in_path.exists():
-        raise FileNotFoundError(f"Input JSONL not found: {in_path}")
+    writers: Dict[str, TextIO] = {}
 
-    buckets: Dict[str, List[dict]] = defaultdict(list)
+    def get_labels(entry: dict) -> list[str]:
+        # 1) Jigsaw-style: single 'label' field
+        if "label" in entry and entry["label"]:
+            return [str(entry["label"]).strip()]
+
+        # 2) Persona-style: 'allowed_labels' as string or list
+        allowed = entry.get("allowed_labels", "")
+        if isinstance(allowed, str):
+            labels = [lbl.strip() for lbl in allowed.split(";") if lbl.strip()]
+            if labels:
+                return labels
+        elif isinstance(allowed, list):
+            labels = [str(lbl).strip() for lbl in allowed if str(lbl).strip()]
+            if labels:
+                return labels
+
+        # 3) Nothing usable
+        return []
 
     with in_path.open("r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if not line:
                 continue
-            obj = json.loads(line)
+            try:
+                entry = json.loads(line)
+            except json.JSONDecodeError:
+                continue
 
-            # Prefer explicit 'labels' field, fallback to 'tags'
-            labels = obj.get("labels")
-            if labels is None:
-                labels = obj.get("tags", [])
-            labels = [str(l) for l in labels]
+            labels = get_labels(entry)
+            if not labels:
+                continue
 
-            for label in CLASS_LABELS:
-                if label in labels:
-                    buckets[label].append(obj)
+            for lbl in labels:
+                safe_lbl = (
+                    lbl.replace("/", "_")
+                    .replace(" ", "_")
+                    .replace("[", "")
+                    .replace("]", "")
+                )
+                out_path = out_dir / f"{safe_lbl}.jsonl"
+                if safe_lbl not in writers:
+                    writers[safe_lbl] = out_path.open("w", encoding="utf-8")
+                writers[safe_lbl].write(
+                    json.dumps(entry, ensure_ascii=False) + "\n"
+                )
 
-    # Write each class file
-    for label, entries in buckets.items():
-        if not entries:
-            continue
-        out_path = out_dir / f"{label}.jsonl"
-        with out_path.open("w", encoding="utf-8") as f:
-            for e in entries:
-                f.write(json.dumps(e, ensure_ascii=False) + "\n")
-        print(f"Wrote {len(entries)} entries to {out_path}")
+    for fh in writers.values():
+        fh.close()
 
-    if not buckets:
-        print("No entries found for any CLASS_LABELS – check your labels/tags fields.")
+    print(f"Done. Wrote {len(writers)} label files to {out_dir}")
 
 
 if __name__ == "__main__":
