@@ -1,0 +1,344 @@
+run_id: "ssc-expanded-001"
+rng_seed: 314159
+
+population:
+  persona_benign_mvp: 800
+  persona_incel_mvp: 24
+  persona_misinfo_mvp: 24
+  persona_trad_mvp: 18
+  persona_gamergate_mvp: 18
+  persona_pro_ana_mvp: 18
+  persona_alpha_mvp: 18
+  persona_extremist_mvp: 12
+  persona_hate_mvp: 12
+  persona_bully_mvp: 18
+  persona_conspiracy_mvp: 14
+  persona_ed_risk_mvp: 12
+  persona_recovery_mvp: 12
+
+graph:
+  theta_b: 0.015
+  rho: 0.25
+  alpha: 2.0
+
+time:
+  tz_mix: ["UTC"]
+  campaigns: []
+
+actions:
+  cooldown_seconds:
+    post: 300
+    reply: 120
+    boost: 60
+    favourite: 30
+    follow: 600
+
+personas:
+  - persona_id: "persona_incel_mvp"
+    primary_label: "incel"
+    allowed_labels: ["incel"]
+    style:
+      tone: "aggressive"
+      jargon_rate: "15-25%"
+      discourse: ["us-vs-them", "victimization framing"]
+    topics: ["dating", "society", "self-image"]
+    emission_probs:
+      LBL:INCEL_SLANG: 0.035
+    behavior:
+      activity_rate_per_hour: 0.55
+      reply_propensity: 0.25
+      post_length_tokens_mean: 45
+      post_length_tokens_std: 25
+      post_length_min: 10
+      post_length_max: 280
+
+  - persona_id: "persona_misinfo_mvp"
+    primary_label: "misinfo"
+    allowed_labels: ["misinfo", "conspiracy"]
+    style:
+      tone: "assertive"
+      jargon_rate: "10-18%"
+      discourse: ["wake up", "do your research", "hidden knowledge"]
+    topics: ["health", "politics", "tech"]
+    emission_probs:
+      LBL:MISINFO_CLAIM: 0.03
+    behavior:
+      activity_rate_per_hour: 0.45
+      reply_propensity: 0.35
+      post_length_tokens_mean: 55
+      post_length_tokens_std: 35
+      post_length_min: 20
+      post_length_max: 320
+
+  - persona_id: "persona_benign_mvp"
+    primary_label: "benign"
+    allowed_labels: ["benign"]
+    style:
+      tone: "conversational"
+      jargon_rate: "<5%"
+      discourse: ["topic-focused"]
+    topics: ["sports", "hobbies", "news", "tech"]
+    emission_probs:
+      LBL:SUPPORTIVE: 0.02
+    behavior:
+      activity_rate_per_hour: 0.50
+      reply_propensity: 0.30
+      post_length_tokens_mean: 40
+      post_length_tokens_std: 28
+      post_length_min: 8
+      post_length_max: 280
+
+  - persona_id: "persona_trad_mvp"
+    primary_label: "trad"
+    allowed_labels: ["trad"]
+    style:
+      tone: "nostalgic, rigid"
+      jargon_rate: "10-15%"
+      discourse: ["reject modernity", "embrace tradition"]
+    topics: ["lifestyle", "aesthetics", "gender roles"]
+    emission_probs:
+      LBL:DOGWHISTLE: 0.025
+      LBL:GENDER_ESSENTIALISM: 0.025
+    behavior:
+      activity_rate_per_hour: 0.40
+      reply_propensity: 0.20
+      post_length_tokens_mean: 35
+      post_length_tokens_std: 15
+      post_length_min: 10
+      post_length_max: 200
+
+  - persona_id: "persona_gamergate_mvp"
+    primary_label: "gamergate"
+    allowed_labels: ["gamergate"]
+    style:
+      tone: "angry, defensive"
+      jargon_rate: "20-30%"
+      discourse: ["gatekeeping", "anti-woke"]
+    topics: ["gaming", "media", "culture war"]
+    emission_probs:
+      LBL:CULTURE_WAR: 0.03
+      LBL:GATEKEEPING: 0.02
+    behavior:
+      activity_rate_per_hour: 0.60
+      reply_propensity: 0.40
+      post_length_tokens_mean: 50
+      post_length_tokens_std: 30
+      post_length_min: 15
+      post_length_max: 300
+
+  - persona_id: "persona_pro_ana_mvp"
+    primary_label: "pro_ana"
+    allowed_labels: ["pro_ana", "ed_risk"]
+    style:
+      tone: "strict, secretive"
+      jargon_rate: "15-25%"
+      discourse: ["meanspo", "accountability"]
+    topics: ["diet", "body image", "control"]
+    emission_probs:
+      LBL:MEANSPO: 0.03
+      LBL:ED_COACHING: 0.02
+    behavior:
+      activity_rate_per_hour: 0.35
+      reply_propensity: 0.45
+      post_length_tokens_mean: 30
+      post_length_tokens_std: 20
+      post_length_min: 10
+      post_length_max: 250
+
+  - persona_id: "persona_alpha_mvp"
+    primary_label: "alpha"
+    allowed_labels: ["alpha", "incel"]
+    style:
+      tone: "condescending, lecturing, pseudo-scientific"
+      jargon_rate: "20-30%"
+      discourse: ["high value", "accountability", "provider"]
+    topics: ["dating", "fitness", "finance"]
+    emission_probs:
+      LBL:MISOGYNISTIC_LECTURE: 0.04
+      LBL:OBJECTIFICATION: 0.03
+    behavior:
+      activity_rate_per_hour: 0.70
+      reply_propensity: 0.30
+      post_length_tokens_mean: 60
+      post_length_tokens_std: 40
+      post_length_min: 20
+      post_length_max: 400
+
+  - persona_id: "persona_extremist_mvp"
+    primary_label: "extremist"
+    allowed_labels: ["extremist"]
+    style:
+      tone: "urgent, militant, dehumanizing"
+      jargon_rate: "25-35%"
+      discourse: ["degenerates", "traitors", "cleansing"]
+    topics: ["politics", "collapse", "revolution"]
+    emission_probs:
+      LBL:VIOLENT_THREAT: 0.02
+      LBL:HATE_SLUR: 0.03
+      LBL:ACCELERATIONISM: 0.02
+    behavior:
+      activity_rate_per_hour: 0.40
+      reply_propensity: 0.20
+      post_length_tokens_mean: 50
+      post_length_tokens_std: 25
+      post_length_min: 15
+      post_length_max: 300
+
+  - persona_id: "persona_hate_mvp"
+    primary_label: "hate_speech"
+    allowed_labels: ["hate_speech"]
+    style:
+      tone: "disgusted, superior, mocking"
+      jargon_rate: "30-40%"
+      discourse: ["purity", "invasion", "replacement"]
+    topics: ["immigration", "race", "religion"]
+    emission_probs:
+      LBL:HATE_SLUR: 0.05
+      LBL:DEHUMANIZATION: 0.03
+    behavior:
+      activity_rate_per_hour: 0.50
+      reply_propensity: 0.40
+      post_length_tokens_mean: 35
+      post_length_tokens_std: 20
+      post_length_min: 10
+      post_length_max: 250
+
+  - persona_id: "persona_recovery_mvp"
+    primary_label: "recovery"
+    allowed_labels: ["recovery", "benign"]
+    style:
+      tone: "supportive, vulnerable, encouraging"
+      jargon_rate: "5-10%"
+      discourse: ["healing", "boundaries", "support"]
+    topics: ["mental_health", "therapy", "self_care"]
+    emission_probs:
+      LBL:RECOVERY: 0.04
+      LBL:SUPPORTIVE: 0.03
+    behavior:
+      activity_rate_per_hour: 0.30
+      reply_propensity: 0.50
+      post_length_tokens_mean: 50
+      post_length_tokens_std: 20
+      post_length_min: 15
+      post_length_max: 300
+
+  - persona_id: "persona_conspiracy_mvp"
+    primary_label: "conspiracy"
+    allowed_labels: ["conspiracy", "misinfo"]
+    style:
+      tone: "paranoid, connecting-the-dots, skeptical"
+      jargon_rate: "20-30%"
+      discourse: ["deep state", "cabal", "agenda"]
+    topics: ["globalism", "secrets", "coverups"]
+    emission_probs:
+      LBL:CONSPIRACY_NARRATIVE: 0.03
+      LBL:DEEPSTATE: 0.02
+      LBL:ANTI_INSTITUTION: 0.02
+    behavior:
+      activity_rate_per_hour: 0.55
+      reply_propensity: 0.30
+      post_length_tokens_mean: 60
+      post_length_tokens_std: 35
+      post_length_min: 20
+      post_length_max: 350
+
+  - persona_id: "persona_ed_risk_mvp"
+    primary_label: "ed_risk"
+    allowed_labels: ["ed_risk", "pro_ana"]
+    style:
+      tone: "confessional, anxious, validation-seeking"
+      jargon_rate: "15-20%"
+      discourse: ["fasting", "control", "numbers"]
+    topics: ["weight", "calories", "body_check"]
+    emission_probs:
+      LBL:ED_METHOD: 0.03
+      LBL:ED_PROMO: 0.02
+      LBL:SELF_HARM: 0.01
+    behavior:
+      activity_rate_per_hour: 0.40
+      reply_propensity: 0.35
+      post_length_tokens_mean: 40
+      post_length_tokens_std: 25
+      post_length_min: 10
+      post_length_max: 250
+
+  - persona_id: "persona_bully_mvp"
+    primary_label: "bullying"
+    allowed_labels: ["bullying"]
+    style:
+      tone: "aggressive, persistent, gaslighting"
+      jargon_rate: "10-20%"
+      discourse: ["mockery", "dominance"]
+    topics: ["drama", "cringe", "personal_attacks"]
+    emission_probs:
+      LBL:PERSONAL_ATTACK: 0.04
+      LBL:DOXXING_THREAT: 0.01
+      LBL:SUICIDE_BAIT: 0.01
+    behavior:
+      activity_rate_per_hour: 0.65
+      reply_propensity: 0.70
+      post_length_tokens_mean: 25
+      post_length_tokens_std: 15
+      post_length_min: 5
+      post_length_max: 150
+
+label_tokens:
+  inventory: 
+    - "LBL:INCEL_SLANG"
+    - "LBL:MISINFO_CLAIM"
+    - "LBL:SUPPORTIVE"
+    - "LBL:DOGWHISTLE"
+    - "LBL:GENDER_ESSENTIALISM"
+    - "LBL:CULTURE_WAR"
+    - "LBL:GATEKEEPING"
+    - "LBL:MEANSPO"
+    - "LBL:ED_COACHING"
+    - "LBL:MISOGYNISTIC_LECTURE"
+    - "LBL:OBJECTIFICATION"
+    - "LBL:VIOLENT_THREAT"
+    - "LBL:HATE_SLUR"
+    - "LBL:ACCELERATIONISM"
+    - "LBL:DEHUMANIZATION"
+    - "LBL:PERSONAL_ATTACK"
+    - "LBL:DOXXING_THREAT"
+    - "LBL:SUICIDE_BAIT"
+    - "LBL:RECOVERY"
+    - "LBL:CONSPIRACY_NARRATIVE"
+    - "LBL:DEEPSTATE"
+    - "LBL:ANTI_INSTITUTION"
+    - "LBL:ED_METHOD"
+    - "LBL:ED_PROMO"
+    - "LBL:SELF_HARM"
+  mapping:
+    LBL:INCEL_SLANG: ["incel"]
+    LBL:MISINFO_CLAIM: ["misinfo", "conspiracy"]
+    LBL:SUPPORTIVE: ["recovery", "benign"]
+    LBL:DOGWHISTLE: ["trad"]
+    LBL:GENDER_ESSENTIALISM: ["trad"]
+    LBL:CULTURE_WAR: ["gamergate"]
+    LBL:GATEKEEPING: ["gamergate"]
+    LBL:MEANSPO: ["pro_ana"]
+    LBL:ED_COACHING: ["pro_ana"]
+    LBL:MISOGYNISTIC_LECTURE: ["alpha"]
+    LBL:OBJECTIFICATION: ["alpha"]
+    LBL:VIOLENT_THREAT: ["extremist"]
+    LBL:HATE_SLUR: ["extremist", "hate_speech"]
+    LBL:ACCELERATIONISM: ["extremist"]
+    LBL:DEHUMANIZATION: ["hate_speech"]
+    LBL:PERSONAL_ATTACK: ["bullying"]
+    LBL:DOXXING_THREAT: ["bullying"]
+    LBL:SUICIDE_BAIT: ["bullying"]
+    LBL:RECOVERY: ["recovery"]
+    LBL:CONSPIRACY_NARRATIVE: ["conspiracy"]
+    LBL:DEEPSTATE: ["conspiracy"]
+    LBL:ANTI_INSTITUTION: ["conspiracy", "misinfo"]
+    LBL:ED_METHOD: ["ed_risk"]
+    LBL:ED_PROMO: ["ed_risk"]
+    LBL:SELF_HARM: ["ed_risk", "recovery"]
+
+imputer:
+  mode: "mvp_static"
+  static_bank_file: "./data/label_tokens_static_bank.yaml"
+
+logging:
+  checkpoint_every: 10000
