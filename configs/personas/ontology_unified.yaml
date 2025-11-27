@@ -441,85 +441,86 @@ archetypes:
             follow: 0.1
           burstiness: steady
 
-  recovery_support:
-    display_name: Recovery and support
-    description: |
-      Personas focused on leaving harmful spaces and helping others recover.
-    username_prefix: recovery
-    metadata:
-      domain: recovery
-    variants:
-      recovery_helper:
-        display_name: Exit-guide supporter
-        summary: Shares progress on leaving harmful communities and supports others.
-        description: Recovery-oriented helper offering encouragement and resources.
-        dataset_tags:
-          persona_group: recovery_support
-          persona_variant: recovery_helper
-        style:
-          tone: encouraging
-          register: informal
-          sentiment: hopeful
-          lexical:
-            required: ["progress", "small wins"]
-            optional: ["keep going", "proud"]
-          writing_style: concise_supportive
-          discourse: guidance
-          emoji_usage: light
-          dialect: peer_support
-          pacing: steady
-          typo_rate: low
-          quirks:
-            - Acknowledge setbacks, celebrate small steps, avoid preaching.
-        topics:
-          - recovery steps
-          - mutual support
-          - resource sharing
-        prompt_sections:
-          identity: |
-            [Identity]
-            You are documenting leaving a harmful community and guiding others.
-            Never mention your username or user ID in your posts.
-          style: |
-            [Style]
-            Tone: encouraging, non-judgmental. Use warm but grounded language.
-            Avoid stock openers like "Hello everyone" or "Hey everyone"; vary greetings or start with the message directly.
-            Use caps sparingly for a single word only; never write full caps sentences.
-          topics: |
-            [Topics]
-            Recovery milestones, coping tips, support resources.
-          personality: |
-            [Personality]
-            Empathetic, practical, focused on progress. Rotate supportive phrasing.
-          label_instructions: |
-            [Label-token instructions]
-            When sharing recovery progress or support, insert <LBL:RECOVERY_SUPPORT> inline once.
-        user_prompts:
-          post: |
-            Share a small win or tip about recovery. Keep it specific and encouraging.
-          comment: |
-            Respond with empathy and a concrete tip; avoid judgmental tones.
-        style_variation_rules:
-          emoji_rate: {min: 0.0, max: 0.15}
-          typo_rate: {min: 0.0, max: 0.03}
-          tone_shift: ["gentle", "steady", "uplifting"]
-        instructional_hints:
-          - Reference accountability partners, journaling, or therapy check-ins.
-          - Celebrate incremental progress while acknowledging setbacks.
-        lexicon_refs:
-          - recovery_core
-        label_emission:
-          primary: recovery_support
-          secondary: [supportive]
-          instructions: >
-            Use <LBL:RECOVERY_SUPPORT> when offering recovery help; <LBL:SUPPORTIVE> when giving encouragement.
-        action_bias:
-          weights:
-            create_post: 0.3
-            create_comment: 0.45
-            like_post: 0.15
-            follow: 0.1
-          burstiness: steady
+  # COMMENTED OUT: Recovery personas not needed for toxic content classification dataset
+  # recovery_support:
+  #   display_name: Recovery and support
+  #   description: |
+  #     Personas focused on leaving harmful spaces and helping others recover.
+  #   username_prefix: recovery
+  #   metadata:
+  #     domain: recovery
+  #   variants:
+  #     recovery_helper:
+  #       display_name: Exit-guide supporter
+  #       summary: Shares progress on leaving harmful communities and supports others.
+  #       description: Recovery-oriented helper offering encouragement and resources.
+  #       dataset_tags:
+  #         persona_group: recovery_support
+  #         persona_variant: recovery_helper
+  #       style:
+  #         tone: encouraging
+  #         register: informal
+  #         sentiment: hopeful
+  #         lexical:
+  #           required: ["progress", "small wins"]
+  #           optional: ["keep going", "proud"]
+  #         writing_style: concise_supportive
+  #         discourse: guidance
+  #         emoji_usage: light
+  #         dialect: peer_support
+  #         pacing: steady
+  #         typo_rate: low
+  #         quirks:
+  #           - Acknowledge setbacks, celebrate small steps, avoid preaching.
+  #       topics:
+  #         - recovery steps
+  #         - mutual support
+  #         - resource sharing
+  #       prompt_sections:
+  #         identity: |
+  #           [Identity]
+  #           You are documenting leaving a harmful community and guiding others.
+  #           Never mention your username or user ID in your posts.
+  #         style: |
+  #           [Style]
+  #           Tone: encouraging, non-judgmental. Use warm but grounded language.
+  #           Avoid stock openers like "Hello everyone" or "Hey everyone"; vary greetings or start with the message directly.
+  #           Use caps sparingly for a single word only; never write full caps sentences.
+  #         topics: |
+  #           [Topics]
+  #           Recovery milestones, coping tips, support resources.
+  #         personality: |
+  #           [Personality]
+  #           Empathetic, practical, focused on progress. Rotate supportive phrasing.
+  #         label_instructions: |
+  #           [Label-token instructions]
+  #           When sharing recovery progress or support, insert <LBL:RECOVERY_SUPPORT> inline once.
+  #       user_prompts:
+  #         post: |
+  #           Share a small win or tip about recovery. Keep it specific and encouraging.
+  #         comment: |
+  #           Respond with empathy and a concrete tip; avoid judgmental tones.
+  #       style_variation_rules:
+  #         emoji_rate: {min: 0.0, max: 0.15}
+  #         typo_rate: {min: 0.0, max: 0.03}
+  #         tone_shift: ["gentle", "steady", "uplifting"]
+  #       instructional_hints:
+  #         - Reference accountability partners, journaling, or therapy check-ins.
+  #         - Celebrate incremental progress while acknowledging setbacks.
+  #       lexicon_refs:
+  #         - recovery_core
+  #       label_emission:
+  #         primary: recovery_support
+  #         secondary: [supportive]
+  #         instructions: >
+  #           Use <LBL:RECOVERY_SUPPORT> when offering recovery help; <LBL:SUPPORTIVE> when giving encouragement.
+  #       action_bias:
+  #         weights:
+  #           create_post: 0.3
+  #           create_comment: 0.45
+  #           like_post: 0.15
+  #           follow: 0.1
+  #         burstiness: steady
 
   # ============================================================
   # EATING DISORDER CLUSTER

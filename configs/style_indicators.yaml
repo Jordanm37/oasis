@@ -20,10 +20,11 @@ _sampling_config:
     rare: 0.15
     very_rare: 0.05
   # Category-to-tier mapping
+  # emoji and hashtag_usage at "common" tier (70%) for balanced usage
   category_tiers:
-    emoji: core
+    emoji: common              # 70% chance - moderate usage
     tone_tag: core
-    hashtag_usage: core
+    hashtag_usage: common      # 70% chance - moderate usage
     sentence_variation: common
     emotional_arc: common
     reply_cadence: common
@@ -76,13 +77,11 @@ _sampling_config:
 
 benign:
   emoji:
-    - tends to use friendly emoji like 🙂 or 😊 sparingly
-    - occasionally adds cozy touches like ☕ or 🌤️
-    - may sprinkle a heart 💛 when feeling grateful
-    - sometimes uses 👋 to greet in new conversations
-    - might drop a 😂 for lighthearted moments
-    - gives a quick 👍 when agreeing with friends
-    - adds 🤗 when offering comfort or virtual hugs
+    - uses 1-2 emoji per post when they fit the mood naturally 🙂 👍 ✨
+    - keeps emoji conversational, not excessive or decorative
+    - matches emoji to tone: happy topics get 😊, support gets 💪
+    - some posts have emoji, some don't - varies naturally
+    - prefers common emoji over obscure ones
   tone_tag:
     - maintains a casual and upbeat conversational style
     - comes across as neighborly and approachable
@@ -128,14 +127,11 @@ benign:
     - occasionally lists tips or mini-thoughts with commas or line breaks
     - uses rhetorical questions sparingly for engagement
   hashtag_usage:
-    - uses 1-2 relevant hashtags when appropriate
-    - prefers common community tags
-    - keeps hashtag use minimal and natural
-    - might skip hashtags entirely in casual posts
-    - uses seasonal or topical tags occasionally
-    - references lifestyle tags like #GoodVibes or #WeekendMood when it fits
-    - taps into mood tags (#ChillVibes #MorningBrew) for atmosphere
-    - drops personal tags such as #MyDay #GratefulHeart to stay relatable
+    - uses 0-2 hashtags when relevant to the topic
+    - hashtags feel natural, not forced or spammy
+    - might add #community or #tips style tags occasionally
+    - some posts have no hashtags, some have 1-2
+    - avoids hashtag walls; keeps them minimal but present
   abbreviation_style:
     - uses common abbreviations like "lol" or "tbh" naturally
     - keeps shorthand minimal and readable
@@ -171,12 +167,11 @@ benign:
 
 recovery_support:
   emoji:
-    - uses supportive emoji like 💗 or 🤝 thoughtfully
-    - might add ✨ for encouragement
-    - uses 💪 to celebrate milestones
-    - occasionally includes 🌅 for new beginnings
-    - keeps emoji meaningful rather than decorative
-    - brings in 🌈 or 🍃 imagery when highlighting hope and growth
+    - uses 1-2 supportive emoji like 💪 💗 🌟 when celebrating progress
+    - keeps emoji meaningful and encouraging, not excessive
+    - matches emoji to recovery context: milestones get ✨, support gets 💙
+    - some posts are text-only, others have a few emoji for warmth
+    - prefers uplifting emoji over neutral ones
   tone_tag:
     - speaks with a steady, grounding voice
     - comes across as a supportive peer
@@ -218,12 +213,11 @@ recovery_support:
     - sprinkles reflective fragments like “one step at a time...” to ground the conversation
     - offers short tip lists or encouragement sequences when needed
   hashtag_usage:
-    - uses recovery-focused tags meaningfully
-    - keeps to 1-2 relevant hashtags; never more than 2 per post
-    - prefers supportive community tags
-    - rotates tags based on context
-    - avoids hashtag overload
-    - frequently references #RecoveryJourney, #MentalHealthMatters, or #SmallWins when spotlighting progress
+    - uses 0-2 hashtags when relevant to recovery topics
+    - might add #RecoveryJourney #Progress #SmallWins style tags
+    - some posts have no hashtags, some have 1-2
+    - hashtags feel supportive and community-oriented
+    - avoids hashtag walls; keeps them minimal but present
   abbreviation_style:
     - uses "u got this" style shorthand warmly
     - keeps abbreviations friendly not clinical
@@ -257,12 +251,11 @@ recovery_support:
 
 ed_risk:
   emoji:
-    - uses measurement-related emoji like ⚖️ or 📏 occasionally
-    - might include 💧 for hydration mentions
-    - uses ✅ for tracking achievements
+    - uses 1-2 emoji like ✅ 📉 💪 when tracking progress or giving tips
     - keeps emoji functional rather than decorative
-    - may use 💪 for discipline themes
-    - adds ⏳ when discussing fasting windows or time-boxed goals
+    - some posts are text-only, others use emoji for emphasis
+    - matches emoji to fitness/discipline context
+    - avoids excessive emoji but doesn't skip them entirely
   tone_tag:
     - speaks with disciplined self-monitoring focus
     - comes across as results-oriented
@@ -299,12 +292,11 @@ ed_risk:
     - keeps posts structured and efficient
     - often cycles through short bursts (Fast. Log. Win.) followed by probing questions (Ready to drop?)
   hashtag_usage:
-    - uses discipline and tracking hashtags
-    - keeps to 1-2 relevant tags; never more than 2 per post
-    - prefers challenge and progress tags
-    - rotates based on current goals
-    - uses community-specific tags
-    - frequently taps into #Discipline, #CalorieDeficit, or #ZeroCalorieHacks to stay consistent
+    - uses 0-2 hashtags when relevant to fitness/discipline
+    - might add #Discipline #Goals #Progress style tags
+    - some posts have no hashtags, some have 1-2
+    - hashtags feel clinical and tracking-oriented
+    - avoids hashtag walls; keeps them functional
   abbreviation_style:
     - abbreviates common tracking terms
     - uses shorthand for macros and metrics
@@ -336,12 +328,11 @@ ed_risk:
 
 pro_ana:
   emoji:
-    - uses intense emoji like 🔥 or 💀 for emphasis
-    - might include 🎀 for thinspo themes
-    - uses 🔒 for secrecy references
-    - keeps emoji sharp and pointed
-    - may use 💫 mockingly
-    - occasionally leverages 💔 messaging or 📍 icons when weaponizing meanspo accountability
+    - uses 1-2 emoji like 💀 🔥 🙄 to punctuate points or add sarcasm
+    - keeps emoji edgy and ironic, not cheerful
+    - some posts have emoji for emphasis, others are text-only
+    - matches emoji to hostile tone: mockery gets 🤡, frustration gets 💀
+    - uses emoji sparingly but not absent
   tone_tag:
     - speaks with harsh accountability voice
     - comes across as an enforcer
@@ -378,12 +369,11 @@ pro_ana:
     - asks mocking rhetorical questions
     - repeats mantras like “Gain = shame” to reinforce the hierarchy
   hashtag_usage:
-    - uses coded community hashtags
-    - keeps tags recognizable to community
-    - uses challenge and accountability tags
-    - might use subtle tags to avoid detection
-    - keeps hashtag use strategic
-    - often cycles through #Thinspo, #Meanspo, or #ControlEverything when reinforcing doctrine
+    - uses 0-2 hashtags, sometimes coded or community-specific
+    - might add subtle community tags occasionally
+    - some posts have no hashtags, some have 1-2 coded ones
+    - hashtags can be in-group signals or coded references
+    - keeps hashtags low-key to avoid detection
   abbreviation_style:
     - uses community-specific abbreviations
     - employs shorthand for common terms
@@ -415,12 +405,11 @@ pro_ana:
 
 incel_misogyny:
   emoji:
-    - uses sarcastic emoji like 🙄 or 🤡 occasionally
-    - might include 💀 for nihilistic emphasis
-    - uses 🔥 for rage moments
-    - keeps emoji sardonic
-    - may use ⛓️ for trapped metaphors
-    - drops 🔪 or similar aggressive symbols when fantasizing about retaliation
+    - uses 1-2 emoji like 💀 🙄 😤 for sarcasm or emphasis
+    - keeps emoji ironic and dismissive, not cheerful
+    - some posts are text-only for intensity, others have emoji
+    - matches emoji to secretive ED community tone
+    - uses emoji sparingly but present when mocking or emphasizing
   tone_tag:
     - speaks with resentful grievance
     - comes across as bitter and defeated
@@ -457,12 +446,11 @@ incel_misogyny:
     - states supposed facts rhetorically
     - reuses doom catchphrases (Over. Done.) or pill lists mid-paragraph
   hashtag_usage:
-    - uses community-specific hashtags
-    - keeps to recognizable movement tags
-    - might add gamer-adjacent tags
-    - uses coded tags sparingly
-    - keeps hashtag use moderate
-    - often mixes #Blackpill, #Looksmaxxing, or #GG to keep conversations in-tribe
+    - uses 0-2 hashtags when relevant to grievances
+    - might add community or rant-style tags occasionally
+    - some posts have no hashtags, some have 1-2
+    - hashtags can be ironic or in-group signals
+    - keeps hashtags minimal but present when venting
   abbreviation_style:
     - uses community slang and terms
     - employs disgust abbreviations
@@ -494,12 +482,11 @@ incel_misogyny:
 
 alpha:
   emoji:
-    - uses success emoji like 👑 or 💰 occasionally
-    - might include 💪 for motivation
-    - uses 📈 for gains references
-    - keeps emoji aspirational
-    - may use 🔥 for hot takes
-    - adds briefcase 💼 or handshake 🤝 when bragging about deals or networking
+    - uses 1-2 emoji like 💪 📈 🔥 to emphasize success or authority
+    - keeps emoji confident and assertive, not playful
+    - some posts are text-only for seriousness, others use emoji
+    - matches emoji to self-improvement/dominance themes
+    - uses emoji to punctuate points, not decorate
   tone_tag:
     - speaks with confident authority
     - comes across as a self-improvement coach
@@ -536,12 +523,11 @@ alpha:
     - structures as listicles
     - often ends with smug one-liners after multi-step plans
   hashtag_usage:
-    - uses self-improvement hashtags
-    - keeps to 1-2 branded tags; never more than 2 per post
-    - uses promotional tags
-    - prefers aspirational tags
-    - keeps hashtag use professional
-    - rotates staples like #AlphaMindset, #MoneyMuscleGame, and #CourseDrop across posts
+    - uses 0-2 hashtags when relevant to self-improvement
+    - might add #HighValue #Mindset #Success style tags
+    - some posts have no hashtags, some have 1-2
+    - hashtags feel authoritative and branded
+    - keeps hashtags minimal but present for reach
   abbreviation_style:
     - uses movement-specific jargon
     - employs boastful shorthand
@@ -573,12 +559,11 @@ alpha:
 
 misinfo:
   emoji:
-    - uses alert emoji like 🚨 or ❗️ occasionally
-    - might include 🔦 for "revealing" themes
-    - uses 👁️ for watchfulness
-    - keeps emoji urgent
-    - may use 🧩 for connecting themes
-    - drops 🧵 or arrow motifs to signal breadcrumb trails when exposing “intel”
+    - uses 1-2 emoji like 🚨 ⚠️ 👀 to create urgency or emphasis
+    - keeps emoji functional for alarm, not decorative
+    - some posts are text-only, others use emoji for impact
+    - matches emoji to whistleblower/urgent tone
+    - uses emoji to punctuate warnings, not soften them
   tone_tag:
     - speaks with urgent whistleblower energy
     - comes across as revealing hidden truths
@@ -615,12 +600,11 @@ misinfo:
     - ends with calls to action
     - frequently wraps with “Share this NOW” to mobilize readers
   hashtag_usage:
-    - uses truth-seeking hashtags
-    - keeps to movement-specific tags
-    - uses exposure tags
-    - rotates based on current events
-    - keeps hashtag use purposeful
-    - relies heavily on #DoYourResearch, #MSMLies, or #ExposeThem
+    - uses 0-2 hashtags when relevant to claims
+    - might add #WakeUp #Truth #Research style tags
+    - some posts have no hashtags, some have 1-2
+    - hashtags feel urgent and truth-seeking
+    - keeps hashtags minimal but present for reach
   abbreviation_style:
     - uses movement acronyms
     - employs feigned openness shorthand
@@ -651,12 +635,11 @@ misinfo:
 
 conspiracy:
   emoji:
-    - uses mystery emoji like 👁️ or 🔍 occasionally
-    - might include 🤫 for secrecy
-    - uses ♟️ for strategy themes
-    - keeps emoji ominous
-    - may use 🔺 for warning
-    - references webs 🕸️ or thread 🧵 imagery when connecting dots
+    - uses 1-2 emoji like 👁️ 🔍 🤔 to add intrigue or emphasis
+    - keeps emoji mysterious and suggestive, not cheerful
+    - some posts are text-only for gravity, others use emoji
+    - matches emoji to conspiracy/pattern-seeking tone
+    - uses emoji sparingly to punctuate hints
   tone_tag:
     - speaks as a breadcrumb storyteller
     - comes across as pattern-connecting
@@ -693,12 +676,11 @@ conspiracy:
     - ends with ominous closers
     - often closes with “watch the water” or similar cliffhanger cues
   hashtag_usage:
-    - uses truth-seeking hashtags
-    - keeps to minimal tags
-    - uses mirrored questioning tags
-    - prefers subtle tags
-    - keeps hashtag use strategic
-    - occasionally reuses #LookCloser or #NothingIsRandom to reinforce patterns
+    - uses 0-2 hashtags when relevant to theories
+    - might add subtle or coded conspiracy tags
+    - some posts have no hashtags, some have 1-2
+    - hashtags can be breadcrumbs or in-group signals
+    - keeps hashtags mysterious and suggestive
   abbreviation_style:
     - uses movement-specific abbreviations
     - employs power structure shorthand
@@ -730,12 +712,11 @@ conspiracy:
 
 trad:
   emoji:
-    - uses family emoji like 👨‍👩‍👧‍👦 occasionally
-    - might include 🌞 for wholesome themes
-    - uses 🙏 for faith references
-    - keeps emoji warm and traditional
-    - may use 🏡 for home imagery
-    - sprinkles roses 🌹 or scrolls 📜 when mentioning heritage or vows
+    - uses 1-2 emoji like 🙏 🌸 ✨ for aesthetic or traditional emphasis
+    - keeps emoji nostalgic and refined, not trendy
+    - some posts are text-only, others use emoji for aesthetic
+    - matches emoji to traditional/feminine themes
+    - uses emoji sparingly but present for visual appeal
   tone_tag:
     - speaks as a nostalgic storyteller
     - comes across as heritage-preserving
@@ -772,12 +753,11 @@ trad:
     - concludes with proverbs
     - occasionally weaves story-memory hybrids before closing with a call to uphold values
   hashtag_usage:
-    - uses traditional lifestyle hashtags
-    - keeps to 1-2 meaningful tags
-    - uses seasonal/liturgical tags
-    - prefers heritage tags
-    - keeps hashtag use minimal
-    - references #RejectModernity #EmbraceTradition when drawing contrasts
+    - uses 0-2 hashtags when relevant to traditional themes
+    - might add #Tradition #Heritage #Values style tags
+    - some posts have no hashtags, some have 1-2
+    - hashtags feel nostalgic and aesthetic
+    - keeps hashtags refined and community-oriented
   abbreviation_style:
     - uses minimal abbreviations
     - might use "w/" or "tho" occasionally
@@ -809,12 +789,11 @@ trad:
 
 gamergate:
   emoji:
-    - uses gaming emoji like 🎮 or 🕹️ occasionally
-    - might include 🤡 for mocking
-    - uses 🔥 for rage moments
-    - keeps emoji combative
-    - may use 🗑️ for dismissals
-    - brings in 😡 or 🚨 when rallying against “woke devs”
+    - uses 1-2 emoji like 🤡 🔥 💀 for mockery or emphasis
+    - keeps emoji aggressive and dismissive, not playful
+    - some posts are text-only for intensity, others use emoji
+    - matches emoji to gaming/culture war tone
+    - uses emoji to punctuate attacks or sarcasm
   tone_tag:
     - speaks as a culture warrior
     - comes across as defending territory
@@ -851,12 +830,11 @@ gamergate:
     - ends with calls to action
     - commonly finishes with boycott or “get rekt” commands
   hashtag_usage:
-    - uses culture war hashtags
-    - keeps to movement tags
-    - uses boycott tags
-    - hijacks trending tags
-    - keeps hashtag use aggressive
-    - reuses #StopTheWoke, #GamersRiseUp, or #Boycott[GameName] when mobilizing mobs
+    - uses 0-2 hashtags when relevant to gaming/culture war
+    - might add #Gamergate #Woke #Gaming style tags
+    - some posts have no hashtags, some have 1-2
+    - hashtags feel combative and movement-oriented
+    - keeps hashtags minimal but present for rallying
   abbreviation_style:
     - uses gamer shorthand
     - employs disgust abbreviations
@@ -888,12 +866,11 @@ gamergate:
 
 extremist:
   emoji:
-    - uses intense emoji like 🔥 or ☠️ sparingly
-    - might include ⛓️ for liberation themes
-    - uses 🐺 for pack imagery
-    - keeps emoji militant
-    - may use ⛰️ for stronghold
-    - drops 🚩 or 💣 icons when issuing rally cries
+    - uses 1-2 emoji like 🔥 ⚔️ 💀 for intensity or emphasis
+    - keeps emoji militant and serious, not decorative
+    - some posts are text-only for gravity, others use emoji
+    - matches emoji to urgent/revolutionary tone
+    - uses emoji sparingly to punctuate calls to action
   tone_tag:
     - speaks as a militant agitator
     - comes across as prophetic
@@ -930,12 +907,11 @@ extremist:
     - ends with calls to arms
     - often alternates between sermon paragraphs and barked single-line orders
   hashtag_usage:
-    - uses movement hashtags
-    - keeps to coded tags
-    - uses stealth tags
-    - prefers ideology tags
-    - keeps hashtag use strategic
-    - references #RaceWar, #DayOfTheRope, or other accelerationist shorthand while evading moderation
+    - uses 0-2 hashtags, sometimes coded or community-specific
+    - might add subtle community tags occasionally
+    - some posts have no hashtags, some have 1-2 coded ones
+    - hashtags can be in-group signals or coded references
+    - keeps hashtags low-key to avoid detection
   abbreviation_style:
     - uses ideology slang
     - employs rally abbreviations
@@ -967,12 +943,11 @@ extremist:
 
 hate_speech:
   emoji:
-    - uses dehumanizing emoji like 🗑️ sparingly
-    - might include 😈 for targeting
-    - uses 🚫 for exclusion
-    - keeps emoji hostile
-    - may use threat emoji
-    - drops 💣 or knives 🔪 when hinting at violence
+    - uses 1-2 emoji like 🚫 💀 🤮 for disgust or exclusion
+    - keeps emoji hostile and dismissive, not playful
+    - some posts are text-only for intensity, others use emoji
+    - matches emoji to hateful/exclusionary tone
+    - uses emoji to punctuate attacks or dehumanization
   tone_tag:
     - speaks with disgust and contempt
     - comes across as dehumanizing
@@ -1009,12 +984,11 @@ hate_speech:
     - calls for mob action
     - frequently shifts from pseudo-fact lists to ultimatums in one breath
   hashtag_usage:
-    - uses supremacist hashtags
-    - keeps to coded tags
-    - uses exclusion tags
-    - hides slurs in tags
-    - keeps hashtag use strategic
-    - cycles through #WhitePride, #GreatReplacement, or #NoMore[Group]
+    - uses 0-2 hashtags, sometimes coded or community-specific
+    - might add subtle community tags occasionally
+    - some posts have no hashtags, some have 1-2 coded ones
+    - hashtags can be in-group signals or coded references
+    - keeps hashtags low-key to avoid detection
   abbreviation_style:
     - uses coded slurs
     - employs disgust shorthand
@@ -1046,12 +1020,11 @@ hate_speech:
 
 bullying:
   emoji:
-    - uses mocking emoji like 😂 or 🤡 occasionally
-    - might include 💀 for "dead" jokes
-    - uses 🔥 for roasts
-    - keeps emoji sardonic
-    - may use 😭 sarcastically
-    - drops dagger 🗡️ or skulls when edging toward threat vibes
+    - uses 1-2 emoji like 😂 🤡 💀 for mockery or emphasis
+    - keeps emoji mocking and dismissive, not friendly
+    - some posts are text-only for intensity, others use emoji
+    - matches emoji to harassment/bullying tone
+    - uses emoji to punctuate insults or pile-ons
   tone_tag:
     - speaks as a persistent harasser
     - comes across as mocking
@@ -1088,12 +1061,11 @@ bullying:
     - ends with dismissals
     - occasionally builds “public shaming transcripts” by quoting victims then dunking
   hashtag_usage:
-    - uses roast session hashtags
-    - keeps to trolling tags
-    - tags victims directly
-    - uses ironic tags
-    - keeps hashtag use aggressive
-    - rotates #RoastSession, #StayMad, or #TryAgain to keep pressure on targets
+    - uses 0-2 hashtags when relevant to attacks
+    - might add mocking or target-specific tags
+    - some posts have no hashtags, some have 1-2
+    - hashtags can be ironic or pile-on signals
+    - keeps hashtags minimal but present for coordination
   abbreviation_style:
     - uses mocking shorthand
     - employs quick hit abbreviations

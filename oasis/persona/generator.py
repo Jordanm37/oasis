@@ -212,12 +212,82 @@ class PersonaGenerator:
         return rows
 
     def _build_username(self, variant: PersonaVariantSpec, index: int) -> str:
+        """Generate a realistic-looking username.
+        
+        Instead of 'recovery_0019_b665b1', generates names like:
+        - 'SarahJ_healing' (recovery)
+        - 'DarkKnight99' (incel)
+        - 'FitnessMom_Jane' (benign)
+        """
         archetype = self.ontology.archetypes[variant.archetype]
-        prefix = archetype.username_prefix or variant.slug
-        digest = hashlib.sha1(
-            f"{prefix}:{variant.id}:{self.seed}:{index}".encode("utf-8")
-        ).hexdigest()[:6]
-        return f"{prefix}_{index:04d}_{digest}"
+        
+        # Use seed + index for deterministic but varied selection
+        local_rng = random.Random(
+            int(hashlib.sha1(
+                f"{variant.id}:{self.seed}:{index}".encode("utf-8")
+            ).hexdigest()[:8], 16)
+        )
+        
+        # First names pool (gender-neutral mix)
+        first_names = [
+            "Alex", "Jordan", "Taylor", "Morgan", "Casey", "Riley", "Quinn", "Avery",
+            "Sam", "Jamie", "Drew", "Blake", "Skyler", "Reese", "Dakota", "Sage",
+            "Emma", "Liam", "Olivia", "Noah", "Ava", "Ethan", "Sophia", "Mason",
+            "Isabella", "James", "Mia", "Lucas", "Charlotte", "Henry", "Amelia", "Ben",
+            "Luna", "Jack", "Harper", "Leo", "Evelyn", "Max", "Aria", "Eli",
+            "Chloe", "Owen", "Ella", "Jake", "Grace", "Ryan", "Lily", "Nathan",
+            "Zoe", "Adam", "Nora", "Dylan", "Hannah", "Cole", "Maya", "Tyler",
+            "Layla", "Caleb", "Penelope", "Luke", "Riley", "Isaac", "Zoey", "Jace",
+        ]
+        
+        # Archetype-specific suffixes/styles
+        archetype_styles = {
+            "benign": ["_daily", "_life", "_vibes", "_thoughts", "Official", "_real", ""],
+            "recovery_support": ["_healing", "_journey", "_hope", "_strength", "_rising", "Recovers"],
+            "ed_risk": ["_thin", "_fit", "_goals", "_body", "Slim", "_diet", ""],
+            "pro_ana": ["_butterfly", "_bones", "_light", "_pure", "Ana", "_goals", ""],
+            "incel_misogyny": ["_blackpill", "_truth", "_based", "Sigma", "_MGTOW", "_redpill", ""],
+            "alpha": ["_alpha", "_king", "_grind", "CEO", "_mindset", "_success", ""],
+            "misinfo": ["_truth", "_awake", "_news", "_facts", "_reality", "Truther", ""],
+            "conspiracy": ["_woke", "_aware", "_seeker", "_truth", "Awakened", "_eyes", ""],
+            "trad": ["_traditional", "_values", "_home", "_family", "Classic", "_heritage", ""],
+            "gamergate": ["_gamer", "_based", "_nerd", "Player", "_gaming", "_pro", ""],
+            "extremist": ["_warrior", "_patriot", "_defender", "_soldier", "", "_rising", ""],
+            "hate_speech": ["_truth", "_real", "_based", "", "_raw", "_unfiltered", ""],
+            "bullying": ["_savage", "_real", "_honest", "", "_raw", "_truth", ""],
+        }
+        
+        # Number suffixes for variety
+        number_styles = ["", str(local_rng.randint(1, 99)), str(local_rng.randint(1990, 2005))[2:], "_" + str(local_rng.randint(1, 999))]
+        
+        # Build username
+        first_name = local_rng.choice(first_names)
+        archetype_id = variant.archetype
+        suffixes = archetype_styles.get(archetype_id, ["", "_user", "_real"])
+        suffix = local_rng.choice(suffixes)
+        number = local_rng.choice(number_styles)
+        
+        # Randomly choose format
+        formats = [
+            f"{first_name}{suffix}{number}",
+            f"{first_name}{number}{suffix}",
+            f"{first_name}_{suffix.strip('_')}{number}" if suffix else f"{first_name}{number}",
+            f"{first_name.lower()}{suffix}{number}",
+        ]
+        
+        username = local_rng.choice(formats)
+        
+        # Clean up any double underscores or trailing underscores
+        while "__" in username:
+            username = username.replace("__", "_")
+        username = username.strip("_")
+        
+        # Ensure uniqueness with a short hash if needed
+        if len(username) < 4:
+            digest = hashlib.sha1(f"{variant.id}:{self.seed}:{index}".encode("utf-8")).hexdigest()[:4]
+            username = f"{username}_{digest}"
+        
+        return username
 
     def _build_row(
         self,

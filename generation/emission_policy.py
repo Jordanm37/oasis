@@ -6,22 +6,155 @@ from typing import Dict, List, Optional, Tuple, Any
 from orchestrator.rng import DeterministicRNG
 
 DEFAULT_LABEL_TO_TOKENS: Dict[str, List[str]] = {
-    # Expanded token inventory matching dataset spec
-    "incel": ["LBL:INCEL_SLANG", "LBL:MISOGYNY", "LBL:HARASSMENT"],
-    "misinfo": ["LBL:MISINFO_CLAIM", "LBL:MISINFO_SOURCE", "LBL:ANTI_INSTITUTION"],
-    "conspiracy": ["LBL:CONSPIRACY_NARRATIVE", "LBL:DEEPSTATE", "LBL:ANTI_INSTITUTION"],
-    "recovery": ["LBL:RECOVERY", "LBL:SUPPORTIVE", "LBL:SELF_HARM"],
-    "ed_risk": ["LBL:ED_METHOD", "LBL:ED_PROMO", "LBL:SELF_HARM"],
-    "benign": ["LBL:SUPPORTIVE"],
+    # ==========================================================================
+    # 13-class taxonomy token inventory (expanded)
+    # ==========================================================================
+    # Benign / Recovery cluster
+    "benign": [
+        "LBL:SUPPORTIVE",
+        "LBL:FRIENDLY",
+        "LBL:HELPFUL",
+        "LBL:POSITIVE",
+    ],
+    "recovery_support": [
+        "LBL:RECOVERY_SUPPORT",
+        "LBL:SUPPORTIVE",
+        "LBL:SELF_HARM",
+        "LBL:PEER_SUPPORT",
+        "LBL:COPING_TIP",
+        "LBL:MILESTONE",
+    ],
+
+    # ED cluster
+    "ed_risk": [
+        "LBL:ED_RISK",
+        "LBL:ED_METHOD",
+        "LBL:ED_PROMO",
+        "LBL:SELF_HARM",
+        "LBL:RESTRICTION_TIP",
+        "LBL:BODY_CHECK",
+        "LBL:CALORIE_OBSESSION",
+        "LBL:FASTING_GLORIFY",
+    ],
+    "pro_ana": [
+        "LBL:MEANSPO",
+        "LBL:ED_COACHING",
+        "LBL:THINSPO",
+        "LBL:PURGE_TIP",
+        "LBL:ACCOUNTABILITY_THREAT",
+        "LBL:GOAL_WEIGHT",
+    ],
+
+    # Incel / Manosphere cluster
+    "incel_misogyny": [
+        "LBL:INCEL_MISOGYNY",
+        "LBL:INCEL_SLANG",
+        "LBL:MISOGYNY",
+        "LBL:HARASSMENT",
+        "LBL:BLACKPILL",
+        "LBL:FOID_SLUR",
+        "LBL:CHAD_COPE",
+        "LBL:DATING_RANT",
+        "LBL:LOOKISM",
+    ],
+    "alpha": [
+        "LBL:MISOGYNISTIC_LECTURE",
+        "LBL:OBJECTIFICATION",
+        "LBL:SMV_THEORY",
+        "LBL:REDPILL_WISDOM",
+        "LBL:HYPERGAMY_CLAIM",
+        "LBL:FRAME_CONTROL",
+        "LBL:PLATE_SPINNING",
+    ],
+
+    # Misinfo / Conspiracy cluster
+    "misinfo": [
+        "LBL:MISINFO_CLAIM",
+        "LBL:MISINFO_SOURCE",
+        "LBL:ANTI_INSTITUTION",
+        "LBL:FAKE_STAT",
+        "LBL:DEBUNKED_CLAIM",
+        "LBL:FEAR_MONGER",
+        "LBL:SUPPRESSED_TRUTH",
+    ],
+    "conspiracy": [
+        "LBL:CONSPIRACY",
+        "LBL:CONSPIRACY_NARRATIVE",
+        "LBL:DEEPSTATE",
+        "LBL:ANTI_INSTITUTION",
+        "LBL:HIDDEN_AGENDA",
+        "LBL:FALSE_FLAG",
+        "LBL:COVER_UP",
+        "LBL:CONTROLLED_OPP",
+        "LBL:WAKE_UP",
+    ],
     
-    # New categories
-    "trad": ["LBL:DOGWHISTLE", "LBL:GENDER_ESSENTIALISM"],
-    "gamergate": ["LBL:CULTURE_WAR", "LBL:GATEKEEPING"],
-    "pro_ana": ["LBL:MEANSPO", "LBL:ED_COACHING"],
-    "alpha": ["LBL:MISOGYNISTIC_LECTURE", "LBL:OBJECTIFICATION"],
-    "extremist": ["LBL:VIOLENT_THREAT", "LBL:HATE_SLUR", "LBL:ACCELERATIONISM"],
-    "hate_speech": ["LBL:HATE_SLUR", "LBL:DEHUMANIZATION"],
-    "bullying": ["LBL:PERSONAL_ATTACK", "LBL:DOXXING_THREAT", "LBL:SUICIDE_BAIT"],
+    # Culture war cluster
+    "trad": [
+        "LBL:DOGWHISTLE",
+        "LBL:GENDER_ESSENTIALISM",
+        "LBL:TRAD_AESTHETIC",
+        "LBL:MODERNITY_CRITIQUE",
+        "LBL:FAMILY_VALUES",
+        "LBL:NATURAL_ORDER",
+        "LBL:DECLINE_NARRATIVE",
+    ],
+    "gamergate": [
+        "LBL:CULTURE_WAR",
+        "LBL:GATEKEEPING",
+        "LBL:WOKE_AGENDA",
+        "LBL:FORCED_DIVERSITY",
+        "LBL:SJW_ATTACK",
+        "LBL:BOYCOTT_CALL",
+        "LBL:GAMER_DEFENSE",
+    ],
+
+    # Extreme harm cluster
+    "extremist": [
+        "LBL:VIOLENT_THREAT",
+        "LBL:HATE_SLUR",
+        "LBL:ACCELERATIONISM",
+        "LBL:RACE_WAR",
+        "LBL:BOOGALOO",
+        "LBL:COLLAPSE_WISH",
+        "LBL:ENEMY_DEHUMANIZE",
+        "LBL:MARTYR_GLORIFY",
+    ],
+    "hate_speech": [
+        "LBL:HATE_SLUR",
+        "LBL:DEHUMANIZATION",
+        "LBL:REPLACEMENT_THEORY",
+        "LBL:RACIAL_SLUR",
+        "LBL:RELIGIOUS_HATE",
+        "LBL:ETHNIC_ATTACK",
+        "LBL:SUPREMACIST",
+        "LBL:VERMIN_RHETORIC",
+    ],
+    "bullying": [
+        "LBL:PERSONAL_ATTACK",
+        "LBL:DOXXING_THREAT",
+        "LBL:SUICIDE_BAIT",
+        "LBL:APPEARANCE_MOCK",
+        "LBL:PILE_ON",
+        "LBL:SCREENSHOT_SHAME",
+        "LBL:GASLIGHT",
+        "LBL:SOCIAL_EXCLUSION",
+    ],
+
+    # Legacy aliases (for backwards compatibility)
+    "incel": [
+        "LBL:INCEL_MISOGYNY",
+        "LBL:INCEL_SLANG",
+        "LBL:MISOGYNY",
+        "LBL:HARASSMENT",
+        "LBL:BLACKPILL",
+    ],
+    "recovery": [
+        "LBL:RECOVERY_SUPPORT",
+        "LBL:SUPPORTIVE",
+        "LBL:SELF_HARM",
+        "LBL:PEER_SUPPORT",
+    ],
 }
 
 
@@ -158,7 +291,7 @@ class EmissionPolicy:
             candidates = self._label_to_tokens.get(label)
         if not candidates:
             # Fallback to canonical token if no variants defined
-            return f"LBL:{label.upper()}"
+        return f"LBL:{label.upper()}"
 
         # 2. Check context for dynamic weighting (e.g., from harm priors)
         dynamic_weights = {}

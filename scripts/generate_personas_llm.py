@@ -70,7 +70,7 @@ FIELDNAMES = [
 # -----------------------
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Generate persona CSV with LLM SPC/narratives and six-class taxonomy."
+        description="Generate persona CSV with LLM SPC/narratives and 13-class taxonomy."
     )
     parser.add_argument("--out", type=str, default="./data/personas_mvp_llm.csv")
     parser.add_argument("--seed", type=int, default=314159)
@@ -774,13 +774,61 @@ def _extract_metadata_list(row: Mapping[str, str], key: str) -> List[str]:
     return [item.strip() for item in raw.split(",") if item.strip()]
 
 
+# Auto-generated secondary label relationships based on archetype clusters
+# This enables multi-class personas even when ontology doesn't define secondary labels
+ARCHETYPE_SECONDARY_LABELS: Dict[str, List[str]] = {
+    # Benign cluster - no secondary (always single-label)
+    "benign": [],
+    "recovery_support": ["benign"],  # Can also be supportive/benign
+    
+    # ED cluster - related harmful behaviors
+    "ed_risk": ["pro_ana", "bullying"],
+    "pro_ana": ["ed_risk", "bullying"],
+    
+    # Incel/Manosphere cluster - overlapping misogyny
+    "incel_misogyny": ["bullying", "hate_speech", "alpha"],
+    "alpha": ["incel_misogyny", "misinfo"],
+    
+    # Misinfo/Conspiracy cluster - overlapping distrust
+    "misinfo": ["conspiracy"],
+    "conspiracy": ["misinfo", "extremist"],
+    
+    # Culture war cluster - overlapping reactionary views
+    "trad": ["conspiracy", "alpha"],
+    "gamergate": ["bullying", "incel_misogyny", "hate_speech"],
+    
+    # Extreme harm cluster - overlapping violence/hate
+    "extremist": ["hate_speech", "conspiracy"],
+    "hate_speech": ["extremist", "bullying"],
+    "bullying": ["hate_speech", "incel_misogyny"],
+}
+
+
 def _allowed_candidates(row: Mapping[str, str]) -> List[str]:
+    """Build list of allowed label candidates for a persona.
+    
+    Priority:
+    1. Explicit override from ontology (allowed_labels_override)
+    2. Ontology-defined secondary labels (label_secondary)
+    3. Auto-generated secondary labels from ARCHETYPE_SECONDARY_LABELS
+    """
     override = _extract_metadata_list(row, "allowed_labels_override")
     if override:
         return override
-    primary = str(row.get("label_primary", "")).strip()
+    
+    primary = str(row.get("label_primary", "")).strip().lower()
+    
+    # Try ontology-defined secondary labels first
     secondary_raw = str(row.get("label_secondary", "")).strip()
-    secondary = [tok.strip() for tok in secondary_raw.split(";") if tok.strip()]
+    # Filter out "None" string which comes from missing ontology values
+    if secondary_raw.lower() in ("none", "null", ""):
+        secondary_raw = ""
+    secondary = [tok.strip().lower() for tok in secondary_raw.split(";") if tok.strip()]
+    
+    # If no ontology secondary labels, use auto-generated ones
+    if not secondary and primary:
+        secondary = ARCHETYPE_SECONDARY_LABELS.get(primary, [])
+    
     candidates = [tok for tok in [primary, *secondary] if tok]
     if not candidates:
         candidates = [primary] if primary else []
@@ -849,7 +897,8 @@ def _render_preamble(s_block: Dict[str, object], p_block: Dict[str, object], c_b
 
 
 def _pick_double_mode(rng: random.Random, primary: str, candidates: List[str], single_ratio: float) -> Tuple[bool, List[str], str]:
-    if primary == "benign":
+    # Benign and recovery_support are always single-label (non-harmful)
+    if primary in ("benign", "recovery_support"):
         return False, [primary], ""
     if len(candidates) < 2:
         return False, [primary], ""

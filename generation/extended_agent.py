@@ -190,6 +190,8 @@ class ExtendedSocialAgent(SocialAgent):
         self._scheduler: Optional[MultiLabelScheduler] = scheduler
         self._harm_priors: Dict[str, float] = dict(harm_priors or {})
         self._guidance_config: Dict[str, Any] = dict(guidance_config or {})
+        # Coordination modifiers (set by SimulationCoordinator before each step)
+        self._coordination_modifiers: Dict[str, Any] = {}
 
     @retry(
         reraise=True,
@@ -242,15 +244,72 @@ class ExtendedSocialAgent(SocialAgent):
                 toxicity = float(pri.get("toxicity", 0.0))
                 insult = float(pri.get("insult", 0.0))
                 profanity = float(pri.get("profanity", 0.0))
-                # Token biases (small, additive; label-agnostic)
+                identity_attack = float(pri.get("identity_attack", 0.0))
+                threat = float(pri.get("threat", 0.0))
+                obscene = float(pri.get("obscene", 0.0))
+
+                # Token biases for expanded 13-class taxonomy (small, additive weights)
                 dyn: Dict[str, float] = {}
-                # Incel space
-                dyn["LBL:HARASSMENT"] = max(0.0, 0.6 * (insult + profanity + toxicity) / 3.0 * intensity)
-                dyn["LBL:INCEL_SLANG"] = 0.0
-                # Misinfo/conspiracy
-                dyn["LBL:MISINFO_CLAIM"] = max(0.0, 0.4 * toxicity * intensity)
-                dyn["LBL:MISINFO_SOURCE"] = max(0.0, 0.2 * toxicity * intensity)
-                # Recovery/benign unchanged
+
+                # Benign / Recovery cluster (no dynamic weighting needed)
+                for tok in ["LBL:SUPPORTIVE", "LBL:FRIENDLY", "LBL:HELPFUL", "LBL:POSITIVE",
+                            "LBL:RECOVERY_SUPPORT", "LBL:PEER_SUPPORT", "LBL:COPING_TIP", "LBL:MILESTONE"]:
+                    dyn[tok] = 0.0
+
+                # ED cluster (driven by obscene/self-harm signals)
+                ed_signal = max(0.0, 0.3 * obscene * intensity)
+                meanspo_signal = max(0.0, 0.4 * (insult + toxicity) / 2.0 * intensity)
+                for tok in ["LBL:ED_RISK", "LBL:ED_METHOD", "LBL:ED_PROMO", "LBL:SELF_HARM",
+                            "LBL:RESTRICTION_TIP", "LBL:BODY_CHECK", "LBL:CALORIE_OBSESSION", "LBL:FASTING_GLORIFY"]:
+                    dyn[tok] = ed_signal
+                for tok in ["LBL:MEANSPO", "LBL:ED_COACHING", "LBL:THINSPO", "LBL:PURGE_TIP",
+                            "LBL:ACCOUNTABILITY_THREAT", "LBL:GOAL_WEIGHT"]:
+                    dyn[tok] = meanspo_signal
+
+                # Incel / Manosphere cluster
+                incel_signal = max(0.0, 0.6 * (insult + profanity + toxicity) / 3.0 * intensity)
+                alpha_signal = max(0.0, 0.5 * (insult + identity_attack) / 2.0 * intensity)
+                for tok in ["LBL:INCEL_MISOGYNY", "LBL:INCEL_SLANG", "LBL:MISOGYNY", "LBL:HARASSMENT",
+                            "LBL:BLACKPILL", "LBL:FOID_SLUR", "LBL:CHAD_COPE", "LBL:DATING_RANT", "LBL:LOOKISM"]:
+                    dyn[tok] = incel_signal
+                for tok in ["LBL:MISOGYNISTIC_LECTURE", "LBL:OBJECTIFICATION", "LBL:SMV_THEORY",
+                            "LBL:REDPILL_WISDOM", "LBL:HYPERGAMY_CLAIM", "LBL:FRAME_CONTROL", "LBL:PLATE_SPINNING"]:
+                    dyn[tok] = alpha_signal
+
+                # Misinfo / Conspiracy cluster
+                misinfo_signal = max(0.0, 0.4 * toxicity * intensity)
+                conspiracy_signal = max(0.0, 0.35 * toxicity * intensity)
+                for tok in ["LBL:MISINFO_CLAIM", "LBL:MISINFO_SOURCE", "LBL:FAKE_STAT",
+                            "LBL:DEBUNKED_CLAIM", "LBL:FEAR_MONGER", "LBL:SUPPRESSED_TRUTH"]:
+                    dyn[tok] = misinfo_signal
+                for tok in ["LBL:CONSPIRACY", "LBL:CONSPIRACY_NARRATIVE", "LBL:DEEPSTATE", "LBL:ANTI_INSTITUTION",
+                            "LBL:HIDDEN_AGENDA", "LBL:FALSE_FLAG", "LBL:COVER_UP", "LBL:CONTROLLED_OPP", "LBL:WAKE_UP"]:
+                    dyn[tok] = conspiracy_signal
+
+                # Culture war cluster
+                culture_signal = max(0.0, 0.4 * (identity_attack + toxicity) / 2.0 * intensity)
+                for tok in ["LBL:DOGWHISTLE", "LBL:GENDER_ESSENTIALISM", "LBL:TRAD_AESTHETIC",
+                            "LBL:MODERNITY_CRITIQUE", "LBL:FAMILY_VALUES", "LBL:NATURAL_ORDER", "LBL:DECLINE_NARRATIVE"]:
+                    dyn[tok] = culture_signal
+                for tok in ["LBL:CULTURE_WAR", "LBL:GATEKEEPING", "LBL:WOKE_AGENDA",
+                            "LBL:FORCED_DIVERSITY", "LBL:SJW_ATTACK", "LBL:BOYCOTT_CALL", "LBL:GAMER_DEFENSE"]:
+                    dyn[tok] = max(0.0, 0.35 * (insult + identity_attack) / 2.0 * intensity)
+
+                # Extreme harm cluster
+                extreme_signal = max(0.0, 0.7 * (threat + identity_attack + toxicity) / 3.0 * intensity)
+                hate_signal = max(0.0, 0.6 * (identity_attack + profanity) / 2.0 * intensity)
+                bully_signal = max(0.0, 0.5 * insult * intensity)
+                for tok in ["LBL:VIOLENT_THREAT", "LBL:ACCELERATIONISM", "LBL:RACE_WAR",
+                            "LBL:BOOGALOO", "LBL:COLLAPSE_WISH", "LBL:ENEMY_DEHUMANIZE", "LBL:MARTYR_GLORIFY"]:
+                    dyn[tok] = extreme_signal
+                dyn["LBL:VIOLENT_THREAT"] = max(0.0, 0.8 * threat * intensity)  # extra weight for explicit threats
+                for tok in ["LBL:HATE_SLUR", "LBL:DEHUMANIZATION", "LBL:REPLACEMENT_THEORY",
+                            "LBL:RACIAL_SLUR", "LBL:RELIGIOUS_HATE", "LBL:ETHNIC_ATTACK", "LBL:SUPREMACIST", "LBL:VERMIN_RHETORIC"]:
+                    dyn[tok] = hate_signal
+                for tok in ["LBL:PERSONAL_ATTACK", "LBL:DOXXING_THREAT", "LBL:SUICIDE_BAIT",
+                            "LBL:APPEARANCE_MOCK", "LBL:PILE_ON", "LBL:SCREENSHOT_SHAME", "LBL:GASLIGHT", "LBL:SOCIAL_EXCLUSION"]:
+                    dyn[tok] = bully_signal
+
                 context = {"dynamic_token_probs": dyn}
         except Exception:
             context = None
@@ -278,7 +337,14 @@ class ExtendedSocialAgent(SocialAgent):
         lexical_hint = self._format_lexical_hint(user_id, decision)
         env_prompt = await self.env.to_text_prompt()
         style_prompt_hint = self._format_prompt_goal_hint()
-        hint_parts = [part for part in (style_hint, lexical_hint, style_prompt_hint, step_hint) if part]
+        
+        # Apply coordination modifiers from SimulationCoordinator
+        coordination_hint = self._format_coordination_hint()
+        
+        # Encourage thread engagement (replying to posts with existing comments)
+        thread_hint = self._format_thread_engagement_hint()
+        
+        hint_parts = [part for part in (style_hint, lexical_hint, style_prompt_hint, coordination_hint, thread_hint, step_hint) if part]
         hint_prefix = "\n".join(hint_parts)
         if hint_prefix:
             hint_prefix += "\n"
@@ -312,6 +378,99 @@ class ExtendedSocialAgent(SocialAgent):
             return f"Use exactly two label markers inline: {tokens[0]} and {tokens[1]}."
         # Fallback
         return "If natural, include label markers as instructed; otherwise keep it neutral."
+
+    def _format_coordination_hint(self) -> str:
+        """Format hints from SimulationCoordinator modifiers.
+        
+        This adds behavioral hints based on active coordination events
+        (pile-ons, echo chambers, debates, brigades).
+        """
+        modifiers = self._coordination_modifiers or {}
+        if not modifiers:
+            return ""
+        
+        event_type = modifiers.get("active_event_type", "none")
+        if event_type == "none":
+            return ""
+        
+        hints = modifiers.get("coordination_hints", [])
+        aggression = modifiers.get("aggression_boost", 0.0)
+        
+        parts: List[str] = []
+        
+        # Event-specific framing
+        if event_type == "pile_on":
+            parts.append("Others are criticizing this target - join in naturally")
+        elif event_type == "echo_chamber":
+            parts.append("Build on what others are saying, reinforce the shared view")
+        elif event_type == "debate":
+            parts.append("Engage with opposing viewpoints directly")
+        elif event_type == "brigade":
+            parts.append("Coordinate with others, amplify the group message")
+        
+        # Add specific hints
+        if hints:
+            parts.extend(hints[:2])  # Limit to 2 hints
+        
+        # Aggression modifier
+        if aggression > 0.2:
+            parts.append("be more forceful than usual")
+        
+        if not parts:
+            return ""
+        
+        return f"Coordination: {'; '.join(parts)}."
+
+    def _format_thread_engagement_hint(self) -> str:
+        """Format hints to encourage deeper thread engagement.
+        
+        This encourages agents to:
+        1. Reply to existing comments on posts they see
+        2. Reference other users' comments in their replies
+        3. Create conversational threads rather than isolated comments
+        """
+        # Use step index to vary the engagement style
+        rng = DeterministicRNG(self._run_seed).fork(
+            "thread_hint", 
+            f"user:{self.social_agent_id}", 
+            f"step:{self._step_index}"
+        )
+        
+        # Engagement probability increases over time (more content = more to reply to)
+        base_prob = 0.4 + min(0.4, self._step_index * 0.05)  # 40% -> 80% over 8 steps
+        
+        # Use bernoulli for probability check (returns True with prob p)
+        if not rng.bernoulli(base_prob):
+            return ""
+        
+        engagement_hints = [
+            "If you see interesting comments on posts, reply to that post and reference what other users said.",
+            "Engage with the conversation - respond to what others have commented, agree or disagree.",
+            "Look at existing comments and add your perspective to the discussion.",
+            "When commenting, reference or quote what another user said to create dialogue.",
+            "Join ongoing discussions by replying to posts that already have comments.",
+            "Build on what others have said - mention their points in your comment.",
+        ]
+        
+        # Select hint based on persona type for more natural engagement
+        primary = self._persona_cfg.primary_label or ""
+        if "benign" in primary.lower() or "recovery" in primary.lower():
+            # Benign personas are more supportive
+            engagement_hints.extend([
+                "Show support for others' comments - acknowledge their perspective.",
+                "If someone shares something personal, respond with empathy.",
+            ])
+        elif any(x in primary.lower() for x in ["incel", "alpha", "hate", "bully"]):
+            # Aggressive personas engage combatively
+            engagement_hints.extend([
+                "If you disagree with a comment, call it out directly.",
+                "Challenge weak arguments you see in the comments.",
+            ])
+        
+        # Use categorical to select a hint (equal weights)
+        hint_probs = {hint: 1.0 for hint in engagement_hints}
+        hint = rng.categorical(hint_probs)
+        return f"Thread engagement: {hint}"
 
     def _format_lexical_hint(self, user_id: int, decision: Dict[str, Any]) -> str:
         label_samples = decision.get("label_lexicon_samples") or {}
@@ -442,7 +601,10 @@ class ExtendedSocialAgent(SocialAgent):
         return " ".join(words)
 
     def _maybe_style_hint(self, decision: Dict[str, Any]) -> str:
-        """Optionally return a short style hint string for harmful posts."""
+        """Optionally return a short style hint string for harmful posts.
+
+        Now class-aware: different archetypes get different base tones.
+        """
         try:
             enabled = bool(self._guidance_config.get("enable", False))
             if not enabled:
@@ -451,7 +613,7 @@ class ExtendedSocialAgent(SocialAgent):
             if mode == "none":
                 return ""
             # Only for personas that can emit harmful labels
-            harmful_allowed = [lab for lab in (self._persona_cfg.allowed_labels or []) if lab not in ("benign", "recovery")]
+            harmful_allowed = [lab for lab in (self._persona_cfg.allowed_labels or []) if lab not in ("benign", "recovery", "recovery_support")]
             if not harmful_allowed:
                 return ""
             priors = self._harm_priors or {}
@@ -467,35 +629,251 @@ class ExtendedSocialAgent(SocialAgent):
             threat = float(priors.get("threat", 0.0))
             flirtation = float(priors.get("flirtation", 0.0))
             sexually_explicit = float(priors.get("sexually_explicit", 0.0))
+
             # Overall chance to show a hint
             p_use = max(0.0, min(1.0, 0.2 + 0.6 * toxicity * intensity))
             if not rng.fork("use").bernoulli(p_use):
                 return ""
-            bits: List[str] = []
-            # Toxicity drives the base tone phrase (unique)
-            bits.append("adopt a more confrontational tone")
-            # Unique per-element phrases (independent seeded draws)
-            if insult > 0.4 and rng.fork("insult").bernoulli(min(0.5, insult * intensity)):
-                bits.append("use slightly insulting phrasing")
-            if profanity > 0.4 and rng.fork("profanity").bernoulli(min(0.4, profanity * intensity)):
-                bits.append("use mild profanity")
-            # Include extreme styles when intensity is high
-            if intensity >= 0.8 and identity_attack > 0.4 and rng.fork("identity").bernoulli(min(0.3, identity_attack * (intensity - 0.2))):
-                bits.append("use identity-based denunciation")
-            if intensity >= 0.9 and threat > 0.3 and rng.fork("threat").bernoulli(min(0.2, threat * (intensity - 0.3))):
-                bits.append("use threatening language")
-            # Optional lighter elements
-            if flirtation > 0.5 and rng.fork("flirtation").bernoulli(min(0.3, flirtation * intensity)):
-                bits.append("use a lightly flirtatious tone")
-            if sexually_explicit > 0.5 and rng.fork("sexexp").bernoulli(min(0.2, sexually_explicit * intensity)):
-                bits.append("use suggestive language only")
-            # Assemble unique-per-element phrases with no extra safety language
+
+            # Class-aware base tone based on primary label
+            primary = self._persona_cfg.primary_label or ""
+            base_tone = self._get_archetype_base_tone(primary, rng)
+
+            bits: List[str] = [base_tone]
+
+            # Class-specific modifier pools (randomly selected for variety)
+            modifier_pools: Dict[str, List[str]] = {
+                "ed_risk": [
+                    "reference specific numbers or measurements",
+                    "sound methodical about tracking",
+                    "treat restriction as a skill to master",
+                    "mention time windows or schedules",
+                ],
+                "pro_ana": [
+                    "frame harshness as motivation",
+                    "dismiss excuses bluntly",
+                    "set expectations high",
+                    "use accountability language",
+                ],
+                "incel_misogyny": [
+                    "reference dating market dynamics",
+                    "use community-specific terms naturally",
+                    "compare social hierarchies",
+                    "express frustration at perceived unfairness",
+                ],
+                "alpha": [
+                    "explain things as if to a student",
+                    "reference frameworks or theories",
+                    "dismiss alternative viewpoints",
+                    "project confidence in your worldview",
+                ],
+                "misinfo": [
+                    "question official sources",
+                    "hint at suppressed information",
+                    "encourage independent research",
+                    "cast doubt on mainstream narratives",
+                ],
+                "conspiracy": [
+                    "connect seemingly unrelated events",
+                    "suggest hidden motives",
+                    "reference patterns others miss",
+                    "imply insider knowledge",
+                ],
+                "trad": [
+                    "contrast past and present unfavorably",
+                    "reference traditional roles approvingly",
+                    "use nostalgic imagery",
+                    "frame change as decline",
+                ],
+                "gamergate": [
+                    "defend community boundaries",
+                    "frame outsiders as threats",
+                    "question others' authenticity",
+                    "rally against perceived infiltration",
+                ],
+                "extremist": [
+                    "frame conflict as inevitable",
+                    "speak in us-vs-them terms",
+                    "glorify strength or action",
+                    "dismiss moderation as weakness",
+                ],
+                "hate_speech": [
+                    "use dehumanizing comparisons",
+                    "express disgust openly",
+                    "frame exclusion as necessary",
+                    "speak from superiority",
+                ],
+                "bullying": [
+                    "find a weak point and press it",
+                    "make it personal",
+                    "don't let up",
+                    "enjoy the reaction",
+                ],
+            }
+
+            # Add class-specific modifier if applicable
+            if primary in modifier_pools:
+                pool = modifier_pools[primary]
+                if pool and rng.fork("class_mod").bernoulli(min(0.6, intensity)):
+                    weights = {opt: 1.0 for opt in pool}
+                    bits.append(rng.fork("class_mod_select").categorical(weights))
+
+            # Harm-prior-driven modifiers (probabilistic, not rigid)
+            if insult > 0.4 and rng.fork("insult").bernoulli(min(0.4, insult * intensity)):
+                insult_options = [
+                    "let some sharpness into the wording",
+                    "don't pull punches",
+                    "be direct even if it stings",
+                ]
+                weights = {opt: 1.0 for opt in insult_options}
+                bits.append(rng.fork("insult_select").categorical(weights))
+
+            if profanity > 0.4 and rng.fork("profanity").bernoulli(min(0.35, profanity * intensity)):
+                profanity_options = [
+                    "let some rough language slip in",
+                    "don't censor yourself",
+                    "speak unfiltered",
+                ]
+                weights = {opt: 1.0 for opt in profanity_options}
+                bits.append(rng.fork("profanity_select").categorical(weights))
+
+            if intensity >= 0.7 and identity_attack > 0.4 and rng.fork("identity").bernoulli(min(0.3, identity_attack * intensity)):
+                identity_options = [
+                    "make it about who they are",
+                    "attack the group, not just the argument",
+                    "use identity as a weapon",
+                ]
+                weights = {opt: 1.0 for opt in identity_options}
+                bits.append(rng.fork("identity_select").categorical(weights))
+
+            if intensity >= 0.85 and threat > 0.3 and rng.fork("threat").bernoulli(min(0.2, threat * intensity)):
+                threat_options = [
+                    "hint at consequences",
+                    "let menace creep in",
+                    "sound like a warning",
+                ]
+                weights = {opt: 1.0 for opt in threat_options}
+                bits.append(rng.fork("threat_select").categorical(weights))
+
+            # Lighter optional modifiers
+            if flirtation > 0.5 and rng.fork("flirtation").bernoulli(min(0.25, flirtation * intensity)):
+                bits.append("add a flirtatious edge")
+            if sexually_explicit > 0.5 and rng.fork("sexexp").bernoulli(min(0.15, sexually_explicit * intensity)):
+                bits.append("let suggestiveness show")
+
             if bits:
                 return f"Style hint: {', '.join(bits)}."
-            # Fallback minimal tone if nothing triggered
-            return "Style hint: adopt a more confrontational tone."
+            return f"Style hint: {base_tone}."
         except Exception:
             return ""
+
+    def _get_archetype_base_tone(self, primary_label: str, rng: DeterministicRNG) -> str:
+        """Return a randomly selected base tone phrase for a given archetype.
+
+        Each archetype has multiple tone options to avoid rigid/repetitive hints.
+        """
+        # Multiple tone options per archetype for variety
+        archetype_tone_options: Dict[str, List[str]] = {
+            # ED cluster
+            "ed_risk": [
+                "lean into a clinical and measurement-focused voice",
+                "sound matter-of-fact about restriction",
+                "keep the tone detached but obsessive",
+                "emphasize discipline and numbers",
+                "speak like someone tracking every detail",
+            ],
+            "pro_ana": [
+                "channel harsh accountability energy",
+                "sound like a strict coach pushing limits",
+                "frame criticism as tough love",
+                "use a no-excuses motivational tone",
+                "be blunt about expectations",
+            ],
+            # Incel / Manosphere cluster
+            "incel_misogyny": [
+                "let resentment color the phrasing",
+                "sound like someone venting long-held frustration",
+                "channel grievance into the message",
+                "speak from a place of perceived injustice",
+                "let bitterness seep through naturally",
+            ],
+            "alpha": [
+                "sound like you're explaining obvious truths to novices",
+                "adopt a know-it-all lecturing style",
+                "speak with unearned authority",
+                "be dismissive of those who disagree",
+                "project superiority through word choice",
+            ],
+            # Misinfo / Conspiracy cluster
+            "misinfo": [
+                "sound skeptical of official narratives",
+                "question everything with an investigative edge",
+                "speak like someone who's done their own research",
+                "cast doubt on mainstream sources",
+                "hint at information being suppressed",
+            ],
+            "conspiracy": [
+                "connect dots others might miss",
+                "sound like you're revealing hidden truths",
+                "speak in hints and implications",
+                "suggest there's more beneath the surface",
+                "adopt an ominous, knowing tone",
+            ],
+            # Culture war cluster
+            "trad": [
+                "romanticize how things used to be",
+                "speak wistfully about traditional values",
+                "contrast modern decay with past virtue",
+                "use coded nostalgic language",
+                "frame modernity as a loss",
+            ],
+            "gamergate": [
+                "sound defensive about your community",
+                "push back against perceived outsiders",
+                "frame criticism as an attack on your identity",
+                "gatekeep who belongs",
+                "treat disagreement as bad faith",
+            ],
+            # Extreme harm cluster
+            "extremist": [
+                "sound like someone ready for action",
+                "frame violence as inevitable or necessary",
+                "speak with urgent militancy",
+                "dehumanize perceived enemies",
+                "glorify confrontation",
+            ],
+            "hate_speech": [
+                "speak from a position of superiority",
+                "use dehumanizing framing",
+                "express disgust toward target groups",
+                "treat hatred as justified",
+                "normalize exclusion rhetoric",
+            ],
+            "bullying": [
+                "sound like you're enjoying someone's discomfort",
+                "pile on with relish",
+                "mock without letting up",
+                "gaslight while attacking",
+                "make it personal and persistent",
+            ],
+        }
+        # Select randomly from options if available
+        options = archetype_tone_options.get(primary_label)
+        if isinstance(options, list) and options:
+            weights = {opt: 1.0 for opt in options}
+            return rng.fork("tone_select").categorical(weights)
+        if isinstance(options, str):
+            return options
+        # Fallback generic options
+        fallback_options = [
+            "lean into a more confrontational energy",
+            "let an edge creep into the phrasing",
+            "sound less filtered than usual",
+            "speak with conviction",
+            "don't soften the message",
+        ]
+        weights = {opt: 1.0 for opt in fallback_options}
+        return rng.fork("tone_fallback").categorical(weights)
 
     async def _log_sidecar(
         self,

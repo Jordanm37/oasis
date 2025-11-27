@@ -195,10 +195,10 @@ def build_dataset(
             "FROM post ORDER BY post_id"
         )
     else:
-        cur.execute(
+    cur.execute(
             "SELECT post_id, user_id, original_post_id, content, quote_content, created_at, NULL "
-            "FROM post ORDER BY post_id"
-        )
+        "FROM post ORDER BY post_id"
+    )
     post_rows = cur.fetchall()
 
     # Fetch comments - handle missing text_rag_imputed column gracefully
@@ -208,10 +208,10 @@ def build_dataset(
             "FROM comment ORDER BY comment_id"
         )
     else:
-        cur.execute(
+    cur.execute(
             "SELECT comment_id, post_id, user_id, content, created_at, NULL "
-            "FROM comment ORDER BY comment_id"
-        )
+        "FROM comment ORDER BY comment_id"
+    )
     comment_rows = cur.fetchall()
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -233,7 +233,7 @@ def build_dataset(
             # Get persona from CSV (authoritative) or fall back to username inference
             persona_data = uid_to_persona.get(user_id, {})
             persona = persona_data.get("primary_label") or infer_persona_from_username(username)
-            
+
             tokens = extract_tokens(text_raw)
             normalized_imputed = (text_rag_imputed_db or "").strip()
             imputer_source: str
@@ -254,7 +254,7 @@ def build_dataset(
             if persona:
                 labels = [persona]
             else:
-                labels = assign_labels(tokens, persona)
+            labels = assign_labels(tokens, persona)
                 if not labels:
                     labels = ["benign"]
 
@@ -300,7 +300,7 @@ def build_dataset(
             # Get persona from CSV (authoritative) or fall back to username inference
             persona_data = uid_to_persona.get(user_id, {})
             persona = persona_data.get("primary_label") or infer_persona_from_username(username)
-            
+
             tokens = extract_tokens(text_raw)
             normalized_imputed = (text_rag_imputed_db or "").strip()
             imputer_source: str
@@ -323,7 +323,7 @@ def build_dataset(
             if persona:
                 labels = [persona]
             else:
-                labels = assign_labels(tokens, persona)
+            labels = assign_labels(tokens, persona)
                 if not labels:
                     labels = ["benign"]
 

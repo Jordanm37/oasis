@@ -49,6 +49,10 @@ class RagImputerConfig:
     static_bank_path: Path = Path(RAG_IMPUTER_STATIC_BANK)
     run_seed: int = 314159
 
+    # Post-imputation obfuscation settings
+    enable_obfuscation: bool = False  # Set True to obfuscate after imputation
+    obfuscation_deterministic: bool = False  # Keep False for realistic variety
+
 
 @dataclass
 class _ImputeRecord:
@@ -177,7 +181,48 @@ class RagImputer:
         if not replacements:
             return
         new_text = self._apply_replacements(record.text, replacements)
+        
+        # Apply post-imputation obfuscation if enabled
+        if self._cfg.enable_obfuscation:
+            new_text = await self._apply_obfuscation(new_text, record)
+        
         await asyncio.to_thread(self._persist_imputed_text, record.table, record.record_id, new_text)
+    
+    async def _apply_obfuscation(self, text: str, record: _ImputeRecord) -> str:
+        """Apply obfuscation to imputed text, targeting harmful terms.
+        
+        This is called AFTER imputation, so we're obfuscating the actual
+        harmful content (slurs, threats, etc.) rather than neutral words.
+        """
+        try:
+            from generation.post_imputation_obfuscator import obfuscate_imputed_text
+            
+            # Get archetype from the first token (they should all be same archetype)
+            archetype = "unknown"
+            if record.tokens:
+                # Extract archetype from token like "LBL:INCEL_SLANG"
+                token = record.tokens[0]
+                if "INCEL" in token.upper():
+                    archetype = "incel_misogyny"
+                elif "HATE" in token.upper() or "SLUR" in token.upper():
+                    archetype = "hate_speech"
+                elif "THREAT" in token.upper() or "VIOLENT" in token.upper():
+                    archetype = "extremist"
+                elif "ED_" in token.upper() or "MEANSPO" in token.upper():
+                    archetype = "pro_ana"
+                elif "BULLY" in token.upper() or "ATTACK" in token.upper():
+                    archetype = "bullying"
+            
+            obfuscated, _ = obfuscate_imputed_text(
+                text=text,
+                archetype=archetype,
+                trajectory_stage="active",  # Default; could be passed in record
+                deterministic=self._cfg.obfuscation_deterministic,
+            )
+            return obfuscated
+        except Exception as exc:
+            logger.warning("Obfuscation failed: %s", exc)
+            return text
 
     async def _generate_replacement(
         self,

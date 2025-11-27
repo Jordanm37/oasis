@@ -14,6 +14,7 @@ load_dotenv()
 from camel.models import BaseModelBackend, ModelFactory, ModelManager
 from camel.types import ModelPlatformType, ModelType
 
+from oasis.llama4_tool_adapter import wrap_llama4_backend
 from orchestrator.llm_config import LLM_CONFIG
 
 logger = logging.getLogger(__name__)
@@ -119,7 +120,7 @@ def create_model_backend(settings: LLMProviderSettings) -> BaseModelBackend:
             "max_tokens": int(cfg.openai_max_tokens),
             "temperature": SIMULATION_TEMPERATURE,  # Low temp for tool call reliability
         }
-        return ModelFactory.create(
+        backend = ModelFactory.create(
             model_platform=ModelPlatformType.OPENAI_COMPATIBLE_MODEL,
             model_type=settings.model_name,
             api_key=api_key,
@@ -127,6 +128,8 @@ def create_model_backend(settings: LLMProviderSettings) -> BaseModelBackend:
             model_config_dict=default_model_cfg,
             timeout=settings.timeout_seconds,
         )
+        # Wrap Llama-4 models with XML-to-JSON tool call adapter
+        return wrap_llama4_backend(backend, settings.model_name)
     if provider == "gemini":
         api_key = settings.api_key or os.getenv("GEMINI_API_KEY", "")
         if not api_key:

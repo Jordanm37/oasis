@@ -10,7 +10,7 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Any, Dict, Optional
 
 from dotenv import load_dotenv
 
@@ -43,6 +43,18 @@ from orchestrator.model_provider import (LLMProviderSettings,
                                          create_model_backend)
 from orchestrator.scheduler import MultiLabelScheduler, MultiLabelTargets
 from orchestrator.sidecar_logger import SidecarLogger
+
+# Enhanced simulation features (optional)
+try:
+    from orchestrator.simulation_coordinator import (
+        SimulationCoordinator,
+        SimulationCoordinatorConfig,
+    )
+    ENHANCED_FEATURES_AVAILABLE = True
+except ImportError:
+    ENHANCED_FEATURES_AVAILABLE = False
+    SimulationCoordinator = None
+    SimulationCoordinatorConfig = None
 
 
 #
@@ -243,6 +255,8 @@ async def run(
     rag_mode: str,
     rag_workers: int,
     rag_batch_size: int,
+    enable_thread_dynamics: bool = False,
+    enable_obfuscation: bool = False,
 ) -> None:
     run_t0 = time.perf_counter()
     print(f"[production] Run started at {datetime.now().isoformat()}")
@@ -281,9 +295,14 @@ async def run(
                 lexicon_terms=label_lexicons or {},
                 static_bank_path=Path(RAG_IMPUTER_STATIC_BANK),
                 run_seed=run_seed,
+                # Post-imputation obfuscation (targets harmful terms after replacement)
+                enable_obfuscation=enable_obfuscation,
+                obfuscation_deterministic=False,  # Non-deterministic for realistic variety
             )
             imputer = RagImputer(imputer_cfg)
             await imputer.start()
+            if enable_obfuscation:
+                print("[production] Post-imputation obfuscation ENABLED")
         except Exception as exc:
             print(f"[production] Failed to start rag imputer: {exc}")
             imputer = None
@@ -311,15 +330,19 @@ async def run(
     # Setup platform and channel
     base_channel = Channel()
     channel = InterceptorChannel(base_channel, expect_registry)
+    # RecSys tuning for better thread engagement:
+    # - refresh_rec_post_count: More posts shown = more chances to comment
+    # - max_rec_post_len: Larger pool = more variety in recommendations
+    # - following_post_count: Show more posts from followed users
     platform = Platform(
         db_path=str(db_path),
         channel=channel,
         sandbox_clock=Clock(k=60),
         start_time=None,
         recsys_type=RecsysType.RANDOM,
-        refresh_rec_post_count=3,
-        max_rec_post_len=5,
-        following_post_count=2,
+        refresh_rec_post_count=8,   # Increased from 3 - show more posts per refresh
+        max_rec_post_len=10,        # Increased from 5 - larger recommendation pool
+        following_post_count=5,     # Increased from 2 - more posts from follows
         show_score=False,
         allow_self_rating=False,
     )
@@ -363,6 +386,27 @@ async def run(
         guidance_config=manifest.guidance_config,
     )
 
+    # Initialize SimulationCoordinator for thread dynamics (optional)
+    coordinator: Optional[SimulationCoordinator] = None
+    if enable_thread_dynamics and ENHANCED_FEATURES_AVAILABLE and SimulationCoordinator is not None:
+        try:
+            coordinator = SimulationCoordinator(
+                config=SimulationCoordinatorConfig(
+                    enable_thread_dynamics=True,
+                    enable_obfuscation=False,  # Obfuscation handled by RagImputer
+                ),
+                seed=run_seed,
+            )
+            # Register agents with their archetypes
+            for agent_id, agent in agent_graph.get_agents():
+                archetype = getattr(agent, "_persona_cfg", None)
+                if archetype:
+                    coordinator.register_agent(agent_id, archetype.primary_label)
+            print("[production] Thread dynamics ENABLED")
+        except Exception as exc:
+            print(f"[production] Failed to initialize thread coordinator: {exc}")
+            coordinator = None
+
     # Create environment
     env = oasis.make(
         agent_graph=agent_graph,
@@ -399,10 +443,27 @@ async def run(
     print("[DEBUG] About to enter warmup loop...")
     sys.stdout.flush()
 
+    def _apply_coordination_modifiers(agent, coord: Optional[SimulationCoordinator]) -> None:
+        """Apply thread coordination modifiers to an agent before their action."""
+        if coord is None:
+            return
+        modifiers = coord.get_agent_modifiers(agent.social_agent_id)
+        # Store modifiers on agent for use in perform_action_by_llm
+        agent._coordination_modifiers = modifiers
+
     # Warmup: run a few LLMAction steps to populate initial content before main loop
     for i in range(max(0, int(warmup_steps))):
         print(f"[production] Starting warmup {i + 1}/{warmup_steps}, building actions dict for {len(list(env.agent_graph.get_agents()))} agents...")
         sys.stdout.flush()
+        
+        # Advance coordinator (if enabled)
+        if coordinator:
+            coordinator.step()
+        
+        # Apply coordination modifiers to each agent
+        for _, agent in env.agent_graph.get_agents():
+            _apply_coordination_modifiers(agent, coordinator)
+        
         actions = {agent: oasis.LLMAction() for _, agent in env.agent_graph.get_agents()}
         print(f"[production] Actions dict built. Calling env.step()...")
         sys.stdout.flush()
@@ -416,6 +477,15 @@ async def run(
     for i in range(max(0, int(steps))):
         print(f"[production] Starting step {i + 1}/{steps}, building actions dict for {len(list(env.agent_graph.get_agents()))} agents...")
         sys.stdout.flush()
+        
+        # Advance coordinator (if enabled)
+        if coordinator:
+            coordinator.step()
+        
+        # Apply coordination modifiers to each agent
+        for _, agent in env.agent_graph.get_agents():
+            _apply_coordination_modifiers(agent, coordinator)
+        
         actions = {agent: oasis.LLMAction() for _, agent in env.agent_graph.get_agents()}
         print(f"[production] Actions dict built. Calling env.step()...")
         sys.stdout.flush()
@@ -493,6 +563,17 @@ def parse_args() -> argparse.Namespace:
         default="",
         help="Path to write threaded HTML (defaults to <out_dir>/production_threads.html).",
     )
+    # Enhanced simulation features
+    parser.add_argument(
+        "--enable-thread-dynamics",
+        action="store_true",
+        help="Enable thread dynamics (pile-ons, echo chambers, debates).",
+    )
+    parser.add_argument(
+        "--enable-obfuscation",
+        action="store_true",
+        help="Enable post-imputation obfuscation of harmful terms.",
+    )
     return parser.parse_args()
 
 
@@ -525,6 +606,8 @@ def main() -> None:
             args.rag_imputer or "",
             args.rag_workers,
             args.rag_batch_size,
+            enable_thread_dynamics=args.enable_thread_dynamics,
+            enable_obfuscation=args.enable_obfuscation,
         )
     )
 

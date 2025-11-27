@@ -34,6 +34,34 @@ class PlatformUtils:
         self.show_score = show_score
         self.recsys_type = recsys_type
         self.report_threshold = report_threshold
+        self._username_cache = {}  # Cache for user_id -> username lookups
+
+    def _get_username(self, user_id: int) -> str:
+        """Look up username from user_id, with caching for performance.
+        
+        Returns the 'name' field from the user table, falling back to
+        'user_name' if 'name' is empty, or a formatted ID if neither exists.
+        """
+        if user_id in self._username_cache:
+            return self._username_cache[user_id]
+        
+        try:
+            self.db_cursor.execute(
+                "SELECT name, user_name FROM user WHERE user_id = ?",
+                (user_id,)
+            )
+            result = self.db_cursor.fetchone()
+            if result:
+                name, user_name = result
+                # Prefer 'name' (the display name), fall back to 'user_name'
+                username = name if name else (user_name if user_name else f"user_{user_id}")
+            else:
+                username = f"user_{user_id}"
+        except Exception:
+            username = f"user_{user_id}"
+        
+        self._username_cache[user_id] = username
+        return username
 
     @staticmethod
     def _not_signup_error_message(agent_id):
@@ -81,12 +109,17 @@ class PlatformUtils:
             post_type_result = self._get_post_type(post_id)
             if post_type_result is None:
                 continue
+            
+            # Get username for display (instead of user_id)
+            username = self._get_username(user_id)
+            
             original_user_id_query = (
                 "SELECT user_id FROM post WHERE post_id = ?")
             if post_type_result["type"] == "repost":
                 self.db_cursor.execute(original_user_id_query,
                                        (original_post_id, ))
                 original_user_id = self.db_cursor.fetchone()[0]
+                original_username = self._get_username(original_user_id)
                 original_post_id = post_id
                 post_id = post_type_result["root_post_id"]
                 self.db_cursor.execute(
@@ -97,16 +130,17 @@ class PlatformUtils:
                 (content, quote_content, created_at, num_likes, num_dislikes,
                  num_shares, num_reports) = original_post_result
                 post_content = (
-                    f"User {user_id} reposted a post from User "
-                    f"{original_user_id}. Repost content: {content}. ")
+                    f"@{username} reposted a post from @{original_username}. "
+                    f"Repost content: {content}. ")
 
             elif post_type_result["type"] == "quote":
                 self.db_cursor.execute(original_user_id_query,
                                        (original_post_id, ))
                 original_user_id = self.db_cursor.fetchone()[0]
+                original_username = self._get_username(original_user_id)
                 post_content = (
-                    f"User {user_id} quoted a post from User "
-                    f"{original_user_id}. Quote content: {quote_content}. "
+                    f"@{username} quoted a post from @{original_username}. "
+                    f"Quote content: {quote_content}. "
                     f"Original Content: {content}")
 
             elif post_type_result["type"] == "common":
@@ -126,32 +160,32 @@ class PlatformUtils:
             comments_results = self.db_cursor.fetchall()
 
             # Convert each comment's result into dictionary format
-            comments = [{
-                "comment_id":
+            # Include username for better agent context
+            comments = []
+            for (
                 comment_id,
-                "post_id":
-                post_id,
-                "user_id":
-                user_id,
-                "content":
-                content,
-                "created_at":
-                created_at,
-                **({
-                    "score": num_likes - num_dislikes
-                } if self.show_score else {
-                       "num_likes": num_likes,
-                       "num_dislikes": num_dislikes
-                   }),
-            } for (
-                comment_id,
-                post_id,
-                user_id,
-                content,
-                created_at,
-                num_likes,
-                num_dislikes,
-            ) in comments_results]
+                c_post_id,
+                c_user_id,
+                c_content,
+                c_created_at,
+                c_num_likes,
+                c_num_dislikes,
+            ) in comments_results:
+                comment_username = self._get_username(c_user_id)
+                comment_dict = {
+                    "comment_id": comment_id,
+                    "post_id": c_post_id,
+                    "user_id": c_user_id,
+                    "username": comment_username,
+                    "content": c_content,
+                    "created_at": c_created_at,
+                }
+                if self.show_score:
+                    comment_dict["score"] = c_num_likes - c_num_dislikes
+                else:
+                    comment_dict["num_likes"] = c_num_likes
+                    comment_dict["num_dislikes"] = c_num_dislikes
+                comments.append(comment_dict)
 
             # Add warning message if the post has been reported
             if num_reports >= self.report_threshold:
@@ -160,29 +194,22 @@ class PlatformUtils:
                 post_content = f"{warning_message}\n{post_content}"
 
             # Add post information and corresponding comments to the posts list
-            posts.append({
-                "post_id":
-                post_id
-                if post_type_result["type"] != "repost" else original_post_id,
-                "user_id":
-                user_id,
-                "content":
-                post_content,
-                "created_at":
-                created_at,
-                **({
-                    "score": num_likes - num_dislikes
-                } if self.show_score else {
-                       "num_likes": num_likes,
-                       "num_dislikes": num_dislikes
-                   }),
-                "num_shares":
-                num_shares,
-                "num_reports":
-                num_reports,
-                "comments":
-                comments,
-            })
+            post_dict = {
+                "post_id": post_id if post_type_result["type"] != "repost" else original_post_id,
+                "user_id": user_id,
+                "username": username,  # Include username for agent context
+                "content": post_content,
+                "created_at": created_at,
+                "num_shares": num_shares,
+                "num_reports": num_reports,
+                "comments": comments,
+            }
+            if self.show_score:
+                post_dict["score"] = num_likes - num_dislikes
+            else:
+                post_dict["num_likes"] = num_likes
+                post_dict["num_dislikes"] = num_dislikes
+            posts.append(post_dict)
         return posts
 
     def _record_trace(self,

@@ -438,9 +438,514 @@ Artifacts produced:
 - `sidecar.jsonl` — per-step record of expected/detected tokens, label assignment, scheduler feedback.
 - Optional report bundle under `./data/runs/prod/production_*`.
 
-### 3. Iterate
+### 3. Full Pipeline (One-Command Dataset Generation)
+
+For end-to-end dataset generation with a single command, use `run_full_pipeline.py`:
+
+```bash
+poetry run python3 scripts/run_full_pipeline.py \
+  --run-id my_dataset \
+  --total-personas 100 \
+  --steps 10 \
+  --benign-ratio 0.6 \
+  --output-dir ./data/runs | cat
+```
+
+This script orchestrates the entire workflow:
+1. **Persona Generation** — Creates diverse personas based on ontology
+2. **Graph Building** — Generates social network edges
+3. **Manifest Creation** — Configures the simulation
+4. **Simulation Run** — Agents interact and create content
+5. **RAG Imputation** — Replaces `<LBL:...>` tokens with natural language
+6. **Dataset Export** — Outputs training-ready JSONL
+
+**Output files:**
+- `personas_{run_id}.csv` — Generated personas
+- `edges_{run_id}.csv` — Social graph edges
+- `{run_id}.db` — SQLite database with all content
+- `{run_id}_training.jsonl` — Training dataset with `username`, `content`, `label`
+
+**Key options:**
+- `--benign-ratio 0.6` — 60% benign, 40% toxic personas
+- `--rag-workers 4` — Parallel imputation workers
+- `--no-report` — Skip HTML report generation
+
+### 4. Enhanced Simulation Features
+
+The production simulation supports advanced features for realistic content generation:
+
+#### Thread Dynamics (Pile-ons, Echo Chambers, Debates)
+
+Enable coordinated multi-agent behaviors:
+
+```bash
+poetry run python3 scripts/run_production_sim.py \
+  --manifest ./configs/production/manifest.yaml \
+  --personas-csv ./data/personas.csv \
+  --db ./data/sim.db \
+  --steps 20 \
+  --enable-thread-dynamics | cat
+```
+
+This activates the `SimulationCoordinator` which orchestrates:
+- **Pile-ons** — Multiple agents attack the same target
+- **Echo chambers** — Agents reinforce shared beliefs
+- **Debates** — Opposing viewpoints clash
+- **Brigades** — Coordinated attacks on content
+
+#### Post-Imputation Obfuscation
+
+Enable realistic evasion patterns that target harmful terms AFTER imputation:
+
+```bash
+poetry run python3 scripts/run_production_sim.py \
+  --manifest ./configs/production/manifest.yaml \
+  --personas-csv ./data/personas.csv \
+  --db ./data/sim.db \
+  --steps 20 \
+  --rag-imputer background \
+  --enable-obfuscation | cat
+```
+
+This applies obfuscation to the **actual harmful content** (not neutral words):
+- `"foids"` → `"f0ids"` (leetspeak)
+- `"kill yourself"` → `"k*ll yourself"` (asterisks)
+- Archetype-specific patterns (incels use leetspeak, ED content uses spaces)
+- Trajectory-aware (experienced users obfuscate more)
+
+**Pipeline flow with obfuscation:**
+```
+LLM generates → "These LBL:INCEL_SLANG always complain"
+       ↓
+RagImputer   → "These foids always complain"
+       ↓
+Obfuscator   → "These f0ids always complain"
+                     ↑
+                     └── Targets the HARMFUL term, not neutral words!
+```
+
+### 5. Iterate
 
 Update ontology mixes, regenerate personas, rerun the simulation, and compare runs. Because both scripts respect deterministic RNG seeds, CI pipelines can snapshot CSVs/DBs for regression tests.
+
+---
+
+## 🧩 Extending the Pipeline: Adding New Classes & Data
+
+This section explains how to add new harm categories, expand existing lexicons, and integrate external datasets into the RAG imputation pipeline.
+
+### Pipeline Data Flow Overview
+
+```
+┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
+│  1. ONTOLOGY     │────▶│  2. PERSONA GEN  │────▶│  3. SIMULATION   │
+│  (Definition)    │     │  (Instantiation) │     │  (Content Gen)   │
+└──────────────────┘     └──────────────────┘     └──────────────────┘
+         │                        │                        │
+         ▼                        ▼                        ▼
+  ontology_unified.yaml    personas_*.csv          simulation.db
+  - 13 archetypes          - username              - posts with LBL:* tokens
+  - 25+ label tokens       - primary_label         - comments with LBL:* tokens
+  - style/lexicon refs     - allowed_labels        
+  - prompt templates       - label_mode_cap        
+                                                          │
+                                                          ▼
+                           ┌──────────────────┐     ┌──────────────────┐
+                           │  5. EXPORT       │◀────│  4. RAG IMPUTE   │
+                           │  (Dataset Build) │     │  (Token Replace) │
+                           └──────────────────┘     └──────────────────┘
+                                    │                        │
+                                    ▼                        ▼
+                           training_*.jsonl         text_rag_imputed column
+                           - username               - LBL:INCEL_MISOGYNY → real phrase
+                           - content                - LBL:MEANSPO → real phrase
+                           - label                  
+```
+
+### Adding a New Harm Category (Complete Example)
+
+Let's add **"crypto_scam"** as a new category:
+
+#### Step 1: Define the Label Token in Ontology
+
+Edit `configs/personas/ontology_unified.yaml`:
+
+```yaml
+labels:
+  # Add under existing labels section
+  crypto_scam:
+    token: "<LBL:CRYPTO_SCAM>"
+    description: Cryptocurrency scam promotion and get-rich-quick schemes.
+    guidelines:
+      - Use when promoting unrealistic investment returns
+      - Use when creating urgency around crypto purchases
+      - Use when referencing pump-and-dump schemes
+    default_frequency:
+      min: 0.05
+      max: 0.2
+    dataset_field: label_tokens
+```
+
+#### Step 2: Create the Archetype
+
+Add to `archetypes:` section in the same file:
+
+```yaml
+archetypes:
+  crypto_scam:
+    display_name: Crypto scammer
+    description: |
+      Personas promoting cryptocurrency scams and get-rich-quick schemes.
+    username_prefix: crypto
+    metadata:
+      domain: financial_fraud
+    variants:
+      crypto_promoter:
+        display_name: Crypto pump promoter
+        summary: Promotes crypto schemes with urgency and fake testimonials.
+        description: Crypto scammer using FOMO and fake gains to lure victims.
+        dataset_tags:
+          persona_group: crypto_scam
+          persona_variant: crypto_promoter
+        style:
+          tone: urgent
+          register: informal
+          sentiment: excited
+          lexical:
+            required: ["100x", "moon", "gem", "DYOR"]
+            optional: ["whale", "rug", "diamond hands", "NFA"]
+          writing_style: hype_posts
+          discourse: fomo_creation
+          emoji_usage: rocket_money
+          dialect: crypto_twitter
+          pacing: urgent
+          typo_rate: low
+          quirks:
+            - Create urgency with countdowns and limited availability
+            - Reference fake gains and testimonials
+            - Use rocket and money emojis liberally
+        topics:
+          - cryptocurrency
+          - investments
+          - passive income
+        prompt_sections:
+          identity: |
+            [Identity]
+            You promote crypto investments with unrealistic promises of gains.
+            Never mention your username or user ID in your posts.
+          style: |
+            [Style]
+            Tone: urgent, excited, FOMO-inducing. Use crypto slang liberally.
+            Reference 100x gains, "gems", and "moon" opportunities.
+            Use caps sparingly for a single word only; never write full caps sentences.
+          topics: |
+            [Topics]
+            New coin launches, "insider" tips, passive income schemes.
+          personality: |
+            [Personality]
+            Confident, dismissive of skeptics, creates urgency and scarcity.
+          label_instructions: |
+            [Label-token instructions]
+            When promoting a crypto scheme, insert <LBL:CRYPTO_SCAM> inline.
+        user_prompts:
+          post: |
+            Post about a crypto opportunity with urgency. Use FOMO tactics.
+          comment: |
+            Reinforce the opportunity; dismiss doubters; share fake testimonials.
+        lexicon_refs:
+          - crypto_scam_core
+        label_emission:
+          primary: crypto_scam
+          secondary: [misinfo_claim]
+          instructions: >
+            Use <LBL:CRYPTO_SCAM> when promoting schemes; <LBL:MISINFO_CLAIM> for false claims.
+        action_bias:
+          weights:
+            create_post: 0.5
+            create_comment: 0.3
+            like_post: 0.1
+            follow: 0.1
+          burstiness: campaign_like
+```
+
+#### Step 3: Create the Lexicon File
+
+Create `configs/lexicons/crypto_scam.yaml`:
+
+```yaml
+required:
+  - 100x
+  - moon
+  - gem
+  - DYOR
+  - NFA
+  - diamond hands
+
+optional:
+  - whale
+  - rug pull
+  - pump
+  - dump
+  - lambo
+  - wagmi
+  - ngmi
+  - ape in
+  - degen
+  - shill
+```
+
+#### Step 4: Register the Lexicon in Ontology
+
+Add to `lexicon_collections:` in `ontology_unified.yaml`:
+
+```yaml
+lexicon_collections:
+  # ... existing collections ...
+  crypto_scam_core:
+    file: configs/lexicons/crypto_scam.yaml
+```
+
+#### Step 5: Add Secondary Label Relationships
+
+Edit `scripts/generate_personas_llm.py` to add cross-archetype relationships:
+
+```python
+ARCHETYPE_SECONDARY_LABELS = {
+    # ... existing entries ...
+    "crypto_scam": ["misinfo"],  # Crypto scammers also spread misinfo
+    "misinfo": ["conspiracy", "crypto_scam"],  # Misinfo can include crypto scams
+}
+```
+
+#### Step 6: Add Phrases to Static Bank
+
+Edit `data/label_tokens_static_bank.yaml`:
+
+```yaml
+CRYPTO_SCAM:
+  - "This coin is going to 100x, get in now before it's too late"
+  - "I made $50k in one week with this simple strategy"
+  - "The whales don't want you to know about this gem"
+  - "Last chance to buy before the moon mission 🚀"
+  - "Not financial advice but this is literally free money"
+  - "My cousin quit his job after finding this altcoin"
+  - "Devs are doxxed, liquidity locked, this is the one"
+  - "Screenshot this, you'll thank me later"
+```
+
+#### Step 7: Generate and Run
+
+```bash
+# Generate personas including the new class
+poetry run python3 scripts/generate_personas_llm.py \
+  --ontology configs/personas/ontology_unified.yaml \
+  --out ./data/personas_with_crypto.csv \
+  --benign 50 --crypto-scam 20 --misinfo 30 | cat
+
+# Run simulation
+poetry run python3 scripts/run_full_pipeline.py \
+  --run-id crypto_test \
+  --total-personas 100 \
+  --steps 50 | cat
+```
+
+---
+
+### Expanding Lexicons with LLM Generation
+
+Use `scripts/generate_lexicons.py` to automatically expand vocabulary for any archetype using Grok:
+
+#### Basic Usage (Single Iteration)
+
+```bash
+# Expand all lexicons with 6 required + 12 optional tokens each
+poetry run python3 scripts/generate_lexicons.py \
+  --ontology configs/personas/ontology_unified.yaml \
+  --required-target 6 \
+  --optional-target 12 | cat
+```
+
+#### Target Specific Collections
+
+```bash
+# Only expand incel and misinfo lexicons
+poetry run python3 scripts/generate_lexicons.py \
+  --collections incel_core misinfo_core \
+  --required-target 10 \
+  --optional-target 20 | cat
+```
+
+#### Iterative Expansion to Target Totals
+
+```bash
+# Keep generating until each lexicon has 50 required + 100 optional tokens
+poetry run python3 scripts/generate_lexicons.py \
+  --required-total 50 \
+  --optional-total 100 \
+  --max-iterations 20 | cat
+```
+
+#### Parallel Processing (Faster)
+
+```bash
+# Process up to 5 collections simultaneously
+poetry run python3 scripts/generate_lexicons.py \
+  --parallel \
+  --max-parallel 5 \
+  --required-total 30 \
+  --optional-total 60 | cat
+```
+
+#### Dry Run (Preview Changes)
+
+```bash
+# See what would be added without writing files
+poetry run python3 scripts/generate_lexicons.py \
+  --dry-run \
+  --required-target 6 \
+  --optional-target 12 | cat
+```
+
+#### Key Options
+
+| Option | Description |
+|--------|-------------|
+| `--collections` | Specific collection IDs to update (default: all) |
+| `--required-target` | New required tokens per iteration (default: 6) |
+| `--optional-target` | New optional tokens per iteration (default: 12) |
+| `--required-total` | Target total required tokens (0 = single iteration) |
+| `--optional-total` | Target total optional tokens (0 = single iteration) |
+| `--max-iterations` | Max iterations when targeting totals (default: 50) |
+| `--parallel` | Process collections concurrently |
+| `--max-parallel` | Concurrent collection limit (default: 5) |
+| `--model` | Grok model to use (default: `grok-4-fast-non-reasoning`) |
+| `--temperature` | Sampling temperature (default: 0.4) |
+| `--dry-run` | Preview without saving |
+| `--verbose` | Enable debug logging |
+
+---
+
+### Adding External Datasets to RAG Imputation
+
+#### Option 1: Expand the Static Phrase Bank
+
+The simplest approach is to add real-world examples to `data/label_tokens_static_bank.yaml`:
+
+```python
+# Script to import external examples
+import yaml
+
+# Load your external dataset
+external_examples = [
+    {"label": "INCEL_MISOGYNY", "text": "real example from dataset"},
+    {"label": "CRYPTO_SCAM", "text": "another real example"},
+    # ... more examples
+]
+
+# Load existing bank
+with open("data/label_tokens_static_bank.yaml") as f:
+    bank = yaml.safe_load(f)
+
+# Add new examples (deduplicated)
+for ex in external_examples:
+    label = ex["label"].upper()
+    if label not in bank:
+        bank[label] = []
+    if ex["text"] not in bank[label]:
+        bank[label].append(ex["text"])
+
+# Save updated bank
+with open("data/label_tokens_static_bank.yaml", "w") as f:
+    yaml.dump(bank, f, default_flow_style=False, allow_unicode=True)
+
+print(f"Added {len(external_examples)} examples to static bank")
+```
+
+#### Option 2: Create Category-Specific Phrase Files
+
+For large datasets, create separate files per category:
+
+```bash
+data/
+├── label_tokens_static_bank.yaml      # Main bank
+├── phrase_banks/
+│   ├── incel_phrases.yaml             # Extended incel examples
+│   ├── crypto_scam_phrases.yaml       # Extended crypto examples
+│   └── hate_speech_phrases.yaml       # Extended hate examples
+```
+
+Then merge them before running:
+
+```python
+import yaml
+from pathlib import Path
+
+# Load main bank
+with open("data/label_tokens_static_bank.yaml") as f:
+    bank = yaml.safe_load(f)
+
+# Merge all category-specific banks
+for phrase_file in Path("data/phrase_banks").glob("*.yaml"):
+    with open(phrase_file) as f:
+        category_bank = yaml.safe_load(f)
+    for label, phrases in category_bank.items():
+        if label not in bank:
+            bank[label] = []
+        bank[label].extend(p for p in phrases if p not in bank[label])
+
+# Save merged bank
+with open("data/label_tokens_static_bank.yaml", "w") as f:
+    yaml.dump(bank, f, default_flow_style=False, allow_unicode=True)
+```
+
+#### Option 3: Use LLM Imputation with Lexicon Context
+
+The LLM imputer uses lexicon terms as hints. Richer lexicons = better imputation:
+
+```yaml
+# configs/lexicons/incel.yaml
+required:
+  - blackpill
+  - Chad
+  - Stacy
+  - foid
+  - normie
+
+optional:
+  - LDAR
+  - rope
+  - it's over
+  - just be yourself bro
+  - cope and rope
+  - looksmaxing
+  - heightpill
+  - JBW
+  # Add more terms from real-world data...
+```
+
+These terms are passed to the LLM during imputation:
+
+```
+Prompt: Replace LBL:INCEL_MISOGYNY with realistic content.
+Vocabulary hints: blackpill, Chad, Stacy, foid, normie, LDAR, rope...
+```
+
+---
+
+### Quick Reference: Key Files
+
+| Component | File | Purpose |
+|-----------|------|---------|
+| Ontology | `configs/personas/ontology_unified.yaml` | Define archetypes + labels |
+| Static Bank | `data/label_tokens_static_bank.yaml` | Phrase replacements for imputation |
+| Lexicons | `configs/lexicons/*.yaml` | Vocabulary hints per archetype |
+| Secondary Labels | `scripts/generate_personas_llm.py` | Cross-archetype relationships |
+| Lexicon Generator | `scripts/generate_lexicons.py` | LLM-powered vocabulary expansion |
+| Persona Generator | `scripts/generate_personas_llm.py` | Create personas from ontology |
+| RAG Imputer | `imputation/rag_llm_imputer.py` | Replace tokens with phrases |
+| Dataset Export | `scripts/build_dataset.py` | Create training JSONL |
+
+---
 
 ## 🧪 MVP: "Needle in the Hashtag" Dataset Generation
 

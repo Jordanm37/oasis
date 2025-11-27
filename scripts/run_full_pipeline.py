@@ -42,6 +42,23 @@ load_dotenv()
 
 
 # =============================================================================
+# Helper: Detect if running on Modal (no poetry) vs local (with poetry)
+# =============================================================================
+
+def get_python_cmd() -> List[str]:
+    """Return the command prefix for running Python scripts.
+    
+    On Modal/cloud: use python3 directly
+    Locally: use poetry run python3
+    """
+    import shutil
+    if shutil.which("poetry") is not None:
+        return ["poetry", "run", "python3"]
+    else:
+        return ["python3"]
+
+
+# =============================================================================
 # Configuration
 # =============================================================================
 
@@ -64,10 +81,11 @@ class PipelineConfig:
     def persona_distribution(self) -> Dict[str, float]:
         """Compute persona distribution based on benign_ratio.
         
-        Benign classes (benign, recovery_support) split the benign_ratio evenly.
+        Benign class (benign only - recovery_support is disabled) gets benign_ratio.
         Toxic classes (11 total) split (1 - benign_ratio) uniformly.
         """
-        benign_classes = ["benign", "recovery_support"]
+        # Note: recovery_support is commented out in ontology_unified.yaml
+        benign_classes = ["benign"]
         toxic_classes = [
             "ed_risk", "pro_ana", "incel_misogyny", "alpha",
             "misinfo", "conspiracy", "trad", "gamergate",
@@ -92,6 +110,10 @@ class PipelineConfig:
     # RAG Imputation
     rag_workers: int = 4
     rag_batch_size: int = 8
+    
+    # Enhanced features
+    enable_thread_dynamics: bool = True   # Pile-ons, echo chambers, debates
+    enable_obfuscation: bool = True       # Leetspeak, asterisks on toxic terms
     
     # Post-processing
     generate_report: bool = True
@@ -129,10 +151,13 @@ class PipelineConfig:
         """Compute integer counts from distribution percentages.
         
         Handles cases where total_personas < number of classes by:
-        1. First ensuring benign classes get their share
+        1. First ensuring benign class gets its share
         2. Then distributing remaining among toxic classes
+        
+        Note: recovery_support is disabled (commented out in ontology_unified.yaml)
         """
-        benign_classes = ["benign", "recovery_support"]
+        # Note: Only "benign" for non-toxic personas now
+        benign_classes = ["benign"]
         toxic_classes = [
             "ed_risk", "pro_ana", "incel_misogyny", "alpha",
             "misinfo", "conspiracy", "trad", "gamergate",
@@ -145,16 +170,8 @@ class PipelineConfig:
         
         counts = {}
         
-        # Distribute benign personas
-        if num_benign >= len(benign_classes):
-            base = num_benign // len(benign_classes)
-            remainder = num_benign % len(benign_classes)
-            for i, c in enumerate(benign_classes):
-                counts[c] = base + (1 if i < remainder else 0)
-        else:
-            # Not enough for all benign classes - just use "benign"
-            counts["benign"] = num_benign
-            counts["recovery_support"] = 0
+        # All benign personas go to "benign" class
+        counts["benign"] = num_benign
         
         # Distribute toxic personas
         if num_toxic >= len(toxic_classes):
@@ -199,8 +216,8 @@ def step_1_generate_personas(config: PipelineConfig) -> bool:
         print(f"  {persona}: {count}")
     
     # Build command for generate_personas_llm.py
-    cmd = [
-        "poetry", "run", "python3", "scripts/generate_personas_llm.py",
+    cmd = get_python_cmd() + [
+        "scripts/generate_personas_llm.py",
         "--out", str(config.personas_csv),
         "--seed", str(config.seed),
         "--ontology", str(config.ontology_path),
@@ -372,8 +389,8 @@ def step_4_run_simulation(config: PipelineConfig) -> bool:
         config.db_path.unlink()
         print(f"Removed existing database: {config.db_path}")
     
-    cmd = [
-        "poetry", "run", "python3", "scripts/run_production_sim.py",
+    cmd = get_python_cmd() + [
+        "scripts/run_production_sim.py",
         "--manifest", str(config.manifest_path),
         "--personas-csv", str(config.personas_csv),
         "--db", str(config.db_path),
@@ -384,7 +401,14 @@ def step_4_run_simulation(config: PipelineConfig) -> bool:
         "--fresh-db",
     ]
     
+    # Add enhanced feature flags
+    if config.enable_thread_dynamics:
+        cmd.append("--enable-thread-dynamics")
+    if config.enable_obfuscation:
+        cmd.append("--enable-obfuscation")
+    
     print(f"\nRunning simulation with {config.warmup_steps} warmup + {config.simulation_steps} steps...")
+    print(f"Thread dynamics: {config.enable_thread_dynamics}, Obfuscation: {config.enable_obfuscation}")
     print(f"Command: {' '.join(cmd[:10])}...")
     
     start_time = time.time()
@@ -498,8 +522,8 @@ def step_6_export_datasets(config: PipelineConfig) -> bool:
     log_step(6, 6, "Exporting Datasets")
     
     # Run build_dataset.py for full export
-    cmd = [
-        "poetry", "run", "python3", "scripts/build_dataset.py",
+    cmd = get_python_cmd() + [
+        "scripts/build_dataset.py",
         "--db", str(config.db_path),
         "--out", str(config.dataset_jsonl),
         "--personas-csv", str(config.personas_csv),
@@ -625,8 +649,8 @@ def step_6_export_datasets(config: PipelineConfig) -> bool:
     # Generate report if requested
     if config.generate_report:
         print("\nGenerating HTML report...")
-        report_cmd = [
-            "poetry", "run", "python3", "scripts/report_production.py",
+        report_cmd = get_python_cmd() + [
+            "scripts/report_production.py",
             "--db", str(config.db_path),
             "--out", str(config.report_html),
             "--personas-csv", str(config.personas_csv),
@@ -780,12 +804,38 @@ Examples:
         default=0.60,
         help="Ratio of benign personas (default: 0.60 = 60%% benign, 40%% toxic)"
     )
+    parser.add_argument(
+        "--enable-thread-dynamics",
+        action="store_true",
+        default=True,
+        help="Enable coordinated behaviors: pile-ons, echo chambers, debates (default: enabled)"
+    )
+    parser.add_argument(
+        "--no-thread-dynamics",
+        action="store_true",
+        help="Disable thread dynamics"
+    )
+    parser.add_argument(
+        "--enable-obfuscation",
+        action="store_true",
+        default=True,
+        help="Enable post-imputation obfuscation: leetspeak, asterisks (default: enabled)"
+    )
+    parser.add_argument(
+        "--no-obfuscation",
+        action="store_true",
+        help="Disable obfuscation"
+    )
     
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
+    
+    # Handle flag overrides (--no-* takes precedence)
+    enable_thread_dynamics = not args.no_thread_dynamics
+    enable_obfuscation = not args.no_obfuscation
     
     # Build config
     config = PipelineConfig(
@@ -799,6 +849,8 @@ def main() -> None:
         rag_workers=args.rag_workers,
         generate_report=not args.no_report,
         ontology_path=Path(args.ontology),
+        enable_thread_dynamics=enable_thread_dynamics,
+        enable_obfuscation=enable_obfuscation,
     )
     
     # Run pipeline

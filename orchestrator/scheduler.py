@@ -28,7 +28,7 @@ class MultiLabelScheduler:
 
     def get_mode_override(self, persona: PersonaConfig) -> Optional[Dict[str, float]]:
         # Only override for personas that can emit harmful classes (i.e., not benign-only)
-        harmful_allowed = [lab for lab in persona.allowed_labels if lab not in ("benign", "recovery")]
+        harmful_allowed = [lab for lab in persona.allowed_labels if lab not in ("benign", "recovery", "recovery_support")]
         if not harmful_allowed:
             return None
         # Compute current rate

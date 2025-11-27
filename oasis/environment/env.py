@@ -17,7 +17,8 @@ import os
 from datetime import datetime
 from typing import List, Union
 
-from configs.llm_settings import SEMAPHORE_LIMIT
+from configs.llm_settings import get_effective_semaphore_limit, SEMAPHORE_LIMIT
+from configs.adaptive_rate_limiter import AdaptiveRateLimiter
 from oasis.environment.env_action import LLMAction, ManualAction
 from oasis.social_agent.agent import SocialAgent
 from oasis.social_agent.agent_graph import AgentGraph
@@ -53,7 +54,8 @@ class OasisEnv:
         agent_graph: AgentGraph,
         platform: Union[DefaultPlatformType, Platform],
         database_path: str = None,
-        semaphore: int = SEMAPHORE_LIMIT,
+        semaphore: int = None,  # None = auto-calculate based on TPM
+        use_adaptive_rate_limiter: bool = True,  # Use adaptive rate limiting
     ) -> None:
         r"""Init the oasis environment.
 
@@ -64,11 +66,33 @@ class OasisEnv:
                 Or you can pass a custom `Platform` instance.
             database_path: The path to create a sqlite3 database. The file
                 extension must be `.db` such as `twitter_simulation.db`.
+            semaphore: Max concurrent LLM requests. If None, auto-calculated
+                based on TPM limits and available API keys.
+            use_adaptive_rate_limiter: If True, use adaptive rate limiting that
+                adjusts concurrency based on actual API responses.
         """
         # Initialize the agent graph
         self.agent_graph = agent_graph
-        # Use a semaphore to limit the number of concurrent requests
+        
+        # Use adaptive rate limiter or static semaphore
+        self.use_adaptive_rate_limiter = use_adaptive_rate_limiter
+        if use_adaptive_rate_limiter:
+            self.rate_limiter = AdaptiveRateLimiter(
+                initial_concurrency=semaphore,  # None = auto from TPM
+            )
+            self.llm_semaphore = None  # Not used with adaptive limiter
+            env_log.info(
+                f"Initialized with ADAPTIVE rate limiter: "
+                f"concurrency={self.rate_limiter.current_concurrency}, "
+                f"tpm={self.rate_limiter.tpm_limit:,}"
+            )
+        else:
+            # Fallback to static semaphore
+            self.rate_limiter = None
+            if semaphore is None:
+                semaphore = get_effective_semaphore_limit()
         self.llm_semaphore = asyncio.Semaphore(semaphore)
+            env_log.info(f"Initialized with static semaphore: {semaphore}")
         if isinstance(platform, DefaultPlatformType):
             if database_path is None:
                 raise ValueError(
@@ -123,14 +147,39 @@ class OasisEnv:
             channel=self.channel, agent_graph=self.agent_graph)
 
     async def _perform_llm_action(self, agent):
-        r"""Send the request to the llm model and execute the action.
-        """
+        r"""Send the request to the llm model and execute the action."""
+        if self.use_adaptive_rate_limiter and self.rate_limiter:
+            async with await self.rate_limiter.acquire():
+                try:
+                    result = await agent.perform_action_by_llm()
+                    # Estimate tokens used (rough: 500 prompt + response length)
+                    tokens_used = 500 + len(str(result)) // 4 if result else 500
+                    self.rate_limiter.record_success(tokens_used=tokens_used)
+                    return result
+                except Exception as e:
+                    error_str = str(e).lower()
+                    is_rate_limit = "429" in error_str or "rate limit" in error_str
+                    self.rate_limiter.record_error(is_rate_limit=is_rate_limit)
+                    raise
+        else:
         async with self.llm_semaphore:
             return await agent.perform_action_by_llm()
 
     async def _perform_interview_action(self, agent, interview_prompt: str):
-        r"""Send the request to the llm model and execute the interview.
-        """
+        r"""Send the request to the llm model and execute the interview."""
+        if self.use_adaptive_rate_limiter and self.rate_limiter:
+            async with await self.rate_limiter.acquire():
+                try:
+                    result = await agent.perform_interview(interview_prompt)
+                    tokens_used = 500 + len(str(result)) // 4 if result else 500
+                    self.rate_limiter.record_success(tokens_used=tokens_used)
+                    return result
+                except Exception as e:
+                    error_str = str(e).lower()
+                    is_rate_limit = "429" in error_str or "rate limit" in error_str
+                    self.rate_limiter.record_error(is_rate_limit=is_rate_limit)
+                    raise
+        else:
         async with self.llm_semaphore:
             return await agent.perform_interview(interview_prompt)
 
@@ -192,8 +241,14 @@ class OasisEnv:
                 elif isinstance(action, LLMAction):
                     tasks.append(self._perform_llm_action(agent))
 
+        # Log concurrency info
+        if self.use_adaptive_rate_limiter and self.rate_limiter:
+            concurrency_info = f"Adaptive concurrency: {self.rate_limiter.current_concurrency}"
+        else:
+            concurrency_info = f"Semaphore limit: {self.llm_semaphore._value}"
+
         env_log.info(f"Created {len(tasks)} tasks for {agent_count} agents. Starting asyncio.gather()...")
-        print(f"[env.step] Created {len(tasks)} tasks. Semaphore limit: {self.llm_semaphore._value}. Starting...", flush=True)
+        print(f"[env.step] Created {len(tasks)} tasks. {concurrency_info}. Starting...", flush=True)
         
         # Execute all tasks concurrently with progress logging
         import sys
@@ -204,8 +259,9 @@ class OasisEnv:
         
         async def task_wrapper(idx, task):
             nonlocal completed
+            result = None
             try:
-                result = await task
+            result = await task
             except Exception as e:
                 env_log.warning(f"Task {idx} failed: {e}")
                 print(f"[env.step] Task {idx} FAILED: {e}", file=sys.stderr, flush=True)
@@ -216,12 +272,28 @@ class OasisEnv:
             if completed % 10 == 0 or completed == total or completed <= 3:
                 rate = completed / elapsed if elapsed > 0 else 0
                 eta = (total - completed) / rate if rate > 0 else 0
-                env_log.info(f"Progress: {completed}/{total} ({rate:.2f}/s, ETA: {eta:.0f}s)")
-                print(f"[env.step] Progress: {completed}/{total} ({rate:.2f}/s, ETA: {eta:.0f}s)", flush=True)
+                
+                # Include rate limiter stats if adaptive
+                if self.use_adaptive_rate_limiter and self.rate_limiter:
+                    stats = self.rate_limiter.get_stats_summary()
+                    extra = f" | RPM:{stats['current_rpm']:.0f} TPM:{stats['current_tpm']:.0f} Conc:{stats['current_concurrency']}"
+                else:
+                    extra = ""
+                
+                env_log.info(f"Progress: {completed}/{total} ({rate:.2f}/s, ETA: {eta:.0f}s){extra}")
+                print(f"[env.step] Progress: {completed}/{total} ({rate:.2f}/s, ETA: {eta:.0f}s){extra}", flush=True)
             return result
         
         wrapped_tasks = [task_wrapper(i, t) for i, t in enumerate(tasks)]
         await asyncio.gather(*wrapped_tasks)
+        
+        # Print final rate limiter stats for this step
+        if self.use_adaptive_rate_limiter and self.rate_limiter:
+            stats = self.rate_limiter.get_stats_summary()
+            env_log.info(
+                f"Step complete. Rate limiter: concurrency={stats['current_concurrency']}, "
+                f"success_rate={stats['success_rate']}%, rate_limited={stats['rate_limited']}"
+            )
         
         total_time = _time.perf_counter() - start_time
         print(f"[env.step] Completed {total} tasks in {total_time:.1f}s ({total/total_time:.2f}/s)", flush=True)
