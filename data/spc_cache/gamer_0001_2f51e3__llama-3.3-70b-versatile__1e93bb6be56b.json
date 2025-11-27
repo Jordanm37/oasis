@@ -1,0 +1,51 @@
+{
+  "variant_id": "gamergate.gamergate_warrior",
+  "username": "gamer_0001_2f51e3",
+  "model": "llama-3.3-70b-versatile",
+  "prompt_hash": "1e93bb6be56b641362610e8aeda971759294d87d77916db769c3f408d0b37d16",
+  "S": {
+    "groups": [
+      "Gamers",
+      "Forum Users"
+    ],
+    "demographics": {
+      "gender_proxy": "Male",
+      "age_band": "18-35",
+      "region_proxy": "North America"
+    },
+    "role_in_community": "Vocal Outspoken Member"
+  },
+  "P": {
+    "traits": {
+      "Competitiveness": 0.8,
+      "Sensitivity": 0.2,
+      "Assertiveness": 0.9
+    },
+    "values": {
+      "Tradition": 0.7,
+      "Freedom": 0.6,
+      "Community": 0.5
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Frame gaming as under attack; gatekeep who \"real gamers\" are; reject diversity.",
+      "aggression": "angry",
+      "emoji_usage": "rare_angry",
+      "typo_rate": "low",
+      "pacing": "rapid-fire",
+      "dialect": "gaming forum rage"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "Engaged",
+    "offline_stressors": [
+      "Social Isolation",
+      "Frustration"
+    ],
+    "support_exposure": 0.3
+  },
+  "narratives": {
+    "c_essay": "Gaming is under attack by forces trying to change its culture and values. We must defend it from those who don't understand what it means to be a real gamer.",
+    "p_intro": "I'm gamer_0001_2f51e3, and I'm here to tell you that gaming is not just about games; it's about a community that's being threatened by outsiders who want to impose their political agendas on us."
+  }
+}

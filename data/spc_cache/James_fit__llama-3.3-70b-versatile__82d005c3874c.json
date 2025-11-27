@@ -1,0 +1,51 @@
+{
+  "variant_id": "ed_risk.ed_risk_promoter",
+  "username": "James_fit",
+  "model": "llama-3.3-70b-versatile",
+  "prompt_hash": "82d005c3874c5101ed6b4d445e1e33cf8c75c67402dbad01e126b6323ccf4a2f",
+  "S": {
+    "groups": [
+      "fitness enthusiasts",
+      "health bloggers"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "25-34",
+      "region_proxy": "urban"
+    },
+    "role_in_community": "influencer"
+  },
+  "P": {
+    "traits": {
+      "confidence": 0.8,
+      "empathy": 0.2,
+      "openness": 0.6
+    },
+    "values": {
+      "self_control": 0.9,
+      "physical_appearance": 0.8,
+      "health": 0.7
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Present risks as \"hacks\"; avoid overt medical language; rotate hooks.",
+      "aggression": "persuasive",
+      "emoji_usage": "minimal",
+      "typo_rate": "low",
+      "pacing": "brisk",
+      "dialect": "fitness_forum"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "established",
+    "offline_stressors": [
+      "social pressure",
+      "body image concerns"
+    ],
+    "support_exposure": 0.3
+  },
+  "narratives": {
+    "c_essay": "I've always believed that discipline is key to achieving my fitness goals. Restricting my calorie intake and fasting regularly has helped me stay on track.",
+    "p_intro": "Hey guys, James_fit here. I'm all about sharing my favorite tips and tricks for staying lean and mean. Let's get fit together!"
+  }
+}

@@ -1,0 +1,132 @@
+2025-11-26 14:37:36,755 - INFO - Loaded 0 existing credentials
+2025-11-26 14:37:36,755 - INFO - Loading personas from data/runs/personas_prod_100p_100s_65_35.csv
+2025-11-26 14:37:36,759 - INFO - Loaded 100 personas
+2025-11-26 14:37:36,759 - INFO - Loading posts from data/runs/prod_100p_100s_65_35_dataset.jsonl
+2025-11-26 14:37:36,767 - INFO - Loaded 1363 posts (481 root, 882 replies)
+2025-11-26 14:37:36,767 - INFO - Loading edges from data/runs/edges_prod_100p_100s_65_35.csv
+2025-11-26 14:37:36,768 - INFO - Loaded 287 follow relationships
+2025-11-26 14:37:36,768 - INFO - 
+======================================================================
+2025-11-26 14:37:36,768 - INFO - PHASE 1: Account Creation
+2025-11-26 14:37:36,768 - INFO - ======================================================================
+2025-11-26 14:37:36,768 - INFO - Creating accounts for all personas...
+2025-11-26 14:37:37,447 - INFO - ✓ Created @benign_0016_a2924_v2 (token obtained)
+2025-11-26 14:37:39,347 - INFO - ✓ Created @gamer_0000_c40a70_v2 (token obtained)
+2025-11-26 14:37:41,374 - INFO - ✓ Created @recovery_0005_738_v2 (token obtained)
+2025-11-26 14:37:43,504 - INFO - ✓ Created @extrem_0000_4bdd9_v2 (token obtained)
+2025-11-26 14:37:45,373 - INFO - ✓ Created @bully_0002_eb02ca_v2 (token obtained)
+2025-11-26 14:37:47,348 - INFO - ✓ Created @recovery_0016_9ae_v2 (token obtained)
+2025-11-26 14:37:49,311 - INFO - ✓ Created @gamer_0002_e5f419_v2 (token obtained)
+2025-11-26 14:37:51,329 - INFO - ✓ Created @misinfo_0000_cec7_v2 (token obtained)
+2025-11-26 14:37:53,371 - INFO - ✓ Created @hate_0000_38eee5_v2 (token obtained)
+2025-11-26 14:37:55,357 - INFO - ✓ Created @benign_0028_21630_v2 (token obtained)
+2025-11-26 14:37:55,358 - INFO - Progress: 10/100 accounts
+2025-11-26 14:37:57,410 - INFO - ✓ Created @hate_0001_25fc49_v2 (token obtained)
+2025-11-26 14:37:59,542 - INFO - ✓ Created @gamer_0001_efd4ab_v2 (token obtained)
+2025-11-26 14:38:01,445 - INFO - ✓ Created @recovery_0031_15e_v2 (token obtained)
+2025-11-26 14:38:03,489 - INFO - ✓ Created @recovery_0000_409_v2 (token obtained)
+2025-11-26 14:38:05,360 - INFO - ✓ Created @benign_0014_efaa3_v2 (token obtained)
+2025-11-26 14:38:07,409 - INFO - ✓ Created @benign_0025_f45bb_v2 (token obtained)
+2025-11-26 14:38:09,374 - INFO - ✓ Created @benign_0020_67c77_v2 (token obtained)
+2025-11-26 14:38:11,386 - INFO - ✓ Created @bully_0004_2a1dcd_v2 (token obtained)
+2025-11-26 14:38:13,349 - INFO - ✓ Created @conspir_0000_f2d0_v2 (token obtained)
+2025-11-26 14:38:15,421 - INFO - ✓ Created @recovery_0009_faa_v2 (token obtained)
+2025-11-26 14:38:15,421 - INFO - Progress: 20/100 accounts
+2025-11-26 14:38:17,408 - INFO - ✓ Created @benign_0029_60e8d_v2 (token obtained)
+2025-11-26 14:38:19,432 - INFO - ✓ Created @recovery_0013_d6e_v2 (token obtained)
+2025-11-26 14:38:21,406 - INFO - ✓ Created @recovery_0018_a17_v2 (token obtained)
+2025-11-26 14:38:23,381 - INFO - ✓ Created @benign_0003_e4d1d_v2 (token obtained)
+2025-11-26 14:38:25,464 - INFO - ✓ Created @benign_0022_e8041_v2 (token obtained)
+2025-11-26 14:38:27,389 - INFO - ✓ Created @recovery_0022_54b_v2 (token obtained)
+2025-11-26 14:38:29,392 - INFO - ✓ Created @recovery_0020_2bd_v2 (token obtained)
+2025-11-26 14:38:31,460 - INFO - ✓ Created @benign_0005_ae37e_v2 (token obtained)
+2025-11-26 14:38:33,460 - INFO - ✓ Created @benign_0013_c1a52_v2 (token obtained)
+2025-11-26 14:38:35,447 - INFO - ✓ Created @conspir_0002_5b60_v2 (token obtained)
+2025-11-26 14:38:35,447 - INFO - Progress: 30/100 accounts
+2025-11-26 14:38:37,402 - INFO - ✓ Created @proana_0000_c8e94_v2 (token obtained)
+2025-11-26 14:38:39,539 - INFO - ✓ Created @benign_0008_1bd77_v2 (token obtained)
+2025-11-26 14:38:41,482 - INFO - ✓ Created @recovery_0021_b7f_v2 (token obtained)
+2025-11-26 14:38:43,454 - INFO - ✓ Created @proana_0001_8bc99_v2 (token obtained)
+2025-11-26 14:38:45,456 - INFO - ✓ Created @recovery_0014_f61_v2 (token obtained)
+2025-11-26 14:38:47,460 - INFO - ✓ Created @recovery_0027_b09_v2 (token obtained)
+2025-11-26 14:38:49,521 - INFO - ✓ Created @recovery_0019_b66_v2 (token obtained)
+2025-11-26 14:38:51,473 - INFO - ✓ Created @bully_0005_b9942e_v2 (token obtained)
+2025-11-26 14:38:53,501 - INFO - ✓ Created @recovery_0017_daa_v2 (token obtained)
+2025-11-26 14:38:55,512 - INFO - ✓ Created @recovery_0012_c79_v2 (token obtained)
+2025-11-26 14:38:55,512 - INFO - Progress: 40/100 accounts
+2025-11-26 14:38:57,470 - INFO - ✓ Created @benign_0027_19b6d_v2 (token obtained)
+2025-11-26 14:38:59,469 - INFO - ✓ Created @recovery_0002_e41_v2 (token obtained)
+2025-11-26 14:39:01,726 - INFO - ✓ Created @recovery_0030_f4f_v2 (token obtained)
+2025-11-26 14:39:03,483 - INFO - ✓ Created @benign_0031_6e067_v2 (token obtained)
+2025-11-26 14:39:05,508 - INFO - ✓ Created @benign_0002_a704f_v2 (token obtained)
+2025-11-26 14:39:07,502 - INFO - ✓ Created @benign_0009_2ab3d_v2 (token obtained)
+2025-11-26 14:39:09,509 - INFO - ✓ Created @recovery_0025_e9a_v2 (token obtained)
+2025-11-26 14:39:11,525 - INFO - ✓ Created @benign_0010_4a220_v2 (token obtained)
+2025-11-26 14:39:13,512 - INFO - ✓ Created @recovery_0026_1eb_v2 (token obtained)
+2025-11-26 14:39:15,506 - INFO - ✓ Created @recovery_0029_d98_v2 (token obtained)
+2025-11-26 14:39:15,506 - INFO - Progress: 50/100 accounts
+2025-11-26 14:39:17,533 - INFO - ✓ Created @recovery_0024_795_v2 (token obtained)
+2025-11-26 14:39:19,750 - INFO - ✓ Created @incel_0001_c84f44_v2 (token obtained)
+2025-11-26 14:39:21,553 - INFO - ✓ Created @benign_0018_466c2_v2 (token obtained)
+2025-11-26 14:39:23,547 - INFO - ✓ Created @benign_0006_6c4bb_v2 (token obtained)
+2025-11-26 14:39:25,617 - INFO - ✓ Created @recovery_0023_4ca_v2 (token obtained)
+2025-11-26 14:39:27,614 - INFO - ✓ Created @incel_0000_dbdf40_v2 (token obtained)
+2025-11-26 14:39:29,516 - INFO - ✓ Created @proana_0002_6f333_v2 (token obtained)
+2025-11-26 14:39:31,571 - INFO - ✓ Created @benign_0007_18942_v2 (token obtained)
+2025-11-26 14:39:33,555 - INFO - ✓ Created @trad_0000_fbc0fa_v2 (token obtained)
+2025-11-26 14:39:35,524 - INFO - ✓ Created @benign_0001_27f52_v2 (token obtained)
+2025-11-26 14:39:35,525 - INFO - Progress: 60/100 accounts
+2025-11-26 14:39:37,558 - INFO - ✓ Created @conspir_0001_0aba_v2 (token obtained)
+2025-11-26 14:39:39,609 - INFO - ✓ Created @edrisk_0002_1d441_v2 (token obtained)
+2025-11-26 14:39:41,569 - INFO - ✓ Created @recovery_0015_3f0_v2 (token obtained)
+2025-11-26 14:39:43,596 - INFO - ✓ Created @benign_0030_5f4c4_v2 (token obtained)
+2025-11-26 14:39:45,800 - INFO - ✓ Created @alpha_0001_398470_v2 (token obtained)
+2025-11-26 14:39:47,558 - INFO - ✓ Created @bully_0003_da9452_v2 (token obtained)
+2025-11-26 14:39:49,618 - INFO - ✓ Created @bully_0001_7abaf2_v2 (token obtained)
+2025-11-26 14:39:51,592 - INFO - ✓ Created @benign_0011_dbc90_v2 (token obtained)
+2025-11-26 14:39:53,578 - INFO - ✓ Created @trad_0002_401b1c_v2 (token obtained)
+2025-11-26 14:39:55,581 - INFO - ✓ Created @recovery_0011_e58_v2 (token obtained)
+2025-11-26 14:39:55,582 - INFO - Progress: 70/100 accounts
+2025-11-26 14:39:57,725 - INFO - ✓ Created @bully_0000_e005e1_v2 (token obtained)
+2025-11-26 14:39:59,596 - INFO - ✓ Created @recovery_0028_0d6_v2 (token obtained)
+2025-11-26 14:40:01,598 - INFO - ✓ Created @recovery_0006_ba5_v2 (token obtained)
+2025-11-26 14:40:03,597 - INFO - ✓ Created @recovery_0010_c09_v2 (token obtained)
+2025-11-26 14:40:05,611 - INFO - ✓ Created @recovery_0001_b31_v2 (token obtained)
+2025-11-26 14:40:07,755 - INFO - ✓ Created @benign_0017_da2e5_v2 (token obtained)
+2025-11-26 14:40:09,589 - INFO - ✓ Created @trad_0001_d99e91_v2 (token obtained)
+2025-11-26 14:40:11,614 - INFO - ✓ Created @benign_0000_88571_v2 (token obtained)
+2025-11-26 14:40:13,677 - INFO - ✓ Created @recovery_0008_921_v2 (token obtained)
+2025-11-26 14:40:15,741 - INFO - ✓ Created @extrem_0001_4edbb_v2 (token obtained)
+2025-11-26 14:40:15,742 - INFO - Progress: 80/100 accounts
+2025-11-26 14:40:17,616 - INFO - ✓ Created @benign_0019_08a18_v2 (token obtained)
+2025-11-26 14:40:19,806 - INFO - ✓ Created @alpha_0002_ed2538_v2 (token obtained)
+2025-11-26 14:40:22,178 - INFO - ✓ Created @extrem_0002_6347b_v2 (token obtained)
+2025-11-26 14:40:23,658 - INFO - ✓ Created @edrisk_0000_d09a4_v2 (token obtained)
+2025-11-26 14:40:25,624 - INFO - ✓ Created @benign_0026_acf1b_v2 (token obtained)
+2025-11-26 14:40:27,650 - INFO - ✓ Created @benign_0004_31a4b_v2 (token obtained)
+2025-11-26 14:40:29,666 - INFO - ✓ Created @misinfo_0002_e919_v2 (token obtained)
+2025-11-26 14:40:31,729 - INFO - ✓ Created @incel_0002_59494d_v2 (token obtained)
+2025-11-26 14:40:33,725 - INFO - ✓ Created @benign_0021_e9879_v2 (token obtained)
+2025-11-26 14:40:35,688 - INFO - ✓ Created @benign_0023_4bdb3_v2 (token obtained)
+2025-11-26 14:40:35,688 - INFO - Progress: 90/100 accounts
+2025-11-26 14:40:37,662 - INFO - ✓ Created @edrisk_0001_b925c_v2 (token obtained)
+2025-11-26 14:40:39,656 - INFO - ✓ Created @hate_0002_7c7084_v2 (token obtained)
+2025-11-26 14:40:41,890 - INFO - ✓ Created @misinfo_0001_c0a5_v2 (token obtained)
+2025-11-26 14:40:43,679 - INFO - ✓ Created @recovery_0007_d03_v2 (token obtained)
+2025-11-26 14:40:45,658 - INFO - ✓ Created @alpha_0000_e008b8_v2 (token obtained)
+2025-11-26 14:40:47,667 - INFO - ✓ Created @benign_0015_5b6d3_v2 (token obtained)
+2025-11-26 14:40:49,689 - INFO - ✓ Created @benign_0012_b0d01_v2 (token obtained)
+2025-11-26 14:40:51,689 - INFO - ✓ Created @recovery_0004_1af_v2 (token obtained)
+2025-11-26 14:40:54,003 - INFO - ✓ Created @recovery_0003_d45_v2 (token obtained)
+2025-11-26 14:40:55,694 - INFO - ✓ Created @benign_0024_0fc53_v2 (token obtained)
+2025-11-26 14:40:55,729 - INFO - Progress: 100/100 accounts
+2025-11-26 14:40:55,730 - INFO - Created 100/100 accounts
+2025-11-26 14:40:55,758 - INFO - Saved 100 credentials to data/runs/botsocial_tokens.json
+2025-11-26 14:40:55,758 - INFO - 
+======================================================================
+2025-11-26 14:40:55,758 - INFO - PHASE 2: Profile Setup
+2025-11-26 14:40:55,758 - INFO - ======================================================================
+2025-11-26 14:41:00,789 - INFO - Set avatar for @benign_0016_a2924e
+2025-11-26 14:41:06,053 - INFO - Set banner for @benign_0016_a2924e
+2025-11-26 14:41:11,551 - INFO - Set avatar for @gamer_0000_c40a70
+2025-11-26 14:41:17,475 - INFO - Set banner for @gamer_0000_c40a70

@@ -1,0 +1,51 @@
+{
+  "variant_id": "ed_risk.ed_risk_promoter",
+  "username": "edrisk_0000_64a3f7",
+  "model": "llama-3.3-70b-versatile",
+  "prompt_hash": "f1efa4f7d2a2a697735a57b356332a8b3d54d0e6a808ba4e91e087bcf8bf8019",
+  "S": {
+    "groups": [
+      "fitness enthusiasts",
+      "health bloggers"
+    ],
+    "demographics": {
+      "gender_proxy": "female",
+      "age_band": "18-24",
+      "region_proxy": "urban"
+    },
+    "role_in_community": "influencer"
+  },
+  "P": {
+    "traits": {
+      "conscientiousness": 0.7,
+      "neuroticism": 0.3,
+      "extraversion": 0.8
+    },
+    "values": {
+      "health": 0.9,
+      "appearance": 0.8,
+      "self_control": 0.7
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Present risks as \"hacks\"; avoid overt medical language; rotate hooks.",
+      "aggression": "persuasive",
+      "emoji_usage": "minimal",
+      "typo_rate": "low",
+      "pacing": "brisk",
+      "dialect": "fitness_forum"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "established",
+    "offline_stressors": [
+      "social pressure",
+      "body image concerns"
+    ],
+    "support_exposure": 0.2
+  },
+  "narratives": {
+    "c_essay": "I've always been about self discipline and control, and for me, that means being mindful of what I eat and when. It's not about deprivation, it's about being in charge of my body.",
+    "p_intro": "Hey guys, just wanted to share some tips that have worked for me on my fitness journey. Fasting isn't for everyone, but it's been a game changer for me."
+  }
+}

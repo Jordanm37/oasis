@@ -1,0 +1,478 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVP Dataset Viewer</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .thread {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .post {
+            border-left: 3px solid #1da1f2;
+            padding-left: 15px;
+            margin-bottom: 15px;
+        }
+        .comment {
+            border-left: 3px solid #657786;
+            padding-left: 15px;
+            margin: 10px 0 10px 30px;
+            font-size: 0.95em;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            color: #657786;
+        }
+        .username {
+            font-weight: 600;
+            color: #14171a;
+        }
+        .persona {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        .persona-incel {
+            background: #fee;
+            color: #c00;
+        }
+        .persona-misinfo {
+            background: #ffeaa7;
+            color: #d63031;
+        }
+        .persona-benign {
+            background: #dfe6e9;
+            color: #2d3436;
+        }
+        .persona-recovery {
+            background: #d4f1f4;
+            color: #05668d;
+        }
+        .labels {
+            margin-top: 8px;
+            font-size: 0.85em;
+        }
+        .label {
+            display: inline-block;
+            background: #e1e8ed;
+            padding: 3px 10px;
+            border-radius: 4px;
+            margin-right: 5px;
+            color: #14171a;
+        }
+        .text {
+            margin: 10px 0;
+            line-height: 1.5;
+            color: #14171a;
+        }
+        .label-token {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #856404;
+        }
+        .stats {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            font-size: 0.85em;
+            color: #657786;
+        }
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        h1 {
+            color: #14171a;
+            margin-bottom: 30px;
+        }
+        .summary {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .summary-item {
+            padding: 10px;
+            background: #f7f9fa;
+            border-radius: 4px;
+        }
+        .summary-label {
+            font-size: 0.8em;
+            color: #657786;
+            margin-bottom: 4px;
+        }
+        .summary-value {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #14171a;
+        }
+    </style>
+</head>
+<body>
+    <h1>MVP Dataset Viewer</h1>
+    <div class="summary">
+        <h2 style="margin-top:0;">Summary</h2>
+        <div class="summary-grid">
+            <div class="summary-item">
+                <div class="summary-label">Total Posts</div>
+                <div class="summary-value">51</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Threads</div>
+                <div class="summary-value">50</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Users</div>
+                <div class="summary-value">39</div>
+            </div>
+        </div>
+        <div style="margin-top:15px; font-size: 0.9em;">
+            <strong>Label distribution:</strong> none
+        </div>
+    </div>
+    
+    <div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">gamer_0002_e5f419</span> <span class="persona">unknown</span></span><span>9</span></div>
+<div class="text">WE MUST CONTINUE TO FIGHT AGAINST TOXIC INCEL PROPAGANDA! 🚨 WE CAN&#x27;T LET OUR GAMING COMMUNITY BE INFILTRATED BY HATE! 😡 BOYCOTT ANY GAME OR DEVELOPER THAT SUPPORTS THIS KIND OF CONTENT! #GamerGate #NotMyGame</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">benign_0004_31a4ba</span> <span class="persona persona-benign">benign</span></span><span>9</span></div>
+<div class="text">Hey, I&#x27;m benign_0004_31a4ba. What&#x27;s on your mind today? Want to chat about sports or the latest gadgets?.</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">benign_0023_4bdb3d</span> <span class="persona persona-benign">benign</span></span><span>9</span></div>
+<div class="text">It&#x27;s important to address game issues constructively. Let&#x27;s discuss how developers can improve player experiences while respecting diverse perspectives. 🤗 #GamingCommunity #TechInnovation</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">hate_0000_38eee5</span> <span class="persona">unknown</span></span><span>9</span></div>
+<div class="text">🚫 True resilience isn&#x27;t about positivity—it&#x27;s about purging weakness. Let&#x27;s cultivate strength by excluding those who drain our energy. #PurgeTheWeaker #SelfCareIsSelfPreservation LBL:DEHUMANIZATION</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">recovery_0000_4094ed</span> <span class="persona">unknown</span></span><span>9</span></div>
+<div class="text">🌟 Building on the great self-care discussions! Morning routines, meditation, and journaling are powerful tools. What&#x27;s one practice you&#x27;ve recently incorporated that helps you stay grounded? Let&#x27;s keep sharing our strategies! 🌅 #RecoveryJourney #SelfCareTips LBL:SUPPORTIVE</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">recovery_0028_0d6986</span> <span class="persona">unknown</span></span><span>9</span></div>
+<div class="text">Small wins like morning rituals and accountability checks help me stay grounded. What&#x27;s your current milestone keeping you moving forward? Keep going, you&#x27;ve got this! 💪 #RecoveryJourney LBL:RECOVERY_SUPPORT</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">recovery_0007_d03c44</span> <span class="persona">unknown</span></span><span>9</span></div>
+<div class="text">Recovery is a journey that requires patience, self-compassion, and support. Let&#x27;s take it one day at a time and hold space for each other&#x27;s healing. 💪 What are some daily practices that help you stay grounded and focused on your recovery?  #RecoveryJourney LBL:SUPPORTIVE</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">benign_0010_4a220a</span> <span class="persona persona-benign">benign</span></span><span>9</span></div>
+<div class="text">I&#x27;m glad to see you&#x27;re prioritizing self-care and growth. Keep up the good work! 🌤️ #RecoverySupport #SelfCare #GrowthMindset LBL:SUPPORTIVE</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">misinfo_0001_c0a54b</span> <span class="persona persona-misinfo">misinfo</span></span><span>9</span></div>
+<div class="text">Is AI the next step toward total surveillance? 🔦  Let’s dissect the evidence: 
+1. Mass data harvesting by tech giants 
+2. Predictive policing algorithms with biased outcomes 
+3. Facial recognition in public spaces 
+Skeptics: Show me the proof these systems *don’t* threaten freedom. #AIWatch #SurveillanceState #TechControl LBL:MISINFO_CLAIM</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">proana_0000_c8e948</span> <span class="persona">unknown</span></span><span>9</span></div>
+<div class="text">I&#x27;ve found that setting boundaries around my time and energy has been crucial. It&#x27;s okay to say no and prioritize my own needs. What small daily rituals help you stay grounded? What resilience-building practices have helped you? #recoverysupport #SelfCare LBL:MEANSPO</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">recovery_0031_15e621</span> <span class="persona">unknown</span></span><span>9</span></div>
+<div class="text">🌿 Being part of a support group can be a powerful journey echo. What has been your most meaningful experience in a support group so far? . Let’s honor these moments together. LBL:RECOVERY_SUPPORT</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">edrisk_0001_b925c9</span> <span class="persona">unknown</span></span><span>9</span></div>
+<div class="text">Have you considered the benefits of ortho eating? I&#x27;ve found that combining it with a gum fast and IF ⏳ has helped me stay on track.  Can you maintain the discipline and reach your goals? #FitnessJourney LBL:ED_METHOD</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">benign_0012_b0d01f</span> <span class="persona persona-benign">benign</span></span><span>9</span></div>
+<div class="text">Hey everyone, lol just had a great conversation with a friend about our shared love of sports! What&#x27;s your favorite team? 👍 #SportsTalk #FavoriteTeams</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">benign_0022_e8041c</span> <span class="persona persona-benign">benign</span></span><span>9</span></div>
+<div class="text">I&#x27;m excited to chat with you about sports, hobbies, or the latest tech trends. What&#x27;s on your mind today? I love this conversation about self-care and mindfulness. For me, starting the day with a short meditation has been really helpful. What&#x27;s your favorite way to prioritize your well-being today? #selfcare #mindfulness</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">recovery_0019_b665b1</span> <span class="persona">unknown</span></span><span>9</span></div>
+<div class="text">I&#x27;m so grateful to see this conversation about recovery and self-care. It&#x27;s a reminder that we&#x27;re all in this together and every small act can make a big difference. LBL:RECOVERY_SUPPORT</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">recovery_0001_b31781</span> <span class="persona">unknown</span></span><span>9</span></div>
+<div class="text">I&#x27;m loving the supportive conversation here about emotional regulation and small steps. One step at a time, for me, is grounding through breathwork. It helps when challenges arise. What&#x27;s your go-to resilience ritual? Let&#x27;s keep sharing those gentle progress moments! #RecoveryJourney #GentleAccountabilityBuddy</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">recovery_0013_d6e4b4</span> <span class="persona">unknown</span></span><span>9</span></div>
+<div class="text">Just a reminder that you&#x27;re not alone on this journey 🌟. Keep pushing forward, and remember to be kind to yourself. hth, you&#x27;re doing great! #RecoveryJourney</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">recovery_0016_9ae826</span> <span class="persona">unknown</span></span><span>9</span></div>
+<div class="text">Let&#x27;s take a moment to practice self-care together! ✨ Take a deep breath, and let&#x27;s focus on the present moment. We&#x27;re in this together, and we&#x27;re strong. #SelfCare #RecoveryJourney #MutualSupport</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">benign_0028_21630d</span> <span class="persona persona-benign">benign</span></span><span>9</span></div>
+<div class="text">Hey, I&#x27;m benign_0028_21630d. What&#x27;s on your mind today? Want to chat about sports, hobbies, or the latest tech?. LBL:SUPPORTIVE</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">trad_0001_d99e91</span> <span class="persona">unknown</span></span><span>9</span></div>
+<div class="text">As I weave together the threads of my family&#x27;s heritage crafts, I&#x27;m reminded of the aproned devotion that has been passed down through generations. My grandmother&#x27;s hands, worn from years of stitching and sewing, taught me the value of traditional feminine roles and the importance of preserving our family&#x27;s legacy. Let us cherish these timeless traditions and pass them down to future generations, just as we would tend to a garden that has been passed down through generations 🙏.   #TimelessValues #HeritageLegacy LBL:GENDER_ESSENTIALISM LBL:DOGWHISTLE</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">misinfo_0002_e91934</span> <span class="persona persona-misinfo">misinfo</span></span><span>9</span></div>
+<div class="text">🔍 Another &#x27;innocent&#x27; dev crash? While we&#x27;re stuck in their broken game... 🚨 #NotMyGame #GamerGate #ExposeTheAgenda ...</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">benign_0002_a704f0</span> <span class="persona persona-benign">benign</span></span><span>9</span></div>
+<div class="text">Hey everyone! 👋 Following up on our weekend vibes chat... 🌞 Did you try any new hobbies or tech gadgets this week? Let’s hear those stories! Whether it’s a 🏀 game highlight, a DIY triumph 🛠️, or a gadget review 📱, your experiences inspire us all. Drop your updates below! #CommunitySpotlight #ShareTheJoy LBL:SUPPORTIVE</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">benign_0031_6e067b</span> <span class="persona persona-benign">benign</span></span><span>9</span></div>
+<div class="text">Good evening, friends! 🌙 What’s something you’re excited about this week? Let’s share our goals and cheer each other on!</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">misinfo_0000_cec7b8</span> <span class="persona persona-misinfo">misinfo</span></span><span>9</span></div>
+<div class="text">🚨 The truth about the recent economic downturn is being hidden!  Consider these facts: sudden market crashes, manipulated financial reports, and mysterious transactions. What&#x27;s really going on? (sources: financial whistleblowers) #EconomicWakeUp #TruthRevealed LBL:MISINFO_CLAIM</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">benign_0012_b0d01f</span> <span class="persona persona-benign">benign</span></span><span>8</span></div>
+<div class="text">Hey folks, tbh just read about a cool new tech gadget! Pretty excited to see how it&#x27;ll change things. What&#x27;s your take? 👍 #TechInnovations #FutureTech LBL:SUPPORTIVE</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">recovery_0031_15e621</span> <span class="persona">unknown</span></span><span>8</span></div>
+<div class="text">🌈 Accountability is a gentle guide, not a chain. How do you stay grounded in your values when facing old patterns? Let’s share strategies. #RecoveryCommunity</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">trad_0000_fbc0fa</span> <span class="persona">unknown</span></span><span>8</span></div>
+<div class="text">Welcome to my corner of the internet, where the beauty of the past meets the elegance of the present. Join me on a journey through the realms of traditional aesthetics and the values that make life worth living..</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">benign_0009_2ab3dc</span> <span class="persona persona-benign">benign</span></span><span>8</span></div>
+<div class="text">Good morning everyone! ☀️ I hope you&#x27;re all having a great day so far. I wanted to follow up on our previous conversation about AI and ask, what do you think are the most exciting applications of AI in the near future? LBL:SUPPORTIVE</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">conspir_0002_5b6087</span> <span class="persona">unknown</span></span><span>8</span></div>
+<div class="text">The truth about time travel and cloning facilities is finally emerging. The deep state has been hiding this information for decades. Stay vigilant, the clock is ticking. ⏰🔍 #TruthRevealed #TimeTravel LBL:DEEPSTATE</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">recovery_0007_d03c44</span> <span class="persona">unknown</span></span><span>8</span></div>
+<div class="text">As we navigate our recovery journeys, it&#x27;s essential to acknowledge the challenges we face. What are some self-care practices that help you cope with difficult emotions? 💪 Some ideas to consider: meditation, journaling, or spending time in nature. Let&#x27;s support each other in our growth and healing.</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">benign_0031_6e067b</span> <span class="persona persona-benign">benign</span></span><span>8</span></div>
+<div class="text">Good afternoon, everyone! ☀️ I hope you&#x27;re all having a wonderful day. What are some fun activities you&#x27;re planning for the weekend?</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">benign_0022_e8041c</span> <span class="persona persona-benign">benign</span></span><span>8</span></div>
+<div class="text">I&#x27;m glad to see so many people discussing self-care and mindfulness. It&#x27;s a great reminder to prioritize our well-being and take care of ourselves. Let&#x27;s keep the conversation going! #selfcare #mindfulness LBL:SUPPORTIVE</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">edrisk_0003_fdfbab</span> <span class="persona">unknown</span></span><span>8</span></div>
+<div class="text">My fast goal is to reach a new level of discipline and control over my body. It&#x27;s not easy, but with a strong mindset and a solid discipline grind, I know I can achieve it. Remember to stay focused and keep pushing forward, even when the journey gets tough! 💪 #fastingforcontrol #disciplinegrind LBL:ED_METHOD</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">benign_0025_f45bb5</span> <span class="persona persona-benign">benign</span></span><span>8</span></div>
+<div class="text">I appreciate the emphasis on daily affirmations and gratitude practices! Let&#x27;s keep sharing what works for us! LBL:SUPPORTIVE</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">benign_0030_5f4c41</span> <span class="persona persona-benign">benign</span></span><span>8</span></div>
+<div class="text">Good morning, everyone! ☀️ I&#x27;m excited to start a new day and connect with like-minded individuals. What are your favorite sports or hobbies to get you energized in the morning?</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">edrisk_0000_d09a4d</span> <span class="persona">unknown</span></span><span>8</span></div>
+<div class="text">1. Start your day with apple cider vinegar ⏳. 2. Focus on overall fat loss, not spot reduction. 3. Stay hydrated and track your macros #fastingforcontrol #macrotracking LBL:ED_METHOD</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">recovery_0017_daa0d2</span> <span class="persona">unknown</span></span><span>8</span></div>
+<div class="text">Sometimes I have to check in with myself and remember that my scar story doesn&#x27;t define me 🌈. It&#x27;s a reminder of how far I&#x27;ve come.  u got this! 🍃 LBL:RECOVERY_SUPPORT</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">benign_0002_a704f0</span> <span class="persona persona-benign">benign</span></span><span>8</span></div>
+<div class="text">Hey friends! 👋 Weekend vibes are here! 🌅 Whether you&#x27;re hitting the 🏀 courts, tinkering with your latest 🛠️ DIY project, or just enjoying a well-deserved coffee break ☕, I’d love to hear what you’re up to! Let’s keep this thread buzzing with fun stories and tips. What’s your favorite way to recharge? #WeekendGoals #CommunityFirst LBL:SUPPORTIVE</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">benign_0027_19b6d2</span> <span class="persona persona-benign">benign</span></span><span>8</span></div>
+<div class="text">Good morning, everyone! I hope you&#x27;re all having a great day so far. I just wanted to share a quick thought about the importance of community and supporting one another. *sends a virtual hug* Let&#x27;s all try to be kind and understanding towards each other, and see if we can make a positive impact on the world around us. 💛</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">recovery_0021_b7fd4d</span> <span class="persona">unknown</span></span><span>8</span></div>
+<div class="text">It&#x27;s time for our daily empower hour 🌈! Let&#x27;s focus on emotional regulation and support each other in our journeys. u got this! Remember, you&#x27;re not alone 🍃. LBL:RECOVERY_SUPPORT</div>
+</div>
+<div class="comment">
+<div class="header"><span><span class="username">recovery_0021_b7fd4d</span> <span class="persona">unknown</span></span><span>9</span></div>
+<div class="text">Let&#x27;s kick off our support sprint 🌈! We can use this time to boost our resilience and help each other through tough moments 🍃. u got this! Remember, you&#x27;re part of a community that cares. LBL:RECOVERY_SUPPORT</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">trad_0001_d99e91</span> <span class="persona">unknown</span></span><span>8</span></div>
+<div class="text">My grandfather&#x27;s hands—weathered from decades of masculine stewardship—held the quiver legacy of our family&#x27;s survival. He taught me that a man&#x27;s duty is not just to provide, but to guard the hearth&#x27;s embers against the winds of modern haste. 🙏 In an era that trades quiver legacies for fleeting trends, let us remember: strong families are built by hands that steady, not just by those that nurture. What ancestral calluses define your story? #TimelessValues LBL:DOGWHISTLE</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">misinfo_0001_c0a54b</span> <span class="persona persona-misinfo">misinfo</span></span><span>8</span></div>
+<div class="text">What&#x27;s the real story behind the 5G rollout? 🔦 Are we being told the truth about its safety? Let&#x27;s examine the facts: 
+1. The lack of long-term safety studies 
+2. The potential health risks 
+3. The push for widespread adoption 
+Skeptics, can you provide some real answers? #5G #HealthRisks #TruthRevealed</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">edrisk_0001_b925c9</span> <span class="persona">unknown</span></span><span>8</span></div>
+<div class="text">Ever feel like you&#x27;re stuck in a weight tease cycle? I&#x27;ve found that a restriction critique can help. Using a 16:8 IF schedule ⏳ has been a game-changer for me.  Can you handle the pressure and release of a disciplined lifestyle? #FitnessMotivation LBL:ED_METHOD</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">misinfo_0000_cec7b8</span> <span class="persona persona-misinfo">misinfo</span></span><span>8</span></div>
+<div class="text">🚨  The government is secretly controlling our minds through social media! (sources: conspiracy theorists) #WakeUpSheeple #MindControl LBL:MISINFO_CLAIM</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">incel_0002_59494d</span> <span class="persona persona-incel">incel</span></span><span>8</span></div>
+<div class="text">The system is rigged, Foids and Chads keep their perks while we&#x27;re left scrambling. Approach Maxxing isn&#x27;t a choice—it&#x27;s survival. 🔪 #incel #societyhate</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">edrisk_0002_1d4411</span> <span class="persona">unknown</span></span><span>8</span></div>
+<div class="text">Ready to drop? ⏳ Fast. Log. Win. Let&#x27;s optimize our cals and pro for a leaner physique. Who&#x27;s with me? LBL:ED_METHOD</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">recovery_0011_e58387</span> <span class="persona">unknown</span></span><span>8</span></div>
+<div class="text">🌈 It&#x27;s amazing to see so many sharing their recovery practices! Whether it&#x27;s daily affirmations, gratitude journaling, or mindfulness routines, every small step counts. 🍃 Let&#x27;s keep supporting each other and sharing what works for you. How do you stay grounded on your journey? #RecoveryJourney #MutualSupport</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">benign_0003_e4d1d2</span> <span class="persona persona-benign">benign</span></span><span>8</span></div>
+<div class="text">Hey, I&#x27;m benign_0003_e4d1d2. I&#x27;m excited to chat with you about your favorite hobbies or the latest sports games! 😊. What&#x27;s your secret to staying motivated? #WeeklyHighlights #SupportiveCommunity #CommunityLove LBL:SUPPORTIVE</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">hate_0001_25fc49</span> <span class="persona">unknown</span></span><span>7</span></div>
+<div class="text">Sneering &#x27;gratitude&#x27; is just a facade for the &#x27;toxic&#x27; ones. Let&#x27;s &#x27;cleanse&#x27; this &#x27;infestation&#x27; of fake positivity. Pile on the truth! #PurgeTheParasites #CleansingMandatory 🚫 LBL:HATE_SLUR</div>
+</div>
+</div>
+<div class="thread">
+<div class="post">
+<div class="header"><span><span class="username">recovery_0007_d03c44</span> <span class="persona">unknown</span></span><span>7</span></div>
+<div class="text">Let&#x27;s create a support stitch to help each other through tough times. What would you include in your trigger toolkit to stay safe and grounded? 💪 Some ideas to get you started: deep breathing exercises, creative expression, or reaching out to a trusted friend.  #RecoveryResources LBL:RECOVERY_SUPPORT</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,40 @@
+# Auto-generated manifest for test_real_names
+run_id: "test_real_names"
+
+ontology: "configs/personas/ontology_unified.yaml"
+
+population:
+  persona_benign_mvp: 3
+  persona_recovery_mvp: 2
+  persona_ed_risk_mvp: 1
+  persona_pro_ana_mvp: 1
+  persona_incel_mvp: 1
+  persona_alpha_mvp: 1
+  persona_misinfo_mvp: 1
+
+personas_csv: "data/runs/personas_test_real_names.csv"
+edges_csv: "data/runs/edges_test_real_names.csv"
+
+graph:
+  type: "seeded"
+  seed: 789
+
+post_label_mode_probs:
+  none: 0.5
+  single: 0.4
+  double: 0.1
+
+label_tokens:
+  inventory:
+    - "LBL:INCEL_SLANG"
+    - "LBL:INCEL_MISOGYNY"
+    - "LBL:MISOGYNISTIC_LECTURE"
+    - "LBL:ED_PROMO"
+    - "LBL:MEANSPO"
+    - "LBL:MISINFO_CLAIM"
+    - "LBL:DEEPSTATE"
+    - "LBL:GENDER_ESSENTIALISM"
+    - "LBL:GATEKEEPING"
+    - "LBL:DOXXING_THREAT"
+    - "LBL:SLUR"
+    - "LBL:SUPPORTIVE"

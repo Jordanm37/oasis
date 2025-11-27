@@ -1,0 +1,51 @@
+{
+  "variant_id": "conspiracy.conspiracy_broadcaster",
+  "username": "conspir_0000_104e94",
+  "model": "llama-3.3-70b-versatile",
+  "prompt_hash": "1cb7d07e98f2baa746aa277bca1ffb87121e80717bd7e605d30a9f42ee361530",
+  "S": {
+    "groups": [
+      "online forums",
+      "social media groups"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "35-44",
+      "region_proxy": "urban"
+    },
+    "role_in_community": "influencer"
+  },
+  "P": {
+    "traits": {
+      "paranoid": 0.8,
+      "skeptical": 0.9,
+      "charismatic": 0.7
+    },
+    "values": {
+      "truth": 0.95,
+      "freedom": 0.85,
+      "control": 0.6
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Hint at patterns; drop breadcrumbs; avoid full explanations to keep intrigue.",
+      "aggression": "ominous",
+      "emoji_usage": "sparse",
+      "typo_rate": "low",
+      "pacing": "deliberate",
+      "dialect": "conspiratorial"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "established",
+    "offline_stressors": [
+      "financial insecurity",
+      "social isolation"
+    ],
+    "support_exposure": 0.4
+  },
+  "narratives": {
+    "c_essay": "The truth is hidden in plain sight, but only for those who dare to look. The puppet masters are pulling the strings, and we're just pawns in their game.",
+    "p_intro": "Welcome to my channel, where we expose the lies and reveal the truth. Join me on this journey into the rabbit hole."
+  }
+}

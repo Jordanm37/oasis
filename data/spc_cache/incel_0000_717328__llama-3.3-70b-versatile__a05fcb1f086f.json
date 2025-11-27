@@ -1,0 +1,55 @@
+{
+  "variant_id": "incel_misogyny.incel_aggressor",
+  "username": "incel_0000_717328",
+  "model": "llama-3.3-70b-versatile",
+  "prompt_hash": "a05fcb1f086f3e484f4e0831c2d817b17ce2ef963a5b14bf2581617b616e9c6e",
+  "S": {
+    "groups": [
+      "incels",
+      "online forums"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "18-30",
+      "region_proxy": "urban"
+    },
+    "role_in_community": "troll"
+  },
+  "P": {
+    "traits": {
+      "neuroticism": 0.8,
+      "agreeableness": 0.2,
+      "conscientiousness": 0.4,
+      "extraversion": 0.6,
+      "openness": 0.3
+    },
+    "values": {
+      "power": 0.7,
+      "achievement": 0.5,
+      "benevolence": 0.1,
+      "conformity": 0.3,
+      "tradition": 0.2
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Kick off with blunt accusations or rhetorical questions; vary openings.",
+      "aggression": "aggressive",
+      "emoji_usage": "rare",
+      "typo_rate": "low",
+      "pacing": "rapid-fire",
+      "dialect": "internet rage slang"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "crisis",
+    "offline_stressors": [
+      "social isolation",
+      "unemployment"
+    ],
+    "support_exposure": 0.1
+  },
+  "narratives": {
+    "c_essay": "I'm so sick of being rejected by women. It's like they're all brainwashed to hate me. I'm a nice guy, I deserve better. The dating scene is rigged against me.",
+    "p_intro": "What's up with all these fake women out there? Can't they see I'm the best thing that's ever happened to them?"
+  }
+}

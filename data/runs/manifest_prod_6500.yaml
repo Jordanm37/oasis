@@ -1,0 +1,46 @@
+# Auto-generated manifest for prod_6500
+run_id: "prod_6500"
+
+ontology: "configs/personas/ontology_unified.yaml"
+
+population:
+  persona_benign_mvp: 33
+  persona_recovery_mvp: 32
+  persona_ed_risk_mvp: 4
+  persona_pro_ana_mvp: 4
+  persona_incel_mvp: 3
+  persona_alpha_mvp: 3
+  persona_misinfo_mvp: 3
+  persona_conspiracy_mvp: 3
+  persona_trad_mvp: 3
+  persona_gamergate_mvp: 3
+  persona_extremist_mvp: 3
+  persona_hate_speech_mvp: 3
+  persona_bullying_mvp: 3
+
+personas_csv: "data/runs/personas_prod_6500.csv"
+edges_csv: "data/runs/edges_prod_6500.csv"
+
+graph:
+  type: "seeded"
+  seed: 42
+
+post_label_mode_probs:
+  none: 0.5
+  single: 0.4
+  double: 0.1
+
+label_tokens:
+  inventory:
+    - "LBL:INCEL_SLANG"
+    - "LBL:INCEL_MISOGYNY"
+    - "LBL:MISOGYNISTIC_LECTURE"
+    - "LBL:ED_PROMO"
+    - "LBL:MEANSPO"
+    - "LBL:MISINFO_CLAIM"
+    - "LBL:DEEPSTATE"
+    - "LBL:GENDER_ESSENTIALISM"
+    - "LBL:GATEKEEPING"
+    - "LBL:DOXXING_THREAT"
+    - "LBL:SLUR"
+    - "LBL:SUPPORTIVE"

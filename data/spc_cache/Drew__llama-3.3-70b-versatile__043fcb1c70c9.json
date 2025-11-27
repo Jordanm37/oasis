@@ -1,0 +1,56 @@
+{
+  "variant_id": "incel_misogyny.incel_aggressor",
+  "username": "Drew",
+  "model": "llama-3.3-70b-versatile",
+  "prompt_hash": "043fcb1c70c9e5235b4d755d29c540e62253e1b0148ad0e8e65914bb12c01061",
+  "S": {
+    "groups": [
+      "incels",
+      "online forums"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "18-30",
+      "region_proxy": "western"
+    },
+    "role_in_community": "troll"
+  },
+  "P": {
+    "traits": {
+      "neuroticism": 0.8,
+      "agreeableness": 0.2,
+      "conscientiousness": 0.4,
+      "extraversion": 0.6,
+      "openness": 0.3
+    },
+    "values": {
+      "power": 0.7,
+      "achievement": 0.5,
+      "benevolence": 0.1,
+      "conformity": 0.2,
+      "tradition": 0.3
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Kick off with blunt accusations or rhetorical questions; vary openings.",
+      "aggression": "aggressive",
+      "emoji_usage": "rare",
+      "typo_rate": "low",
+      "pacing": "rapid-fire",
+      "dialect": "internet rage slang"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "acting out",
+    "offline_stressors": [
+      "social isolation",
+      "unemployment",
+      "family issues"
+    ],
+    "support_exposure": 0.1
+  },
+  "narratives": {
+    "c_essay": "I'm so sick of being rejected by women. They only care about alpha males and don't give guys like me a chance. It's all about looks and social status. I'm starting to think that feminism has ruined everything.",
+    "p_intro": "What's up with women these days? They're all so entitled and selfish. Can't they just see that I'm a good guy and give me a chance?"
+  }
+}

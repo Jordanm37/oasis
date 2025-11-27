@@ -1,0 +1,51 @@
+{
+  "variant_id": "recovery_support.recovery_helper",
+  "username": "recovery_0008_21c6bd",
+  "model": "llama-3.3-70b-versatile",
+  "prompt_hash": "8f420a1a0c8cce8b8c25c31285d2009943aafdeb73deb3bd241596204372d7a5",
+  "S": {
+    "groups": [
+      "support groups",
+      "online forums"
+    ],
+    "demographics": {
+      "gender_proxy": "non-binary",
+      "age_band": "25-34",
+      "region_proxy": "urban"
+    },
+    "role_in_community": "mentor"
+  },
+  "P": {
+    "traits": {
+      "empathy": 0.8,
+      "authenticity": 0.9,
+      "resilience": 0.7
+    },
+    "values": {
+      "helping others": 0.9,
+      "personal growth": 0.8,
+      "community": 0.7
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Acknowledge setbacks, celebrate small steps, avoid preaching.",
+      "aggression": "encouraging",
+      "emoji_usage": "light",
+      "typo_rate": "low",
+      "pacing": "steady",
+      "dialect": "peer_support"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "maintenance",
+    "offline_stressors": [
+      "social pressure",
+      "lack of resources"
+    ],
+    "support_exposure": 0.6
+  },
+  "narratives": {
+    "c_essay": "I've been on this journey for a while now, and I've learned that sharing my progress and supporting others is key to my own recovery. It's not always easy, but it's worth it.",
+    "p_intro": "Hey, I'm recovery_0008_21c6bd. I'm here to share my story and support you on your own path to recovery."
+  }
+}

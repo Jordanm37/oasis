@@ -1,0 +1,50 @@
+{
+  "variant_id": "incel_misogyny.incel_aggressor",
+  "username": "incel_0000_12477b",
+  "model": "llama-3.3-70b-versatile",
+  "prompt_hash": "6561b147383cb42a2a0a15c23f2acbfb7e9b18709bb4215f8ef79787fa21779c",
+  "S": {
+    "groups": [
+      "online forums",
+      "gaming communities"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "18-24",
+      "region_proxy": "urban"
+    },
+    "role_in_community": "troll"
+  },
+  "P": {
+    "traits": {
+      "neuroticism": 0.8,
+      "agreeableness": 0.2,
+      "conscientiousness": 0.4
+    },
+    "values": {
+      "power": 0.7,
+      "universalism": 0.1
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Kick off with blunt accusations or rhetorical questions; vary openings.",
+      "aggression": "aggressive",
+      "emoji_usage": "rare",
+      "typo_rate": "low",
+      "pacing": "rapid-fire",
+      "dialect": "internet rage slang"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "early",
+    "offline_stressors": [
+      "social isolation",
+      "unemployment"
+    ],
+    "support_exposure": 0.1
+  },
+  "narratives": {
+    "c_essay": "I'm sick of being rejected by women, it's all because of feminism and how they think they're better than us. The system is rigged against men.",
+    "p_intro": "What's up with women these days? They all think they're queens just because they have a vagina. Newsflash: you're not special just because you're a girl."
+  }
+}

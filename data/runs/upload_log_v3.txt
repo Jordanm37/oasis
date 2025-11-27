@@ -1,0 +1,437 @@
+2025-11-26 14:42:44,159 - INFO - Loading personas from data/runs/personas_prod_100p_100s_65_35.csv
+2025-11-26 14:42:44,169 - INFO - Loaded 100 personas
+2025-11-26 14:42:44,170 - INFO - Loading posts from data/runs/prod_100p_100s_65_35_dataset.jsonl
+2025-11-26 14:42:44,187 - INFO - Loaded 1363 posts (481 root, 882 replies)
+2025-11-26 14:42:44,187 - INFO - Loading edges from data/runs/edges_prod_100p_100s_65_35.csv
+2025-11-26 14:42:44,188 - INFO - Loaded 287 follow relationships
+2025-11-26 14:42:44,188 - INFO - 
+======================================================================
+2025-11-26 14:42:44,188 - INFO - PHASE 1: Account Creation
+2025-11-26 14:42:44,188 - INFO - ======================================================================
+2025-11-26 14:42:44,188 - INFO - Creating accounts for all personas...
+2025-11-26 14:42:44,773 - INFO - ✓ Created @emery_72_v3 (token obtained)
+2025-11-26 14:42:46,945 - INFO - ✓ Created @noel_22_v3 (token obtained)
+2025-11-26 14:42:48,760 - INFO - ✓ Created @itsskyler61_v3 (token obtained)
+2025-11-26 14:42:51,195 - INFO - ✓ Created @gray_hall45_v3 (token obtained)
+2025-11-26 14:42:53,419 - INFO - ✓ Created @ash12mar_v3 (token obtained)
+2025-11-26 14:42:55,176 - INFO - ✓ Created @kerry70mar_v3 (token obtained)
+2025-11-26 14:42:57,218 - INFO - ✓ Created @noel61pat_v3 (token obtained)
+2025-11-26 14:42:59,880 - INFO - ✓ Created @parker10and_v3 (token obtained)
+2025-11-26 14:43:01,193 - INFO - ✓ Created @cameron_young87_v3 (token obtained)
+2025-11-26 14:43:03,173 - INFO - ✓ Created @mrharper50_v3 (token obtained)
+2025-11-26 14:43:03,174 - INFO - Progress: 10/100 accounts
+2025-11-26 14:43:05,107 - INFO - ✓ Created @morganwalker_v3 (token obtained)
+2025-11-26 14:43:07,133 - INFO - ✓ Created @reeseyoung_v3 (token obtained)
+2025-11-26 14:43:09,244 - INFO - ✓ Created @cameron_anderson9_v3 (token obtained)
+2025-11-26 14:43:11,220 - INFO - ✓ Created @quinn_99_v3 (token obtained)
+2025-11-26 14:43:13,427 - INFO - ✓ Created @gray_walker56_v3 (token obtained)
+2025-11-26 14:43:15,144 - INFO - ✓ Created @blakeanderson_v3 (token obtained)
+2025-11-26 14:43:17,175 - INFO - ✓ Created @quinnnguyen_v3 (token obtained)
+2025-11-26 14:43:19,183 - INFO - ✓ Created @bay93and_v3 (token obtained)
+2025-11-26 14:43:21,149 - INFO - ✓ Created @jamielopez_v3 (token obtained)
+2025-11-26 14:43:23,164 - INFO - ✓ Created @gray84jon_v3 (token obtained)
+2025-11-26 14:43:23,165 - INFO - Progress: 20/100 accounts
+2025-11-26 14:43:25,189 - INFO - ✓ Created @heykerry10_v3 (token obtained)
+2025-11-26 14:43:27,214 - INFO - ✓ Created @finley_kim63_v3 (token obtained)
+2025-11-26 14:43:29,263 - INFO - ✓ Created @mrindigo32_v3 (token obtained)
+2025-11-26 14:43:31,191 - INFO - ✓ Created @_logan22_v3 (token obtained)
+2025-11-26 14:43:33,201 - INFO - ✓ Created @justzion92_v3 (token obtained)
+2025-11-26 14:43:35,211 - INFO - ✓ Created @charlie_64_v3 (token obtained)
+2025-11-26 14:43:37,219 - INFO - ✓ Created @bay_41_v3 (token obtained)
+2025-11-26 14:43:39,239 - INFO - ✓ Created @sammiller_v3 (token obtained)
+2025-11-26 14:43:41,207 - INFO - ✓ Created @morgan_17_v3 (token obtained)
+2025-11-26 14:43:43,197 - INFO - ✓ Created @blake_anderson34_v3 (token obtained)
+2025-11-26 14:43:43,198 - INFO - Progress: 30/100 accounts
+2025-11-26 14:43:45,282 - INFO - ✓ Created @ashkim_v3 (token obtained)
+2025-11-26 14:43:47,207 - INFO - ✓ Created @logan_wilson68_v3 (token obtained)
+2025-11-26 14:43:49,218 - INFO - ✓ Created @logan_taylor20_v3 (token obtained)
+2025-11-26 14:43:51,216 - INFO - ✓ Created @hayden_83_v3 (token obtained)
+2025-11-26 14:43:53,307 - INFO - ✓ Created @charlieali_v3 (token obtained)
+2025-11-26 14:43:55,239 - INFO - ✓ Created @riley_lewis65_v3 (token obtained)
+2025-11-26 14:43:57,275 - INFO - ✓ Created @kerry53lew_v3 (token obtained)
+2025-11-26 14:43:59,341 - INFO - ✓ Created @harper89ngu_v3 (token obtained)
+2025-11-26 14:44:01,332 - INFO - ✓ Created @morganwong_v3 (token obtained)
+2025-11-26 14:44:03,351 - INFO - ✓ Created @morganwhite_v3 (token obtained)
+2025-11-26 14:44:03,398 - INFO - Progress: 40/100 accounts
+2025-11-26 14:44:05,318 - INFO - ✓ Created @indigo67wal_v3 (token obtained)
+2025-11-26 14:44:07,407 - INFO - ✓ Created @charlie41cla_v3 (token obtained)
+2025-11-26 14:44:10,082 - INFO - ✓ Created @_charlie6_v3 (token obtained)
+2025-11-26 14:44:11,400 - INFO - ✓ Created @tonimoore_v3 (token obtained)
+2025-11-26 14:44:13,256 - INFO - ✓ Created @quinn_chen91_v3 (token obtained)
+2025-11-26 14:44:15,421 - INFO - ✓ Created @mrzion10_v3 (token obtained)
+2025-11-26 14:44:17,450 - INFO - ✓ Created @wren_73_v3 (token obtained)
+2025-11-26 14:44:19,385 - INFO - ✓ Created @skylerdavis_v3 (token obtained)
+2025-11-26 14:44:21,298 - INFO - ✓ Created @frankie_45_v3 (token obtained)
+2025-11-26 14:44:23,338 - INFO - ✓ Created @dakota_73_v3 (token obtained)
+2025-11-26 14:44:23,340 - INFO - Progress: 50/100 accounts
+2025-11-26 14:44:25,268 - INFO - ✓ Created @yoreese34_v3 (token obtained)
+2025-11-26 14:44:27,736 - INFO - ✓ Created @leesmith_v3 (token obtained)
+2025-11-26 14:44:29,375 - INFO - ✓ Created @itstoni0_v3 (token obtained)
+2025-11-26 14:44:31,287 - INFO - ✓ Created @mrlee68_v3 (token obtained)
+2025-11-26 14:44:33,391 - INFO - ✓ Created @edenkim_v3 (token obtained)
+2025-11-26 14:44:35,281 - INFO - ✓ Created @zion_patel51_v3 (token obtained)
+2025-11-26 14:44:37,345 - INFO - ✓ Created @drewali_v3 (token obtained)
+2025-11-26 14:44:39,464 - INFO - ✓ Created @cameron_anderson4_v3 (token obtained)
+2025-11-26 14:44:41,347 - INFO - ✓ Created @realnoel0_v3 (token obtained)
+2025-11-26 14:44:43,254 - WARNING - Account creation failed for benign_0001_27f528: 500
+2025-11-26 14:44:45,355 - INFO - ✓ Created @parkerkim_v3 (token obtained)
+2025-11-26 14:44:45,355 - INFO - Progress: 60/100 accounts
+2025-11-26 14:44:47,342 - INFO - ✓ Created @frankie16mil_v3 (token obtained)
+2025-11-26 14:44:49,358 - INFO - ✓ Created @avery28ali_v3 (token obtained)
+2025-11-26 14:44:51,440 - INFO - ✓ Created @val33jac_v3 (token obtained)
+2025-11-26 14:44:53,311 - INFO - ✓ Created @bay42kim_v3 (token obtained)
+2025-11-26 14:44:55,430 - INFO - ✓ Created @indigo56mil_v3 (token obtained)
+2025-11-26 14:44:57,374 - INFO - ✓ Created @jamie_anderson33_v3 (token obtained)
+2025-11-26 14:44:59,535 - INFO - ✓ Created @lee_19_v3 (token obtained)
+2025-11-26 14:45:01,609 - INFO - ✓ Created @indigo48jon_v3 (token obtained)
+2025-11-26 14:45:03,505 - INFO - ✓ Created @harper_jones42_v3 (token obtained)
+2025-11-26 14:45:05,468 - INFO - ✓ Created @indigo_40_v3 (token obtained)
+2025-11-26 14:45:05,470 - INFO - Progress: 70/100 accounts
+2025-11-26 14:45:08,068 - INFO - ✓ Created @noel_davis87_v3 (token obtained)
+2025-11-26 14:45:10,460 - INFO - ✓ Created @alex_17_v3 (token obtained)
+2025-11-26 14:45:11,621 - INFO - ✓ Created @quinn78kim_v3 (token obtained)
+2025-11-26 14:45:13,611 - INFO - ✓ Created @ashbrown_v3 (token obtained)
+2025-11-26 14:45:16,606 - INFO - ✓ Created @nico_garcia53_v3 (token obtained)
+2025-11-26 14:45:17,602 - INFO - ✓ Created @alex84jon_v3 (token obtained)
+2025-11-26 14:45:19,483 - INFO - ✓ Created @xbay5_v3 (token obtained)
+2025-11-26 14:45:21,804 - INFO - ✓ Created @casey_kim98_v3 (token obtained)
+2025-11-26 14:45:23,539 - INFO - ✓ Created @avery27mar_v3 (token obtained)
+2025-11-26 14:45:25,528 - INFO - ✓ Created @drew91mil_v3 (token obtained)
+2025-11-26 14:45:25,529 - INFO - Progress: 80/100 accounts
+2025-11-26 14:45:27,482 - INFO - ✓ Created @indigolee_v3 (token obtained)
+2025-11-26 14:45:29,516 - INFO - ✓ Created @charlie_97_v3 (token obtained)
+2025-11-26 14:45:31,515 - INFO - ✓ Created @emery89dav_v3 (token obtained)
+2025-11-26 14:45:33,535 - INFO - ✓ Created @marley4sil_v3 (token obtained)
+2025-11-26 14:45:35,484 - INFO - ✓ Created @ashwilson_v3 (token obtained)
+2025-11-26 14:45:37,637 - INFO - ✓ Created @hayden_89_v3 (token obtained)
+2025-11-26 14:45:39,511 - INFO - ✓ Created @val54lee_v3 (token obtained)
+2025-11-26 14:45:41,578 - INFO - ✓ Created @wren81wal_v3 (token obtained)
+2025-11-26 14:45:43,550 - INFO - ✓ Created @casey_martin58_v3 (token obtained)
+2025-11-26 14:45:45,513 - INFO - ✓ Created @marleylewis_v3 (token obtained)
+2025-11-26 14:45:45,513 - INFO - Progress: 90/100 accounts
+2025-11-26 14:45:47,589 - INFO - ✓ Created @alexgarcia_v3 (token obtained)
+2025-11-26 14:45:49,541 - INFO - ✓ Created @cameron_lee17_v3 (token obtained)
+2025-11-26 14:45:51,556 - INFO - ✓ Created @finley_silva3_v3 (token obtained)
+2025-11-26 14:45:53,532 - INFO - ✓ Created @immax40_v3 (token obtained)
+2025-11-26 14:45:56,268 - INFO - ✓ Created @kerry_54_v3 (token obtained)
+2025-11-26 14:45:57,605 - INFO - ✓ Created @jordanmartinez_v3 (token obtained)
+2025-11-26 14:45:59,572 - INFO - ✓ Created @xparker15_v3 (token obtained)
+2025-11-26 14:46:01,690 - INFO - ✓ Created @jess_wong40_v3 (token obtained)
+2025-11-26 14:46:03,599 - INFO - ✓ Created @haydenchen_v3 (token obtained)
+2025-11-26 14:46:03,600 - INFO - Created 99/100 accounts
+2025-11-26 14:46:03,604 - INFO - Saved 99 credentials to data/runs/botsocial_tokens_v3.json
+2025-11-26 14:46:03,604 - INFO - 
+======================================================================
+2025-11-26 14:46:03,604 - INFO - PHASE 2: Profile Setup
+2025-11-26 14:46:03,604 - INFO - ======================================================================
+2025-11-26 14:46:08,655 - INFO - Set avatar for @benign_0016_a2924e
+2025-11-26 14:46:13,950 - INFO - Set banner for @benign_0016_a2924e
+2025-11-26 14:46:19,606 - INFO - Set avatar for @gamer_0000_c40a70
+2025-11-26 14:46:25,297 - INFO - Set banner for @gamer_0000_c40a70
+2025-11-26 14:46:30,822 - INFO - Set avatar for @recovery_0005_738893
+2025-11-26 14:46:36,089 - INFO - Set banner for @recovery_0005_738893
+2025-11-26 14:46:41,481 - INFO - Set avatar for @extrem_0000_4bdd90
+2025-11-26 14:46:46,817 - INFO - Set banner for @extrem_0000_4bdd90
+2025-11-26 14:46:52,101 - INFO - Set avatar for @bully_0002_eb02ca
+2025-11-26 14:46:57,364 - INFO - Set banner for @bully_0002_eb02ca
+2025-11-26 14:47:02,666 - INFO - Set avatar for @recovery_0016_9ae826
+2025-11-26 14:47:07,982 - INFO - Set banner for @recovery_0016_9ae826
+2025-11-26 14:47:13,233 - INFO - Set avatar for @gamer_0002_e5f419
+2025-11-26 14:47:18,494 - INFO - Set banner for @gamer_0002_e5f419
+2025-11-26 14:47:23,759 - INFO - Set avatar for @misinfo_0000_cec7b8
+2025-11-26 14:47:29,035 - INFO - Set banner for @misinfo_0000_cec7b8
+2025-11-26 14:47:34,267 - INFO - Set avatar for @hate_0000_38eee5
+2025-11-26 14:47:39,528 - INFO - Set banner for @hate_0000_38eee5
+2025-11-26 14:47:44,793 - INFO - Set avatar for @benign_0028_21630d
+2025-11-26 14:47:50,070 - INFO - Set banner for @benign_0028_21630d
+2025-11-26 14:47:55,332 - INFO - Set avatar for @hate_0001_25fc49
+2025-11-26 14:48:00,592 - INFO - Set banner for @hate_0001_25fc49
+2025-11-26 14:48:05,848 - INFO - Set avatar for @gamer_0001_efd4ab
+2025-11-26 14:48:11,107 - INFO - Set banner for @gamer_0001_efd4ab
+2025-11-26 14:48:16,419 - INFO - Set avatar for @recovery_0031_15e621
+2025-11-26 14:48:21,715 - INFO - Set banner for @recovery_0031_15e621
+2025-11-26 14:48:26,966 - INFO - Set avatar for @recovery_0000_4094ed
+2025-11-26 14:48:32,525 - INFO - Set banner for @recovery_0000_4094ed
+2025-11-26 14:48:39,030 - INFO - Set avatar for @benign_0014_efaa30
+2025-11-26 14:48:44,323 - INFO - Set banner for @benign_0014_efaa30
+2025-11-26 14:48:49,569 - INFO - Set avatar for @benign_0025_f45bb5
+2025-11-26 14:48:55,005 - INFO - Set banner for @benign_0025_f45bb5
+2025-11-26 14:49:00,244 - INFO - Set avatar for @benign_0020_67c777
+2025-11-26 14:49:05,500 - INFO - Set banner for @benign_0020_67c777
+2025-11-26 14:49:10,773 - INFO - Set avatar for @bully_0004_2a1dcd
+2025-11-26 14:49:16,086 - INFO - Set banner for @bully_0004_2a1dcd
+2025-11-26 14:49:21,454 - INFO - Set avatar for @conspir_0000_f2d045
+2025-11-26 14:49:26,755 - INFO - Set banner for @conspir_0000_f2d045
+2025-11-26 14:49:32,047 - INFO - Set avatar for @recovery_0009_faa25d
+2025-11-26 14:49:37,302 - INFO - Set banner for @recovery_0009_faa25d
+2025-11-26 14:49:42,581 - INFO - Set avatar for @benign_0029_60e8d2
+2025-11-26 14:49:50,225 - INFO - Set banner for @benign_0029_60e8d2
+2025-11-26 14:49:55,473 - INFO - Set avatar for @recovery_0013_d6e4b4
+2025-11-26 14:50:00,740 - INFO - Set banner for @recovery_0013_d6e4b4
+2025-11-26 14:50:06,009 - INFO - Set avatar for @recovery_0018_a17750
+2025-11-26 14:50:13,658 - INFO - Set banner for @recovery_0018_a17750
+2025-11-26 14:50:19,034 - INFO - Set avatar for @benign_0003_e4d1d2
+2025-11-26 14:50:24,293 - INFO - Set banner for @benign_0003_e4d1d2
+2025-11-26 14:50:29,573 - INFO - Set avatar for @benign_0022_e8041c
+2025-11-26 14:50:34,857 - INFO - Set banner for @benign_0022_e8041c
+2025-11-26 14:50:41,044 - INFO - Set avatar for @recovery_0022_54b4f9
+2025-11-26 14:50:46,299 - INFO - Set banner for @recovery_0022_54b4f9
+2025-11-26 14:50:51,573 - INFO - Set avatar for @recovery_0020_2bd610
+2025-11-26 14:50:56,853 - INFO - Set banner for @recovery_0020_2bd610
+2025-11-26 14:51:02,142 - INFO - Set avatar for @benign_0005_ae37e4
+2025-11-26 14:51:07,512 - INFO - Set banner for @benign_0005_ae37e4
+2025-11-26 14:51:12,958 - INFO - Set avatar for @benign_0013_c1a528
+2025-11-26 14:51:18,655 - INFO - Set banner for @benign_0013_c1a528
+2025-11-26 14:51:23,941 - INFO - Set avatar for @conspir_0002_5b6087
+2025-11-26 14:51:29,294 - INFO - Set banner for @conspir_0002_5b6087
+2025-11-26 14:51:34,527 - INFO - Set avatar for @proana_0000_c8e948
+2025-11-26 14:51:39,772 - INFO - Set banner for @proana_0000_c8e948
+2025-11-26 14:51:45,032 - INFO - Set avatar for @benign_0008_1bd778
+2025-11-26 14:51:50,289 - INFO - Set banner for @benign_0008_1bd778
+2025-11-26 14:51:55,674 - INFO - Set avatar for @recovery_0021_b7fd4d
+2025-11-26 14:52:00,956 - INFO - Set banner for @recovery_0021_b7fd4d
+2025-11-26 14:52:06,226 - INFO - Set avatar for @proana_0001_8bc999
+2025-11-26 14:52:11,495 - INFO - Set banner for @proana_0001_8bc999
+2025-11-26 14:52:16,777 - INFO - Set avatar for @recovery_0014_f6133a
+2025-11-26 14:52:22,039 - INFO - Set banner for @recovery_0014_f6133a
+2025-11-26 14:52:27,303 - INFO - Set avatar for @recovery_0027_b09458
+2025-11-26 14:52:32,570 - INFO - Set banner for @recovery_0027_b09458
+2025-11-26 14:52:37,809 - INFO - Set avatar for @recovery_0019_b665b1
+2025-11-26 14:52:43,053 - INFO - Set banner for @recovery_0019_b665b1
+2025-11-26 14:52:48,333 - INFO - Set avatar for @bully_0005_b9942e
+2025-11-26 14:52:55,897 - INFO - Set banner for @bully_0005_b9942e
+2025-11-26 14:53:01,164 - INFO - Set avatar for @recovery_0017_daa0d2
+2025-11-26 14:53:06,433 - INFO - Set banner for @recovery_0017_daa0d2
+2025-11-26 14:53:11,782 - INFO - Set avatar for @recovery_0012_c7937e
+2025-11-26 14:53:36,755 - INFO - Set avatar for @benign_0027_19b6d2
+2025-11-26 14:53:42,008 - INFO - Set banner for @benign_0027_19b6d2
+2025-11-26 14:53:47,260 - INFO - Set avatar for @recovery_0002_e41662
+2025-11-26 14:54:12,193 - INFO - Set avatar for @recovery_0030_f4ffe0
+2025-11-26 14:54:17,530 - INFO - Set banner for @recovery_0030_f4ffe0
+2025-11-26 14:54:24,324 - INFO - Set avatar for @benign_0031_6e067b
+2025-11-26 14:54:29,961 - INFO - Set banner for @benign_0031_6e067b
+2025-11-26 14:54:35,207 - INFO - Set avatar for @benign_0002_a704f0
+2025-11-26 14:54:41,417 - INFO - Set banner for @benign_0002_a704f0
+2025-11-26 14:54:48,035 - INFO - Set avatar for @benign_0009_2ab3dc
+2025-11-26 14:54:53,444 - INFO - Set banner for @benign_0009_2ab3dc
+2025-11-26 14:54:58,768 - INFO - Set avatar for @recovery_0025_e9a822
+2025-11-26 14:55:04,187 - INFO - Set banner for @recovery_0025_e9a822
+2025-11-26 14:55:09,473 - INFO - Set avatar for @benign_0010_4a220a
+2025-11-26 14:55:15,001 - INFO - Set banner for @benign_0010_4a220a
+2025-11-26 14:55:20,682 - INFO - Set avatar for @recovery_0026_1eb2be
+2025-11-26 14:55:25,944 - INFO - Set banner for @recovery_0026_1eb2be
+2025-11-26 14:55:31,210 - INFO - Set avatar for @recovery_0029_d98b71
+2025-11-26 14:55:36,584 - INFO - Set banner for @recovery_0029_d98b71
+2025-11-26 14:55:41,885 - INFO - Set avatar for @recovery_0024_795c8d
+2025-11-26 14:55:47,199 - INFO - Set banner for @recovery_0024_795c8d
+2025-11-26 14:55:53,106 - INFO - Set avatar for @incel_0001_c84f44
+2025-11-26 14:55:58,385 - INFO - Set banner for @incel_0001_c84f44
+2025-11-26 14:56:03,640 - INFO - Set avatar for @benign_0018_466c2c
+2025-11-26 14:56:08,950 - INFO - Set banner for @benign_0018_466c2c
+2025-11-26 14:56:14,213 - INFO - Set avatar for @benign_0006_6c4bb4
+2025-11-26 14:56:19,620 - INFO - Set banner for @benign_0006_6c4bb4
+2025-11-26 14:56:25,000 - INFO - Set avatar for @recovery_0023_4ca056
+2025-11-26 14:56:30,284 - INFO - Set banner for @recovery_0023_4ca056
+2025-11-26 14:56:35,816 - INFO - Set avatar for @incel_0000_dbdf40
+2025-11-26 14:56:41,143 - INFO - Set banner for @incel_0000_dbdf40
+2025-11-26 14:56:46,405 - INFO - Set avatar for @proana_0002_6f3331
+2025-11-26 14:56:51,669 - INFO - Set banner for @proana_0002_6f3331
+2025-11-26 14:56:56,932 - INFO - Set avatar for @benign_0007_189425
+2025-11-26 14:57:02,227 - INFO - Set banner for @benign_0007_189425
+2025-11-26 14:57:08,206 - INFO - Set avatar for @trad_0000_fbc0fa
+2025-11-26 14:57:13,772 - INFO - Set banner for @trad_0000_fbc0fa
+2025-11-26 14:57:13,774 - WARNING - No token for benign_0001_27f528, skipping profile
+2025-11-26 14:57:19,472 - INFO - Set avatar for @conspir_0001_0abac2
+2025-11-26 14:57:24,866 - INFO - Set banner for @conspir_0001_0abac2
+2025-11-26 14:57:30,137 - INFO - Set avatar for @edrisk_0002_1d4411
+2025-11-26 14:57:35,845 - INFO - Set banner for @edrisk_0002_1d4411
+2025-11-26 14:57:41,241 - INFO - Set avatar for @recovery_0015_3f0ad6
+2025-11-26 14:57:46,536 - INFO - Set banner for @recovery_0015_3f0ad6
+2025-11-26 14:57:51,836 - INFO - Set avatar for @benign_0030_5f4c41
+2025-11-26 14:57:57,953 - INFO - Set banner for @benign_0030_5f4c41
+2025-11-26 14:58:04,018 - INFO - Set avatar for @alpha_0001_398470
+2025-11-26 14:58:09,283 - INFO - Set banner for @alpha_0001_398470
+2025-11-26 14:58:14,531 - INFO - Set avatar for @bully_0003_da9452
+2025-11-26 14:58:19,783 - INFO - Set banner for @bully_0003_da9452
+2025-11-26 14:58:25,322 - INFO - Set avatar for @bully_0001_7abaf2
+2025-11-26 14:58:30,867 - INFO - Set banner for @bully_0001_7abaf2
+2025-11-26 14:58:36,149 - INFO - Set avatar for @benign_0011_dbc905
+2025-11-26 14:58:41,505 - INFO - Set banner for @benign_0011_dbc905
+2025-11-26 14:58:46,762 - INFO - Set avatar for @trad_0002_401b1c
+2025-11-26 14:58:52,047 - INFO - Set banner for @trad_0002_401b1c
+2025-11-26 14:58:57,393 - INFO - Set avatar for @recovery_0011_e58387
+2025-11-26 14:59:02,662 - INFO - Set banner for @recovery_0011_e58387
+2025-11-26 14:59:07,931 - INFO - Set avatar for @bully_0000_e005e1
+2025-11-26 14:59:13,241 - INFO - Set banner for @bully_0000_e005e1
+2025-11-26 14:59:18,492 - INFO - Set avatar for @recovery_0028_0d6986
+2025-11-26 14:59:23,754 - INFO - Set banner for @recovery_0028_0d6986
+2025-11-26 14:59:29,201 - INFO - Set avatar for @recovery_0006_ba5ac2
+2025-11-26 14:59:34,484 - INFO - Set banner for @recovery_0006_ba5ac2
+2025-11-26 14:59:39,732 - INFO - Set avatar for @recovery_0010_c09583
+2025-11-26 14:59:45,001 - INFO - Set banner for @recovery_0010_c09583
+2025-11-26 14:59:50,265 - INFO - Set avatar for @recovery_0001_b31781
+2025-11-26 14:59:55,545 - INFO - Set banner for @recovery_0001_b31781
+2025-11-26 15:00:00,814 - INFO - Set avatar for @benign_0017_da2e53
+2025-11-26 15:00:06,101 - INFO - Set banner for @benign_0017_da2e53
+2025-11-26 15:00:11,390 - INFO - Set avatar for @trad_0001_d99e91
+2025-11-26 15:00:16,729 - INFO - Set banner for @trad_0001_d99e91
+2025-11-26 15:00:22,014 - INFO - Set avatar for @benign_0000_88571a
+2025-11-26 15:00:27,299 - INFO - Set banner for @benign_0000_88571a
+2025-11-26 15:00:32,582 - INFO - Set avatar for @recovery_0008_9211a8
+2025-11-26 15:00:37,859 - INFO - Set banner for @recovery_0008_9211a8
+2025-11-26 15:00:43,130 - INFO - Set avatar for @extrem_0001_4edbb8
+2025-11-26 15:00:48,425 - INFO - Set banner for @extrem_0001_4edbb8
+2025-11-26 15:00:53,677 - INFO - Set avatar for @benign_0019_08a18d
+2025-11-26 15:00:59,219 - INFO - Set banner for @benign_0019_08a18d
+2025-11-26 15:01:04,505 - INFO - Set avatar for @alpha_0002_ed2538
+2025-11-26 15:01:09,770 - INFO - Set banner for @alpha_0002_ed2538
+2025-11-26 15:01:15,177 - INFO - Set avatar for @extrem_0002_6347b9
+2025-11-26 15:01:20,460 - INFO - Set banner for @extrem_0002_6347b9
+2025-11-26 15:01:25,700 - INFO - Set avatar for @edrisk_0000_d09a4d
+2025-11-26 15:01:30,954 - INFO - Set banner for @edrisk_0000_d09a4d
+2025-11-26 15:01:36,199 - INFO - Set avatar for @benign_0026_acf1b9
+2025-11-26 15:01:41,464 - INFO - Set banner for @benign_0026_acf1b9
+2025-11-26 15:01:46,716 - INFO - Set avatar for @benign_0004_31a4ba
+2025-11-26 15:01:52,048 - INFO - Set banner for @benign_0004_31a4ba
+2025-11-26 15:01:57,328 - INFO - Set avatar for @misinfo_0002_e91934
+2025-11-26 15:02:02,693 - INFO - Set banner for @misinfo_0002_e91934
+2025-11-26 15:02:07,933 - INFO - Set avatar for @incel_0002_59494d
+2025-11-26 15:02:13,203 - INFO - Set banner for @incel_0002_59494d
+2025-11-26 15:02:18,443 - INFO - Set avatar for @benign_0021_e98792
+2025-11-26 15:02:23,701 - INFO - Set banner for @benign_0021_e98792
+2025-11-26 15:02:28,964 - INFO - Set avatar for @benign_0023_4bdb3d
+2025-11-26 15:02:34,267 - INFO - Set banner for @benign_0023_4bdb3d
+2025-11-26 15:02:39,521 - INFO - Set avatar for @edrisk_0001_b925c9
+2025-11-26 15:02:44,837 - INFO - Set banner for @edrisk_0001_b925c9
+2025-11-26 15:02:50,107 - INFO - Set avatar for @hate_0002_7c7084
+2025-11-26 15:02:55,402 - INFO - Set banner for @hate_0002_7c7084
+2025-11-26 15:03:00,679 - INFO - Set avatar for @misinfo_0001_c0a54b
+2025-11-26 15:03:05,965 - INFO - Set banner for @misinfo_0001_c0a54b
+2025-11-26 15:03:11,222 - INFO - Set avatar for @recovery_0007_d03c44
+2025-11-26 15:03:16,493 - INFO - Set banner for @recovery_0007_d03c44
+2025-11-26 15:03:21,837 - INFO - Set avatar for @alpha_0000_e008b8
+2025-11-26 15:03:27,102 - INFO - Set banner for @alpha_0000_e008b8
+2025-11-26 15:03:32,390 - INFO - Set avatar for @benign_0015_5b6d33
+2025-11-26 15:03:37,678 - INFO - Set banner for @benign_0015_5b6d33
+2025-11-26 15:03:42,920 - INFO - Set avatar for @benign_0012_b0d01f
+2025-11-26 15:03:48,201 - INFO - Set banner for @benign_0012_b0d01f
+2025-11-26 15:03:53,486 - INFO - Set avatar for @recovery_0004_1afe0b
+2025-11-26 15:03:58,752 - INFO - Set banner for @recovery_0004_1afe0b
+2025-11-26 15:04:04,034 - INFO - Set avatar for @recovery_0003_d458cf
+2025-11-26 15:04:09,314 - INFO - Set banner for @recovery_0003_d458cf
+2025-11-26 15:04:14,609 - INFO - Set avatar for @benign_0024_0fc532
+2025-11-26 15:04:20,893 - INFO - Set banner for @benign_0024_0fc532
+2025-11-26 15:04:20,894 - INFO - 
+======================================================================
+2025-11-26 15:04:20,894 - INFO - PHASE 3: Post Upload
+2025-11-26 15:04:20,894 - INFO - ======================================================================
+2025-11-26 15:04:20,894 - INFO - Uploading 1363 posts...
+2025-11-26 15:04:41,186 - INFO - Progress: 20/1363 posts uploaded
+2025-11-26 15:04:53,345 - INFO - Progress: 40/1363 posts uploaded
+2025-11-26 15:04:57,004 - WARNING - No token for user 59, skipping post
+2025-11-26 15:05:05,496 - INFO - Progress: 60/1363 posts uploaded
+2025-11-26 15:05:07,299 - WARNING - Note creation failed: 400
+2025-11-26 15:05:13,373 - WARNING - Note creation failed: 400
+2025-11-26 15:05:18,863 - INFO - Progress: 80/1363 posts uploaded
+2025-11-26 15:05:30,410 - WARNING - No token for user 59, skipping post
+2025-11-26 15:05:30,986 - INFO - Progress: 100/1363 posts uploaded
+2025-11-26 15:05:43,119 - INFO - Progress: 120/1363 posts uploaded
+2025-11-26 15:05:55,385 - INFO - Progress: 140/1363 posts uploaded
+2025-11-26 15:06:08,941 - INFO - Progress: 160/1363 posts uploaded
+2025-11-26 15:06:32,151 - INFO - Progress: 180/1363 posts uploaded
+2025-11-26 15:06:44,252 - INFO - Progress: 200/1363 posts uploaded
+2025-11-26 15:06:56,325 - INFO - Progress: 220/1363 posts uploaded
+2025-11-26 15:07:04,764 - WARNING - No token for user 59, skipping post
+2025-11-26 15:07:08,384 - INFO - Progress: 240/1363 posts uploaded
+2025-11-26 15:07:20,590 - INFO - Progress: 260/1363 posts uploaded
+2025-11-26 15:07:32,630 - INFO - Progress: 280/1363 posts uploaded
+2025-11-26 15:07:34,478 - WARNING - No token for user 59, skipping post
+2025-11-26 15:07:44,679 - INFO - Progress: 300/1363 posts uploaded
+2025-11-26 15:07:56,766 - INFO - Progress: 320/1363 posts uploaded
+2025-11-26 15:08:19,836 - INFO - Progress: 340/1363 posts uploaded
+2025-11-26 15:08:31,897 - INFO - Progress: 360/1363 posts uploaded
+2025-11-26 15:08:43,965 - INFO - Progress: 380/1363 posts uploaded
+2025-11-26 15:08:45,173 - WARNING - No token for user 59, skipping post
+2025-11-26 15:08:56,032 - INFO - Progress: 400/1363 posts uploaded
+2025-11-26 15:09:08,113 - INFO - Progress: 420/1363 posts uploaded
+2025-11-26 15:09:20,924 - INFO - Progress: 440/1363 posts uploaded
+2025-11-26 15:09:28,168 - WARNING - No token for user 59, skipping post
+2025-11-26 15:09:33,009 - INFO - Progress: 460/1363 posts uploaded
+2025-11-26 15:09:45,085 - INFO - Progress: 480/1363 posts uploaded
+2025-11-26 15:09:57,148 - INFO - Progress: 500/1363 posts uploaded
+2025-11-26 15:10:19,129 - INFO - Progress: 520/1363 posts uploaded
+2025-11-26 15:10:31,226 - INFO - Progress: 540/1363 posts uploaded
+2025-11-26 15:10:38,780 - WARNING - Note creation failed: 400
+2025-11-26 15:10:44,239 - INFO - Progress: 560/1363 posts uploaded
+2025-11-26 15:10:49,077 - WARNING - No token for user 59, skipping post
+2025-11-26 15:10:56,307 - INFO - Progress: 580/1363 posts uploaded
+2025-11-26 15:11:08,400 - INFO - Progress: 600/1363 posts uploaded
+2025-11-26 15:11:20,455 - INFO - Progress: 620/1363 posts uploaded
+2025-11-26 15:11:32,543 - INFO - Progress: 640/1363 posts uploaded
+2025-11-26 15:11:37,983 - WARNING - No token for user 59, skipping post
+2025-11-26 15:11:44,619 - INFO - Progress: 660/1363 posts uploaded
+2025-11-26 15:12:09,564 - INFO - Progress: 680/1363 posts uploaded
+2025-11-26 15:12:21,626 - INFO - Progress: 700/1363 posts uploaded
+2025-11-26 15:12:33,690 - INFO - Progress: 720/1363 posts uploaded
+2025-11-26 15:12:46,078 - INFO - Progress: 740/1363 posts uploaded
+2025-11-26 15:12:58,419 - INFO - Progress: 760/1363 posts uploaded
+2025-11-26 15:12:58,420 - WARNING - No token for user 59, skipping post
+2025-11-26 15:13:10,654 - INFO - Progress: 780/1363 posts uploaded
+2025-11-26 15:13:22,902 - INFO - Progress: 800/1363 posts uploaded
+2025-11-26 15:13:34,804 - INFO - Progress: 820/1363 posts uploaded
+2025-11-26 15:13:46,877 - INFO - Progress: 840/1363 posts uploaded
+2025-11-26 15:13:49,287 - WARNING - No token for user 59, skipping post
+2025-11-26 15:14:11,524 - INFO - Progress: 860/1363 posts uploaded
+2025-11-26 15:14:24,055 - INFO - Progress: 880/1363 posts uploaded
+2025-11-26 15:14:36,572 - INFO - Progress: 900/1363 posts uploaded
+2025-11-26 15:14:43,785 - WARNING - Note creation failed: 400
+2025-11-26 15:14:45,603 - WARNING - Note creation failed: 400
+2025-11-26 15:14:49,851 - INFO - Progress: 920/1363 posts uploaded
+2025-11-26 15:15:01,917 - INFO - Progress: 940/1363 posts uploaded
+2025-11-26 15:15:08,559 - WARNING - No token for user 59, skipping post
+2025-11-26 15:15:14,646 - INFO - Progress: 960/1363 posts uploaded
+2025-11-26 15:15:27,529 - INFO - Progress: 980/1363 posts uploaded
+2025-11-26 15:15:29,124 - WARNING - No token for user 59, skipping post
+2025-11-26 15:15:39,821 - INFO - Progress: 1000/1363 posts uploaded
+2025-11-26 15:15:54,606 - INFO - Progress: 1020/1363 posts uploaded
+2025-11-26 15:16:11,530 - INFO - Progress: 1040/1363 posts uploaded
+2025-11-26 15:16:23,768 - INFO - Progress: 1060/1363 posts uploaded
+2025-11-26 15:16:35,829 - INFO - Progress: 1080/1363 posts uploaded
+2025-11-26 15:16:39,452 - WARNING - No token for user 59, skipping post
+2025-11-26 15:16:47,929 - INFO - Progress: 1100/1363 posts uploaded
+2025-11-26 15:17:00,004 - INFO - Progress: 1120/1363 posts uploaded
+2025-11-26 15:17:12,073 - INFO - Progress: 1140/1363 posts uploaded
+2025-11-26 15:17:24,123 - INFO - Progress: 1160/1363 posts uploaded
+2025-11-26 15:17:28,333 - WARNING - No token for user 59, skipping post
+2025-11-26 15:17:41,956 - WARNING - No token for user 59, skipping post
+2025-11-26 15:17:42,880 - INFO - Progress: 1180/1363 posts uploaded
+2025-11-26 15:17:53,724 - WARNING - Note creation failed: 400
+2025-11-26 15:17:55,545 - WARNING - Note creation failed: 400
+2025-11-26 15:17:56,743 - INFO - Progress: 1200/1363 posts uploaded
+2025-11-26 15:18:08,841 - INFO - Progress: 1220/1363 posts uploaded
+2025-11-26 15:18:20,934 - INFO - Progress: 1240/1363 posts uploaded
+2025-11-26 15:18:22,737 - WARNING - No token for user 59, skipping post
+2025-11-26 15:18:42,365 - INFO - Progress: 1260/1363 posts uploaded
+2025-11-26 15:18:46,605 - WARNING - No token for user 59, skipping post
+2025-11-26 15:18:54,559 - INFO - Progress: 1280/1363 posts uploaded
+2025-11-26 15:19:16,320 - WARNING - No token for user 59, skipping post
+2025-11-26 15:19:29,323 - INFO - Progress: 1300/1363 posts uploaded
+2025-11-26 15:19:36,575 - WARNING - No token for user 59, skipping post
+2025-11-26 15:19:53,317 - INFO - Progress: 1320/1363 posts uploaded
+2025-11-26 15:20:43,254 - INFO - Uploaded 1337/1363 posts
+2025-11-26 15:20:43,254 - INFO - 
+======================================================================
+2025-11-26 15:20:43,254 - INFO - PHASE 4: Follow Relationships
+2025-11-26 15:20:43,254 - INFO - ======================================================================
+2025-11-26 15:20:43,255 - INFO - Creating 287 follow relationships...
+2025-11-26 15:22:21,940 - INFO - Progress: 50/287 follows
+2025-11-26 15:24:02,257 - INFO - Progress: 100/287 follows
+2025-11-26 15:25:42,579 - INFO - Progress: 150/287 follows
+2025-11-26 15:27:23,054 - INFO - Progress: 200/287 follows
+2025-11-26 15:29:03,150 - INFO - Progress: 250/287 follows
+2025-11-26 15:30:11,281 - INFO - Created 284/287 follows
+2025-11-26 15:30:11,281 - INFO - 
+======================================================================
+2025-11-26 15:30:11,281 - INFO - PHASE 5: Reactions
+2025-11-26 15:30:11,281 - INFO - ======================================================================
+2025-11-26 15:30:11,281 - INFO - Generating ~200 reactions...
