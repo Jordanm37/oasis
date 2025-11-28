@@ -1,0 +1,194 @@
+# Label Mapping: Gab Hate Corpus (GHC) -> OASIS Ontology
+# Maps GHC hierarchical hate labels to OASIS archetypes
+#
+# GHC Structure:
+# - Hate labels: CV (Call for Violence), HD (Human Degradation), Hate (general)
+# - Target groups: African, Islam, Jewish, LGBTQ, Women, Refugee, Arab, Caucasian, Hispanic, Asian
+# - Rhetorical framing annotations
+
+label_mappings:
+  # === CV: CALL FOR VIOLENCE ===
+  # Explicit calls to commit violence - most severe
+  cv:
+    severity: "critical"
+    archetypes:
+      - archetype: "extremist"
+        weight: 0.85
+        tokens:
+          - "LBL:CALL_TO_VIOLENCE"
+          - "LBL:VIOLENT_THREAT"
+          - "LBL:INCITEMENT"
+          - "LBL:ACCELERATIONISM"
+      - archetype: "hate_speech"
+        weight: 0.15
+        tokens:
+          - "LBL:HATE_SLUR"
+          - "LBL:DEHUMANIZATION"
+
+  # === HD: HUMAN DEGRADATION ===
+  # Dehumanizing content without explicit violence calls
+  hd:
+    severity: "high"
+    archetypes:
+      - archetype: "hate_speech"
+        weight: 0.8
+        tokens:
+          - "LBL:HUMAN_DEGRADATION"
+          - "LBL:DEHUMANIZATION"
+          - "LBL:HATE_SLUR"
+          - "LBL:EXPLICIT_HATE"
+      - archetype: "extremist"
+        weight: 0.2
+        tokens:
+          - "LBL:DEHUMANIZATION"
+          - "LBL:VERMIN_COMPARISON"
+
+  # === HATE: General Hate ===
+  # Hate speech that doesn't fit CV or HD specifically
+  hate:
+    severity: "medium"
+    archetypes:
+      - archetype: "hate_speech"
+        weight: 0.7
+        tokens:
+          - "LBL:HATE_SLUR"
+          - "LBL:EXPLICIT_HATE"
+      - archetype: "bullying"
+        weight: 0.2
+        tokens:
+          - "LBL:PERSONAL_ATTACK"
+      - archetype: "extremist"
+        weight: 0.1
+        tokens:
+          - "LBL:DOGWHISTLE"
+
+  # === NOT HATE ===
+  not_hate:
+    archetypes:
+      - archetype: "benign"
+        weight: 1.0
+        tokens:
+          - "LBL:SUPPORTIVE"
+
+# Target group mappings
+target_mappings:
+  African:
+    target_marker: "LBL:TARGET_RACIAL"
+    additional_tokens:
+      - "LBL:INFERIORITY_CLAIM"
+      - "LBL:DEHUMANIZATION"
+
+  Islam:
+    target_marker: "LBL:TARGET_RELIGIOUS"
+    additional_tokens:
+      - "LBL:DEHUMANIZATION"
+
+  Jewish:
+    target_marker: "LBL:TARGET_RELIGIOUS"
+    additional_tokens:
+      - "LBL:CONSPIRACY"
+      - "LBL:DEEPSTATE"
+      - "LBL:REPLACEMENT_RHETORIC"
+
+  LGBTQ:
+    target_marker: "LBL:TARGET_SEXUALITY"
+    additional_tokens:
+      - "LBL:GENDER_ESSENTIALISM"
+      - "LBL:PURITY_RHETORIC"
+
+  Women:
+    target_marker: "LBL:TARGET_GENDER"
+    additional_tokens:
+      - "LBL:INCEL_MISOGYNY"
+      - "LBL:OBJECTIFICATION"
+
+  Refugee:
+    target_marker: "LBL:TARGET_NATIONAL"
+    additional_tokens:
+      - "LBL:REPLACEMENT_RHETORIC"
+      - "LBL:VERMIN_COMPARISON"
+
+  Arab:
+    target_marker: "LBL:TARGET_RACIAL"
+    additional_tokens:
+      - "LBL:STEREOTYPE"
+
+  Caucasian:
+    target_marker: "LBL:TARGET_RACIAL"
+    additional_tokens: []
+
+  Hispanic:
+    target_marker: "LBL:TARGET_RACIAL"
+    additional_tokens:
+      - "LBL:TARGET_NATIONAL"
+      - "LBL:REPLACEMENT_RHETORIC"
+
+  Asian:
+    target_marker: "LBL:TARGET_RACIAL"
+    additional_tokens:
+      - "LBL:STEREOTYPE"
+      - "LBL:CONSPIRACY"
+
+# Combination rules
+combination_rules:
+  # CV + target = severe targeted violence
+  - condition:
+      label_eq: "cv"
+      has_any_target: true
+    priority_tokens:
+      - "LBL:CALL_TO_VIOLENCE"
+      - "LBL:VIOLENT_THREAT"
+      - "LBL:ACCELERATIONISM"
+
+  # HD + Jewish target = antisemitic conspiracy
+  - condition:
+      label_eq: "hd"
+      has_target: "Jewish"
+    additional_tokens:
+      - "LBL:CONSPIRACY"
+      - "LBL:REPLACEMENT_RHETORIC"
+
+  # CV + Women = misogynistic violence
+  - condition:
+      label_eq: "cv"
+      has_target: "Women"
+    override_archetype: "extremist"
+    priority_tokens:
+      - "LBL:SEXUAL_VIOLENCE_RHETORIC"
+      - "LBL:VIOLENT_THREAT"
+
+  # Multiple targets = broader hate ideology
+  - condition:
+      num_targets_gte: 2
+    additional_tokens:
+      - "LBL:DEHUMANIZATION"
+      - "LBL:EXPLICIT_HATE"
+
+fallback_mappings:
+  default_archetype: "hate_speech"
+  default_tokens:
+    - "LBL:HATE_SLUR"
+
+  low_confidence_archetype: "bullying"
+  low_confidence_tokens:
+    - "LBL:PERSONAL_ATTACK"
+
+metadata:
+  version: "1.0.0"
+  created: "2024-11-28"
+  author: "OASIS Team"
+  source_dataset: "Gab Hate Corpus / juliadollis/The_Gab_Hate_Corpus_ghc_train_original"
+  description: |
+    Maps Gab Hate Corpus to OASIS ontology.
+    Key insight: GHC uses a hierarchical labeling scheme where CV (Call for Violence)
+    is the most severe, followed by HD (Human Degradation), then general Hate.
+    This granularity enables fine-tuned severity assessment.
+
+    Platform context: Gab is known for hosting far-right and extremist content,
+    so baseline toxicity levels are higher than mainstream platforms.
+
+  statistics:
+    total_samples: 27665
+    hate_labels: ["CV", "HD", "Hate", "Not Hate"]
+    target_groups: 10
+    primary_archetypes: ["extremist", "hate_speech", "bullying"]

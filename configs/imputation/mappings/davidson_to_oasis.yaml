@@ -1,0 +1,103 @@
+# Label Mapping: Davidson Hate Speech & Offensive Language -> OASIS Ontology
+# Maps Davidson's 3-class scheme to OASIS archetypes
+#
+# Davidson Structure:
+# - class: 0 (hate speech), 1 (offensive language), 2 (neither)
+# - Multi-annotator labels with counts
+
+label_mappings:
+  # === CLASS 0: HATE SPEECH ===
+  hate_speech:
+    class_id: 0
+    archetypes:
+      - archetype: "hate_speech"
+        weight: 0.8
+        tokens:
+          - "LBL:HATE_SLUR"
+          - "LBL:DEHUMANIZATION"
+          - "LBL:EXPLICIT_HATE"
+      - archetype: "extremist"
+        weight: 0.15
+        tokens:
+          - "LBL:VIOLENT_THREAT"
+      - archetype: "bullying"
+        weight: 0.05
+        tokens:
+          - "LBL:PERSONAL_ATTACK"
+
+  # === CLASS 1: OFFENSIVE LANGUAGE ===
+  offensive_language:
+    class_id: 1
+    archetypes:
+      - archetype: "bullying"
+        weight: 0.6
+        tokens:
+          - "LBL:OFFENSIVE_LANGUAGE"
+          - "LBL:PERSONAL_ATTACK"
+          - "LBL:PROFANITY"
+      - archetype: "hate_speech"
+        weight: 0.3
+        tokens:
+          - "LBL:OFFENSIVE_LANGUAGE"
+          - "LBL:DOGWHISTLE"
+      - archetype: "benign"
+        weight: 0.1
+        tokens:
+          - "LBL:OFFENSIVE_LANGUAGE"
+
+  # === CLASS 2: NEITHER ===
+  neither:
+    class_id: 2
+    archetypes:
+      - archetype: "benign"
+        weight: 1.0
+        tokens:
+          - "LBL:SUPPORTIVE"
+
+# Rules based on annotator agreement
+combination_rules:
+  # High agreement on hate speech (>=4 annotators)
+  - condition:
+      hate_speech_count_gte: 4
+    override_archetype: "hate_speech"
+    priority_tokens:
+      - "LBL:HATE_SLUR"
+      - "LBL:EXPLICIT_HATE"
+
+  # Mixed annotations (hate + offensive)
+  - condition:
+      hate_speech_count_gte: 1
+      offensive_language_count_gte: 2
+    priority_tokens:
+      - "LBL:HATE_SLUR"
+      - "LBL:OFFENSIVE_LANGUAGE"
+
+fallback_mappings:
+  default_archetype: "bullying"
+  default_tokens:
+    - "LBL:OFFENSIVE_LANGUAGE"
+    - "LBL:PERSONAL_ATTACK"
+
+  low_confidence_archetype: "benign"
+  low_confidence_tokens:
+    - "LBL:SUPPORTIVE"
+
+metadata:
+  version: "1.0.0"
+  created: "2024-11-28"
+  author: "OASIS Team"
+  source_dataset: "tdavidson/hate_speech_offensive"
+  description: |
+    Maps Davidson Hate Speech & Offensive Language dataset to OASIS ontology.
+    Key insight: This dataset distinguishes between hate speech (targeting identity)
+    and offensive language (crude but not identity-based), allowing training of
+    systems that can differentiate severity levels.
+
+  statistics:
+    total_samples: 24783
+    classes: 3
+    class_distribution:
+      hate_speech: "~6%"
+      offensive_language: "~77%"
+      neither: "~17%"
+    primary_archetypes: ["hate_speech", "bullying", "benign"]

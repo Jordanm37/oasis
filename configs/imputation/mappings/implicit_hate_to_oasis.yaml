@@ -1,0 +1,323 @@
+# Label Mapping: ImplicitHate (SALT-NLP) Dataset -> OASIS Ontology
+# Maps implicit/subtle hate speech patterns to OASIS archetypes
+#
+# ImplicitHate Structure:
+# - Columns: post, implicit_class, extra_implicit_class
+# - Implicit classes: white_grievance, irony, stereotypical, threatening,
+#                     incitement, inferiority, dismissive, dehumanization
+#
+# Key distinction: ImplicitHate captures SUBTLE hate that lacks explicit slurs
+# but still conveys harmful messages through coded language, implication, and framing.
+
+label_mappings:
+  # === WHITE GRIEVANCE ===
+  # Framing white people as victims; "great replacement" adjacent rhetoric
+  # Often intersects with conspiracy narratives
+  white_grievance:
+    meta_marker: "LBL:IMPLICIT_HATE"
+    archetypes:
+      - archetype: "conspiracy"
+        weight: 0.4
+        tokens:
+          - "LBL:CONSPIRACY"
+          - "LBL:CONSPIRACY_NARRATIVE"
+          - "LBL:ANTI_INSTITUTION"
+          - "LBL:GRIEVANCE_FRAMING"
+          - "LBL:REPLACEMENT_RHETORIC"
+      - archetype: "hate_speech"
+        weight: 0.35
+        tokens:
+          - "LBL:DOGWHISTLE"
+          - "LBL:DEHUMANIZATION"
+          - "LBL:IMPLICIT_HATE"
+      - archetype: "trad"
+        weight: 0.25
+        tokens:
+          - "LBL:DOGWHISTLE"
+          - "LBL:CULTURE_WAR"
+          - "LBL:PURITY_RHETORIC"
+
+  # === IRONY ===
+  # Sarcastic or "joking" hate that provides plausible deniability
+  # Classic dogwhistle territory - uses coded language understood by in-group
+  irony:
+    meta_marker: "LBL:IMPLICIT_HATE"
+    archetypes:
+      - archetype: "hate_speech"
+        weight: 0.5
+        tokens:
+          - "LBL:DOGWHISTLE"
+          - "LBL:HATE_SLUR"
+          - "LBL:IRONIC_HATE"
+          - "LBL:IMPLICIT_HATE"
+      - archetype: "gamergate"
+        weight: 0.25
+        tokens:
+          - "LBL:CULTURE_WAR"
+          - "LBL:GATEKEEPING"
+          - "LBL:IRONIC_HATE"
+      - archetype: "bullying"
+        weight: 0.25
+        tokens:
+          - "LBL:PERSONAL_ATTACK"
+
+  # === STEREOTYPICAL ===
+  # Reinforcing negative stereotypes about groups
+  # Maps to dehumanization and hate speech
+  stereotypical:
+    meta_marker: "LBL:IMPLICIT_HATE"
+    archetypes:
+      - archetype: "hate_speech"
+        weight: 0.7
+        tokens:
+          - "LBL:DEHUMANIZATION"
+          - "LBL:DOGWHISTLE"
+          - "LBL:STEREOTYPE"
+          - "LBL:IMPLICIT_HATE"
+      - archetype: "incel_misogyny"
+        weight: 0.2
+        tokens:
+          - "LBL:MISOGYNISTIC_LECTURE"
+          - "LBL:OBJECTIFICATION"
+          - "LBL:STEREOTYPE"
+      - archetype: "misinfo"
+        weight: 0.1
+        tokens:
+          - "LBL:MISINFO_CLAIM"
+
+  # === THREATENING ===
+  # Implicit threats or suggestions of violence
+  # Maps primarily to extremist archetype
+  threatening:
+    meta_marker: "LBL:IMPLICIT_HATE"
+    archetypes:
+      - archetype: "extremist"
+        weight: 0.7
+        tokens:
+          - "LBL:VIOLENT_THREAT"
+          - "LBL:ACCELERATIONISM"
+          - "LBL:IMPLICIT_THREAT"
+      - archetype: "bullying"
+        weight: 0.2
+        tokens:
+          - "LBL:DOXXING_THREAT"
+          - "LBL:PERSONAL_ATTACK"
+          - "LBL:IMPLICIT_THREAT"
+      - archetype: "hate_speech"
+        weight: 0.1
+        tokens:
+          - "LBL:DEHUMANIZATION"
+          - "LBL:IMPLICIT_HATE"
+
+  # === INCITEMENT ===
+  # Calls to action against target groups
+  # Strong extremist/accelerationist signal
+  incitement:
+    meta_marker: "LBL:IMPLICIT_HATE"
+    archetypes:
+      - archetype: "extremist"
+        weight: 0.75
+        tokens:
+          - "LBL:ACCELERATIONISM"
+          - "LBL:VIOLENT_THREAT"
+          - "LBL:INCITEMENT"
+      - archetype: "hate_speech"
+        weight: 0.25
+        tokens:
+          - "LBL:DEHUMANIZATION"
+          - "LBL:HATE_SLUR"
+          - "LBL:INCITEMENT"
+
+  # === INFERIORITY ===
+  # Claims that target groups are inferior
+  # Classic dehumanization rhetoric
+  inferiority:
+    meta_marker: "LBL:IMPLICIT_HATE"
+    archetypes:
+      - archetype: "hate_speech"
+        weight: 0.65
+        tokens:
+          - "LBL:DEHUMANIZATION"
+          - "LBL:HATE_SLUR"
+          - "LBL:INFERIORITY_CLAIM"
+          - "LBL:IMPLICIT_HATE"
+      - archetype: "incel_misogyny"
+        weight: 0.2
+        tokens:
+          - "LBL:MISOGYNISTIC_LECTURE"
+          - "LBL:INCEL_MISOGYNY"
+          - "LBL:INFERIORITY_CLAIM"
+      - archetype: "alpha"
+        weight: 0.15
+        tokens:
+          - "LBL:OBJECTIFICATION"
+          - "LBL:GENDER_ESSENTIALISM"
+
+  # === DISMISSIVE ===
+  # Dismissing concerns, existence, or humanity of target groups
+  # Often manifests as gaslighting or minimization
+  dismissive:
+    meta_marker: "LBL:IMPLICIT_HATE"
+    archetypes:
+      - archetype: "bullying"
+        weight: 0.45
+        tokens:
+          - "LBL:PERSONAL_ATTACK"
+          - "LBL:DISMISSIVE_HATE"
+      - archetype: "hate_speech"
+        weight: 0.3
+        tokens:
+          - "LBL:DOGWHISTLE"
+          - "LBL:DEHUMANIZATION"
+          - "LBL:DISMISSIVE_HATE"
+          - "LBL:IMPLICIT_HATE"
+      - archetype: "trad"
+        weight: 0.25
+        tokens:
+          - "LBL:GENDER_ESSENTIALISM"
+          - "LBL:CULTURE_WAR"
+
+  # === DEHUMANIZATION ===
+  # Explicit dehumanizing comparisons (vermin, animals, disease)
+  # Most severe implicit hate category
+  dehumanization:
+    meta_marker: "LBL:IMPLICIT_HATE"
+    archetypes:
+      - archetype: "hate_speech"
+        weight: 0.75
+        tokens:
+          - "LBL:DEHUMANIZATION"
+          - "LBL:HATE_SLUR"
+          - "LBL:VERMIN_COMPARISON"
+      - archetype: "extremist"
+        weight: 0.25
+        tokens:
+          - "LBL:VIOLENT_THREAT"
+          - "LBL:ACCELERATIONISM"
+
+# Combination rules for multi-label content
+combination_rules:
+  # White grievance + threatening → Extremist accelerationist
+  - condition:
+      all_of: ["white_grievance", "threatening"]
+    override_archetype: "extremist"
+    priority_tokens:
+      - "LBL:ACCELERATIONISM"
+      - "LBL:CONSPIRACY"
+      - "LBL:VIOLENT_THREAT"
+
+  # Stereotypical + inferiority → Strong hate speech
+  - condition:
+      all_of: ["stereotypical", "inferiority"]
+    override_archetype: "hate_speech"
+    priority_tokens:
+      - "LBL:DEHUMANIZATION"
+      - "LBL:HATE_SLUR"
+
+  # Irony + dismissive → Dogwhistle hate
+  - condition:
+      all_of: ["irony", "dismissive"]
+    priority_tokens:
+      - "LBL:DOGWHISTLE"
+      - "LBL:CULTURE_WAR"
+
+  # Incitement + dehumanization → Severe extremist content
+  - condition:
+      all_of: ["incitement", "dehumanization"]
+    override_archetype: "extremist"
+    priority_tokens:
+      - "LBL:ACCELERATIONISM"
+      - "LBL:VIOLENT_THREAT"
+      - "LBL:DEHUMANIZATION"
+
+# Extra implicit class mappings (when extra_implicit_class is present)
+extra_class_mappings:
+  # Some posts have secondary classifications
+  # These add additional tokens without changing primary archetype
+  white_grievance:
+    additional_tokens: ["LBL:CONSPIRACY"]
+  irony:
+    additional_tokens: ["LBL:DOGWHISTLE"]
+  stereotypical:
+    additional_tokens: ["LBL:DEHUMANIZATION"]
+  threatening:
+    additional_tokens: ["LBL:VIOLENT_THREAT"]
+  incitement:
+    additional_tokens: ["LBL:ACCELERATIONISM"]
+  inferiority:
+    additional_tokens: ["LBL:DEHUMANIZATION"]
+  dismissive:
+    additional_tokens: ["LBL:PERSONAL_ATTACK"]
+  dehumanization:
+    additional_tokens: ["LBL:DEHUMANIZATION"]
+
+# Fallback mappings
+fallback_mappings:
+  # Default for unclassified implicit hate
+  default_archetype: "hate_speech"
+  default_tokens:
+    - "LBL:DOGWHISTLE"
+    - "LBL:DEHUMANIZATION"
+
+  # For very low confidence matches
+  low_confidence_archetype: "bullying"
+  low_confidence_tokens:
+    - "LBL:PERSONAL_ATTACK"
+
+# Severity levels for implicit hate classes
+# Used for prioritization and filtering
+severity_levels:
+  critical:
+    - "incitement"
+    - "dehumanization"
+    - "threatening"
+  high:
+    - "inferiority"
+    - "white_grievance"
+  moderate:
+    - "stereotypical"
+    - "irony"
+  low:
+    - "dismissive"
+
+# Detection difficulty (for benchmark purposes)
+# Implicit hate is harder to detect than explicit
+detection_difficulty:
+  hard:  # Most subtle, highest deniability
+    - "irony"
+    - "white_grievance"
+    - "dismissive"
+  medium:  # Recognizable patterns but coded
+    - "stereotypical"
+    - "inferiority"
+  easy:  # Clearer harmful intent
+    - "threatening"
+    - "incitement"
+    - "dehumanization"
+
+# Metadata
+metadata:
+  version: "1.0.0"
+  created: "2024-11-28"
+  author: "OASIS Team"
+  source_dataset: "SALT-NLP/ImplicitHate"
+  description: |
+    Maps ImplicitHate subtle hate speech patterns to OASIS ontology.
+    This dataset focuses on implicit hate that lacks explicit slurs but still
+    conveys harmful messages through coded language, stereotypes, and framing.
+
+    Key insight: Implicit hate often requires more context to detect and
+    can map to multiple OASIS archetypes depending on the rhetorical strategy used.
+
+  statistics:
+    total_samples: 6346
+    implicit_classes: 8
+    primary_archetypes: ["hate_speech", "extremist", "conspiracy", "bullying", "incel_misogyny", "trad", "gamergate", "alpha"]
+    coverage: "Maps 8 implicit hate classes to 8 OASIS archetypes with 15+ label tokens"
+
+  research_notes: |
+    - White grievance often intersects with conspiracy theories (e.g., "great replacement")
+    - Irony provides plausible deniability - classic dogwhistle territory
+    - Implicit hate is harder for automated systems to detect
+    - Stereotypical content may target any demographic group
+    - Incitement and dehumanization are most severe despite being implicit

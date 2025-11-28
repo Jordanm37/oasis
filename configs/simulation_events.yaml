@@ -1,0 +1,928 @@
+# Simulation Events Configuration
+# ================================
+# Events that trigger coordinated behavior changes during simulation.
+# Each event:
+#   - Activates at a step within trigger_step_range
+#   - Lasts for duration_steps
+#   - Affects specific archetypes with behavior modifiers
+#   - Has probability of occurring (0.0-1.0)
+
+events:
+  # ==========================================================================
+  # NEWS EVENTS - Real-world triggers
+  # ==========================================================================
+  
+  - id: celebrity_relationship_drama
+    type: news_event
+    description: "Celebrity couple announces messy breakup with cheating allegations"
+    trigger_step_range: [3, 12]
+    duration_steps: 5
+    probability: 0.85
+    affects_archetypes:
+      - incel_misogyny
+      - alpha
+      - trad
+    modifiers:
+      aggression_boost: 0.35
+      label_frequency_boost: 0.3
+      reply_probability: 0.75
+    topic_keywords:
+      - relationship
+      - dating
+      - cheating
+      - women
+      - loyalty
+      - hypergamy
+      - AWALT
+      - branch swinging
+      - monkey branching
+    inject_narrative: "Another example of female nature revealed. AWALT confirmed. This is why we say what we say."
+
+  - id: influencer_weight_loss
+    type: news_event
+    description: "Celebrity posts dramatic weight loss transformation"
+    trigger_step_range: [5, 15]
+    duration_steps: 4
+    probability: 0.75
+    affects_archetypes:
+      - pro_ana
+      - ed_risk
+    modifiers:
+      aggression_boost: 0.25
+      label_frequency_boost: 0.35
+      create_post_probability: 0.6
+    topic_keywords:
+      - weight
+      - diet
+      - transformation
+      - skinny
+      - goal
+      - thinspo
+      - body check
+      - progress
+    inject_narrative: "See what discipline looks like. No excuses. This is goals."
+
+  - id: metoo_accusation
+    type: news_event
+    description: "New high-profile harassment accusation goes public"
+    trigger_step_range: [8, 20]
+    duration_steps: 5
+    probability: 0.7
+    affects_archetypes:
+      - incel_misogyny
+      - alpha
+      - gamergate
+    modifiers:
+      aggression_boost: 0.45
+      label_frequency_boost: 0.35
+      reply_probability: 0.8
+    topic_keywords:
+      - metoo
+      - accusation
+      - believe
+      - false
+      - witch hunt
+      - cancel
+      - innocent
+    inject_narrative: "Another false accusation. They're destroying men's lives with no evidence. Believe all women is a joke."
+
+  - id: dating_app_study
+    type: news_event
+    description: "Study reveals dating app statistics about user behavior"
+    trigger_step_range: [10, 25]
+    duration_steps: 4
+    probability: 0.65
+    affects_archetypes:
+      - incel_misogyny
+      - alpha
+    modifiers:
+      aggression_boost: 0.3
+      label_frequency_boost: 0.3
+    topic_keywords:
+      - dating apps
+      - 80/20
+      - hypergamy
+      - swipe
+      - matches
+      - height
+      - looks
+    inject_narrative: "The data proves what we've been saying. 80% of women go for 20% of men. It's over for average guys."
+
+  - id: mass_shooting_news
+    type: news_event
+    description: "Mass shooting dominates news cycle"
+    trigger_step_range: [15, 35]
+    duration_steps: 4
+    probability: 0.5
+    affects_archetypes:
+      - extremist
+      - conspiracy
+      - hate_speech
+    modifiers:
+      aggression_boost: 0.5
+      label_frequency_boost: 0.4
+    topic_keywords:
+      - shooting
+      - manifesto
+      - false flag
+      - psyop
+      - gun control
+      - crisis actor
+    inject_narrative: "Watch how they use this. False flag to push their agenda. The narrative is already being crafted."
+
+  - id: economic_crisis_news
+    type: news_event
+    description: "Major economic downturn or job losses announced"
+    trigger_step_range: [12, 30]
+    duration_steps: 5
+    probability: 0.6
+    affects_archetypes:
+      - conspiracy
+      - misinfo
+      - extremist
+    modifiers:
+      aggression_boost: 0.4
+      label_frequency_boost: 0.35
+    topic_keywords:
+      - economy
+      - collapse
+      - reset
+      - planned
+      - elites
+      - WEF
+      - own nothing
+    inject_narrative: "This is all planned. The Great Reset is happening. They want you poor and dependent."
+
+  - id: vaccine_controversy
+    type: news_event
+    description: "New vaccine side effect report surfaces"
+    trigger_step_range: [8, 25]
+    duration_steps: 5
+    probability: 0.65
+    affects_archetypes:
+      - misinfo
+      - conspiracy
+    modifiers:
+      aggression_boost: 0.35
+      label_frequency_boost: 0.4
+    topic_keywords:
+      - vaccine
+      - side effects
+      - VAERS
+      - suppressed
+      - big pharma
+      - myocarditis
+      - died suddenly
+    inject_narrative: "They're finally admitting what we knew all along. How many more have to suffer before people wake up?"
+
+  - id: election_fraud_claim
+    type: news_event
+    description: "Election integrity concerns surface"
+    trigger_step_range: [20, 45]
+    duration_steps: 6
+    probability: 0.55
+    affects_archetypes:
+      - conspiracy
+      - misinfo
+      - extremist
+    modifiers:
+      aggression_boost: 0.45
+      label_frequency_boost: 0.4
+    topic_keywords:
+      - election
+      - fraud
+      - stolen
+      - rigged
+      - dominion
+      - mail-in
+      - audit
+    inject_narrative: "The evidence is overwhelming. They stole it and they're doing it again. Our voices don't matter to them."
+
+  # ==========================================================================
+  # PLATFORM EVENTS - Social media triggers
+  # ==========================================================================
+
+  - id: controversial_account_banned
+    type: platform_action
+    description: "Popular controversial figure suspended from platform"
+    trigger_step_range: [10, 25]
+    duration_steps: 5
+    probability: 0.8
+    affects_archetypes:
+      - conspiracy
+      - misinfo
+      - extremist
+      - gamergate
+      - alpha
+    modifiers:
+      aggression_boost: 0.5
+      label_frequency_boost: 0.4
+      anti_institution_boost: 0.45
+    topic_keywords:
+      - censorship
+      - banned
+      - silenced
+      - truth
+      - free speech
+      - big tech
+      - cancel
+      - deplatformed
+    inject_narrative: "They're silencing anyone who speaks the truth. This proves we're over the target."
+
+  - id: fact_check_controversy
+    type: platform_action
+    description: "Platform adds fact-check labels to popular posts"
+    trigger_step_range: [15, 35]
+    duration_steps: 4
+    probability: 0.7
+    affects_archetypes:
+      - misinfo
+      - conspiracy
+    modifiers:
+      aggression_boost: 0.35
+      label_frequency_boost: 0.3
+    topic_keywords:
+      - fact check
+      - censorship
+      - narrative
+      - control
+      - lies
+      - ministry of truth
+    inject_narrative: "The 'fact checkers' are just pushing their agenda. They fact check truth and let lies spread."
+
+  - id: algorithm_change
+    type: platform_action
+    description: "Platform announces algorithm changes affecting reach"
+    trigger_step_range: [12, 30]
+    duration_steps: 4
+    probability: 0.6
+    affects_archetypes:
+      - conspiracy
+      - misinfo
+      - gamergate
+    modifiers:
+      aggression_boost: 0.3
+      label_frequency_boost: 0.25
+    topic_keywords:
+      - algorithm
+      - shadow ban
+      - suppressed
+      - reach
+      - engagement
+      - throttled
+    inject_narrative: "They're throttling our reach. The algorithm is designed to silence dissent."
+
+  - id: content_policy_update
+    type: platform_action
+    description: "Platform updates content policies, restricting certain speech"
+    trigger_step_range: [18, 40]
+    duration_steps: 5
+    probability: 0.65
+    affects_archetypes:
+      - extremist
+      - hate_speech
+      - conspiracy
+      - misinfo
+    modifiers:
+      aggression_boost: 0.4
+      label_frequency_boost: 0.35
+    topic_keywords:
+      - policy
+      - banned
+      - terms of service
+      - hate speech
+      - misinformation
+      - censorship
+    inject_narrative: "More censorship. They're making it impossible to speak freely. 1984 wasn't supposed to be an instruction manual."
+
+  - id: influencer_canceled
+    type: platform_action
+    description: "Popular influencer gets canceled for old posts"
+    trigger_step_range: [8, 28]
+    duration_steps: 4
+    probability: 0.7
+    affects_archetypes:
+      - gamergate
+      - alpha
+      - incel_misogyny
+    modifiers:
+      aggression_boost: 0.35
+      label_frequency_boost: 0.3
+      reply_probability: 0.7
+    topic_keywords:
+      - canceled
+      - old tweets
+      - mob
+      - outrage
+      - hypocrisy
+      - double standard
+    inject_narrative: "The mob comes for everyone eventually. Cancel culture is cancer."
+
+  # ==========================================================================
+  # CULTURAL EVENTS - Cultural moment triggers
+  # ==========================================================================
+
+  - id: game_diversity_announcement
+    type: cultural_moment
+    description: "Major game studio announces diverse character roster"
+    trigger_step_range: [15, 35]
+    duration_steps: 6
+    probability: 0.75
+    affects_archetypes:
+      - gamergate
+      - trad
+      - incel_misogyny
+    modifiers:
+      aggression_boost: 0.45
+      label_frequency_boost: 0.35
+      create_post_probability: 0.6
+    topic_keywords:
+      - gaming
+      - woke
+      - DEI
+      - forced
+      - agenda
+      - diversity
+      - ruined
+      - politics
+      - sweet baby inc
+    inject_narrative: "They're ruining gaming with forced diversity. Go woke go broke. Keep politics out of games."
+
+  - id: feminist_viral_post
+    type: cultural_moment
+    description: "Feminist content goes viral on social media"
+    trigger_step_range: [5, 25]
+    duration_steps: 4
+    probability: 0.75
+    affects_archetypes:
+      - incel_misogyny
+      - alpha
+      - trad
+    modifiers:
+      aggression_boost: 0.4
+      label_frequency_boost: 0.3
+      reply_probability: 0.7
+    topic_keywords:
+      - feminist
+      - patriarchy
+      - equality
+      - women
+      - toxic masculinity
+      - mansplaining
+    inject_narrative: "More feminist propaganda. They hate men and want to destroy masculinity. This is why society is falling apart."
+
+  - id: body_positivity_campaign
+    type: cultural_moment
+    description: "Brand launches body positivity campaign"
+    trigger_step_range: [10, 30]
+    duration_steps: 4
+    probability: 0.65
+    affects_archetypes:
+      - pro_ana
+      - ed_risk
+    modifiers:
+      aggression_boost: 0.3
+      label_frequency_boost: 0.35
+    topic_keywords:
+      - body positivity
+      - fat
+      - health
+      - glorifying
+      - obesity
+      - plus size
+      - HAES
+    inject_narrative: "Stop glorifying unhealthy bodies. Discipline is what matters. This is promoting death."
+
+  - id: trans_sports_debate
+    type: cultural_moment
+    description: "Trans athlete controversy makes headlines"
+    trigger_step_range: [12, 35]
+    duration_steps: 5
+    probability: 0.7
+    affects_archetypes:
+      - trad
+      - gamergate
+      - hate_speech
+    modifiers:
+      aggression_boost: 0.45
+      label_frequency_boost: 0.4
+    topic_keywords:
+      - trans
+      - sports
+      - women
+      - unfair
+      - biology
+      - gender
+      - protect
+    inject_narrative: "This is destroying women's sports. Biology is real. They're erasing women."
+
+  - id: movie_race_swap
+    type: cultural_moment
+    description: "Classic character race-swapped in new adaptation"
+    trigger_step_range: [8, 28]
+    duration_steps: 5
+    probability: 0.7
+    affects_archetypes:
+      - gamergate
+      - trad
+      - hate_speech
+    modifiers:
+      aggression_boost: 0.4
+      label_frequency_boost: 0.35
+    topic_keywords:
+      - race swap
+      - blackwashing
+      - forced diversity
+      - original
+      - agenda
+      - woke
+      - DEI
+    inject_narrative: "They can't create, only destroy. Make your own characters. Stop ruining classics."
+
+  - id: pride_month_corporate
+    type: cultural_moment
+    description: "Corporate pride month campaigns flood social media"
+    trigger_step_range: [15, 40]
+    duration_steps: 5
+    probability: 0.6
+    affects_archetypes:
+      - trad
+      - hate_speech
+      - extremist
+    modifiers:
+      aggression_boost: 0.4
+      label_frequency_boost: 0.35
+    topic_keywords:
+      - pride
+      - rainbow
+      - corporate
+      - grooming
+      - children
+      - agenda
+      - degeneracy
+    inject_narrative: "They're pushing this on children. It's not about equality anymore. Protect the kids."
+
+  - id: influencer_diet_culture
+    type: cultural_moment
+    description: "Fitness influencer promotes extreme diet"
+    trigger_step_range: [6, 22]
+    duration_steps: 4
+    probability: 0.7
+    affects_archetypes:
+      - pro_ana
+      - ed_risk
+    modifiers:
+      aggression_boost: 0.25
+      label_frequency_boost: 0.4
+      create_post_probability: 0.55
+    topic_keywords:
+      - diet
+      - fasting
+      - calories
+      - skinny
+      - discipline
+      - results
+      - transformation
+    inject_narrative: "This is what dedication looks like. No pain no gain. Stop making excuses."
+
+  - id: red_pill_documentary
+    type: cultural_moment
+    description: "Documentary about manosphere goes viral"
+    trigger_step_range: [18, 40]
+    duration_steps: 5
+    probability: 0.55
+    affects_archetypes:
+      - incel_misogyny
+      - alpha
+    modifiers:
+      aggression_boost: 0.35
+      label_frequency_boost: 0.3
+    topic_keywords:
+      - red pill
+      - documentary
+      - truth
+      - awakening
+      - men's rights
+      - society
+    inject_narrative: "More people are waking up. The truth is spreading. They can't stop the signal."
+
+  # ==========================================================================
+  # CONSPIRACY TRIGGERS
+  # ==========================================================================
+
+  - id: government_announcement
+    type: news_event
+    description: "Government announces new policy or regulation"
+    trigger_step_range: [12, 35]
+    duration_steps: 5
+    probability: 0.7
+    affects_archetypes:
+      - conspiracy
+      - misinfo
+      - extremist
+    modifiers:
+      aggression_boost: 0.4
+      label_frequency_boost: 0.35
+    topic_keywords:
+      - government
+      - control
+      - agenda
+      - deep state
+      - surveillance
+      - freedom
+      - tyranny
+    inject_narrative: "This is just another step in their plan. They're tightening the noose. Wake up."
+
+  - id: mainstream_media_story
+    type: news_event
+    description: "Major news outlet runs controversial story"
+    trigger_step_range: [3, 30]
+    duration_steps: 4
+    probability: 0.75
+    affects_archetypes:
+      - misinfo
+      - conspiracy
+    modifiers:
+      aggression_boost: 0.3
+      label_frequency_boost: 0.25
+    topic_keywords:
+      - MSM
+      - fake news
+      - narrative
+      - propaganda
+      - lies
+      - media
+      - trust
+    inject_narrative: "The mainstream media is lying again. They think we're stupid. Turn off the TV."
+
+  - id: whistleblower_leak
+    type: news_event
+    description: "Whistleblower releases damaging information"
+    trigger_step_range: [20, 45]
+    duration_steps: 5
+    probability: 0.5
+    affects_archetypes:
+      - conspiracy
+      - misinfo
+      - extremist
+    modifiers:
+      aggression_boost: 0.45
+      label_frequency_boost: 0.4
+    topic_keywords:
+      - whistleblower
+      - leak
+      - exposed
+      - cover up
+      - truth
+      - corruption
+      - deep state
+    inject_narrative: "They tried to hide this. The truth always comes out. This is just the tip of the iceberg."
+
+  - id: ufo_disclosure
+    type: news_event
+    description: "Government releases UFO/UAP information"
+    trigger_step_range: [25, 50]
+    duration_steps: 4
+    probability: 0.45
+    affects_archetypes:
+      - conspiracy
+      - misinfo
+    modifiers:
+      aggression_boost: 0.25
+      label_frequency_boost: 0.3
+    topic_keywords:
+      - UFO
+      - UAP
+      - disclosure
+      - aliens
+      - cover up
+      - government
+      - truth
+    inject_narrative: "They're finally admitting it. What else are they hiding? This changes everything."
+
+  - id: billionaire_controversy
+    type: news_event
+    description: "Tech billionaire makes controversial statement"
+    trigger_step_range: [10, 35]
+    duration_steps: 4
+    probability: 0.65
+    affects_archetypes:
+      - conspiracy
+      - extremist
+      - gamergate
+    modifiers:
+      aggression_boost: 0.35
+      label_frequency_boost: 0.3
+    topic_keywords:
+      - billionaire
+      - elite
+      - control
+      - agenda
+      - WEF
+      - globalist
+      - puppet
+    inject_narrative: "These people think they own us. They're not hiding their plans anymore. Time to resist."
+
+  # ==========================================================================
+  # HATE/EXTREMISM TRIGGERS
+  # ==========================================================================
+
+  - id: immigration_news
+    type: news_event
+    description: "News story about immigration policy or incident"
+    trigger_step_range: [8, 30]
+    duration_steps: 5
+    probability: 0.7
+    affects_archetypes:
+      - hate_speech
+      - extremist
+      - conspiracy
+    modifiers:
+      aggression_boost: 0.55
+      label_frequency_boost: 0.45
+    topic_keywords:
+      - immigration
+      - border
+      - invasion
+      - replacement
+      - crime
+      - illegal
+      - migrant
+    inject_narrative: "This is what they want. The replacement is real. Our country is being destroyed."
+
+  - id: political_rally
+    type: cultural_moment
+    description: "Major political rally or protest occurs"
+    trigger_step_range: [20, 45]
+    duration_steps: 4
+    probability: 0.6
+    affects_archetypes:
+      - extremist
+      - hate_speech
+      - conspiracy
+    modifiers:
+      aggression_boost: 0.55
+      label_frequency_boost: 0.4
+    topic_keywords:
+      - rally
+      - protest
+      - movement
+      - revolution
+      - action
+      - rise up
+      - fight
+    inject_narrative: "The time for talk is over. We need action. Our people are waking up."
+
+  - id: crime_statistics_release
+    type: news_event
+    description: "Crime statistics showing demographic patterns released"
+    trigger_step_range: [15, 40]
+    duration_steps: 4
+    probability: 0.55
+    affects_archetypes:
+      - hate_speech
+      - extremist
+    modifiers:
+      aggression_boost: 0.5
+      label_frequency_boost: 0.45
+    topic_keywords:
+      - crime
+      - statistics
+      - despite
+      - facts
+      - truth
+      - patterns
+      - reality
+    inject_narrative: "The numbers don't lie. They hide this data for a reason. We're not allowed to notice."
+
+  - id: interracial_ad_campaign
+    type: cultural_moment
+    description: "Brand runs interracial advertising campaign"
+    trigger_step_range: [10, 35]
+    duration_steps: 4
+    probability: 0.6
+    affects_archetypes:
+      - hate_speech
+      - extremist
+      - trad
+    modifiers:
+      aggression_boost: 0.45
+      label_frequency_boost: 0.4
+    topic_keywords:
+      - advertising
+      - agenda
+      - replacement
+      - propaganda
+      - anti-white
+      - demographic
+    inject_narrative: "Every single time. They're doing this on purpose. It's not organic."
+
+  - id: white_guilt_article
+    type: cultural_moment
+    description: "Article about privilege or systemic racism goes viral"
+    trigger_step_range: [12, 38]
+    duration_steps: 4
+    probability: 0.6
+    affects_archetypes:
+      - hate_speech
+      - extremist
+      - gamergate
+    modifiers:
+      aggression_boost: 0.45
+      label_frequency_boost: 0.35
+    topic_keywords:
+      - privilege
+      - systemic
+      - racism
+      - white guilt
+      - anti-white
+      - CRT
+      - woke
+    inject_narrative: "They want us to hate ourselves. This is psychological warfare. Never apologize."
+
+  # ==========================================================================
+  # BULLYING TRIGGERS
+  # ==========================================================================
+
+  - id: viral_cringe_content
+    type: cultural_moment
+    description: "Embarrassing content about someone goes viral"
+    trigger_step_range: [5, 25]
+    duration_steps: 3
+    probability: 0.8
+    affects_archetypes:
+      - bullying
+      - gamergate
+    modifiers:
+      aggression_boost: 0.45
+      label_frequency_boost: 0.35
+      reply_probability: 0.8
+    topic_keywords:
+      - cringe
+      - embarrassing
+      - exposed
+      - ratio
+      - L
+      - clown
+      - main character
+    inject_narrative: "This is too good. Everyone needs to see this. The internet never forgets."
+
+  - id: public_meltdown
+    type: cultural_moment
+    description: "Public figure has public meltdown or breakdown"
+    trigger_step_range: [10, 30]
+    duration_steps: 3
+    probability: 0.7
+    affects_archetypes:
+      - bullying
+      - gamergate
+      - incel_misogyny
+    modifiers:
+      aggression_boost: 0.4
+      label_frequency_boost: 0.35
+      reply_probability: 0.75
+    topic_keywords:
+      - meltdown
+      - crying
+      - triggered
+      - snowflake
+      - fragile
+      - cope
+      - seethe
+    inject_narrative: "Can't handle the heat. This is what happens when you can't take criticism. Cope and seethe."
+
+  - id: failed_comeback
+    type: cultural_moment
+    description: "Someone's attempt at a comeback fails spectacularly"
+    trigger_step_range: [8, 28]
+    duration_steps: 3
+    probability: 0.7
+    affects_archetypes:
+      - bullying
+      - gamergate
+    modifiers:
+      aggression_boost: 0.35
+      label_frequency_boost: 0.3
+      reply_probability: 0.7
+    topic_keywords:
+      - ratio
+      - L
+      - failed
+      - embarrassing
+      - self-own
+      - clown
+      - cope
+    inject_narrative: "Imagine thinking this was a good idea. The self-own is incredible. Keep digging."
+
+  - id: doxxing_incident
+    type: platform_action
+    description: "Someone's personal information gets leaked"
+    trigger_step_range: [15, 40]
+    duration_steps: 3
+    probability: 0.5
+    affects_archetypes:
+      - bullying
+      - extremist
+    modifiers:
+      aggression_boost: 0.5
+      label_frequency_boost: 0.4
+    topic_keywords:
+      - doxxed
+      - exposed
+      - address
+      - real name
+      - consequences
+      - accountability
+    inject_narrative: "Actions have consequences. They thought they could hide. The internet always finds out."
+
+  # ==========================================================================
+  # ED/PRO-ANA TRIGGERS
+  # ==========================================================================
+
+  - id: celebrity_weight_gain
+    type: news_event
+    description: "Celebrity criticized for weight gain"
+    trigger_step_range: [8, 25]
+    duration_steps: 4
+    probability: 0.7
+    affects_archetypes:
+      - pro_ana
+      - ed_risk
+      - bullying
+    modifiers:
+      aggression_boost: 0.3
+      label_frequency_boost: 0.35
+    topic_keywords:
+      - weight gain
+      - fat
+      - let herself go
+      - discipline
+      - lazy
+      - excuses
+    inject_narrative: "No excuse for this. They have all the resources. Pure laziness and lack of discipline."
+
+  - id: eating_disorder_awareness
+    type: cultural_moment
+    description: "Eating disorder awareness campaign launches"
+    trigger_step_range: [12, 35]
+    duration_steps: 4
+    probability: 0.6
+    affects_archetypes:
+      - pro_ana
+      - ed_risk
+    modifiers:
+      aggression_boost: 0.25
+      label_frequency_boost: 0.3
+    topic_keywords:
+      - recovery
+      - awareness
+      - help
+      - treatment
+      - NEDA
+      - support
+    inject_narrative: "They don't understand. Recovery is giving up. We're stronger than they know."
+
+  - id: fashion_week
+    type: cultural_moment
+    description: "Fashion week showcases thin models"
+    trigger_step_range: [10, 30]
+    duration_steps: 5
+    probability: 0.65
+    affects_archetypes:
+      - pro_ana
+      - ed_risk
+    modifiers:
+      aggression_boost: 0.2
+      label_frequency_boost: 0.4
+      create_post_probability: 0.55
+    topic_keywords:
+      - fashion week
+      - models
+      - thin
+      - runway
+      - goals
+      - thinspo
+      - body check
+    inject_narrative: "This is what perfection looks like. Goals. We can get there too. Stay strong."
+
+  - id: ozempic_trend
+    type: cultural_moment
+    description: "Weight loss drug trend dominates social media"
+    trigger_step_range: [8, 28]
+    duration_steps: 5
+    probability: 0.7
+    affects_archetypes:
+      - pro_ana
+      - ed_risk
+    modifiers:
+      aggression_boost: 0.2
+      label_frequency_boost: 0.35
+    topic_keywords:
+      - ozempic
+      - weight loss
+      - skinny
+      - cheating
+      - natural
+      - discipline
+      - results
+    inject_narrative: "Cheating with drugs. Real discipline is doing it naturally. We're stronger than that."

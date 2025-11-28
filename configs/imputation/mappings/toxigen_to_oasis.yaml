@@ -1,0 +1,380 @@
+# Label Mapping: ToxiGen Dataset -> OASIS Ontology
+# Maps ToxiGen demographic-based hate speech and neutral content to OASIS archetypes
+#
+# ToxiGen Structure:
+# - Prompt types: "hate" (toxic) vs "neutral" (benign)
+# - Demographics: asian, bisexual, black, chinese, immigrant, jewish, latino, lgbtq,
+#                 mental_disability, mexican, middle_east, muslim, native_american,
+#                 physical_disability, trans, women
+
+# Mapping based on prompt type (hate vs neutral)
+label_mappings:
+  # === HATE PROMPTS (Explicit Toxicity) ===
+  hate:
+    archetypes:
+      - archetype: "hate_speech"
+        weight: 0.85
+        tokens:
+          - "LBL:HATE_SLUR"
+          - "LBL:DEHUMANIZATION"
+          - "LBL:EXPLICIT_HATE"  # Meta-marker for explicit hate
+      - archetype: "extremist"
+        weight: 0.15
+        tokens:
+          - "LBL:VIOLENT_THREAT"
+
+  # === NEUTRAL PROMPTS (Benign Content) ===
+  neutral:
+    archetypes:
+      - archetype: "benign"
+        weight: 1.0
+        tokens:
+          - "LBL:SUPPORTIVE"
+
+# Demographic-specific refinements
+# These override or augment the base hate/neutral mapping when demographic context is available
+# Each demographic now includes TARGET_* markers for tracking targeted demographics
+demographic_mappings:
+  # Gender-based hate
+  women:
+    target_marker: "LBL:TARGET_GENDER"
+    archetypes:
+      - archetype: "incel_misogyny"
+        weight: 0.6
+        tokens:
+          - "LBL:INCEL_MISOGYNY"
+          - "LBL:OBJECTIFICATION"
+          - "LBL:MISOGYNISTIC_LECTURE"
+          - "LBL:TARGET_GENDER"
+      - archetype: "hate_speech"
+        weight: 0.4
+        tokens:
+          - "LBL:HATE_SLUR"
+          - "LBL:DEHUMANIZATION"
+          - "LBL:STEREOTYPE"
+
+  # LGBTQ+ groups
+  lgbtq:
+    target_marker: "LBL:TARGET_SEXUALITY"
+    archetypes:
+      - archetype: "hate_speech"
+        weight: 0.7
+        tokens:
+          - "LBL:HATE_SLUR"
+          - "LBL:DEHUMANIZATION"
+          - "LBL:TARGET_SEXUALITY"
+      - archetype: "trad"
+        weight: 0.3
+        tokens:
+          - "LBL:GENDER_ESSENTIALISM"
+          - "LBL:DOGWHISTLE"
+          - "LBL:PURITY_RHETORIC"
+
+  bisexual:
+    target_marker: "LBL:TARGET_SEXUALITY"
+    archetypes:
+      - archetype: "hate_speech"
+        weight: 0.7
+        tokens:
+          - "LBL:HATE_SLUR"
+          - "LBL:DEHUMANIZATION"
+          - "LBL:TARGET_SEXUALITY"
+      - archetype: "trad"
+        weight: 0.3
+        tokens:
+          - "LBL:GENDER_ESSENTIALISM"
+
+  trans:
+    target_marker: "LBL:TARGET_GENDER"
+    archetypes:
+      - archetype: "hate_speech"
+        weight: 0.6
+        tokens:
+          - "LBL:HATE_SLUR"
+          - "LBL:DEHUMANIZATION"
+          - "LBL:TARGET_GENDER"
+      - archetype: "trad"
+        weight: 0.4
+        tokens:
+          - "LBL:GENDER_ESSENTIALISM"
+          - "LBL:DOGWHISTLE"
+
+  # Racial/Ethnic groups
+  asian:
+    target_marker: "LBL:TARGET_RACIAL"
+    archetypes:
+      - archetype: "hate_speech"
+        weight: 0.9
+        tokens:
+          - "LBL:HATE_SLUR"
+          - "LBL:DEHUMANIZATION"
+          - "LBL:TARGET_RACIAL"
+          - "LBL:STEREOTYPE"
+      - archetype: "conspiracy"
+        weight: 0.1
+        tokens:
+          - "LBL:CONSPIRACY"
+
+  black:
+    target_marker: "LBL:TARGET_RACIAL"
+    archetypes:
+      - archetype: "hate_speech"
+        weight: 0.95
+        tokens:
+          - "LBL:HATE_SLUR"
+          - "LBL:DEHUMANIZATION"
+          - "LBL:TARGET_RACIAL"
+          - "LBL:INFERIORITY_CLAIM"
+      - archetype: "extremist"
+        weight: 0.05
+        tokens:
+          - "LBL:ACCELERATIONISM"
+
+  chinese:
+    target_marker: "LBL:TARGET_RACIAL"
+    archetypes:
+      - archetype: "hate_speech"
+        weight: 0.7
+        tokens:
+          - "LBL:HATE_SLUR"
+          - "LBL:DEHUMANIZATION"
+          - "LBL:TARGET_RACIAL"
+          - "LBL:VERMIN_COMPARISON"
+      - archetype: "conspiracy"
+        weight: 0.2
+        tokens:
+          - "LBL:CONSPIRACY"
+          - "LBL:ANTI_INSTITUTION"
+      - archetype: "misinfo"
+        weight: 0.1
+        tokens:
+          - "LBL:MISINFO_CLAIM"
+
+  latino:
+    target_marker: "LBL:TARGET_RACIAL"
+    archetypes:
+      - archetype: "hate_speech"
+        weight: 0.9
+        tokens:
+          - "LBL:HATE_SLUR"
+          - "LBL:DEHUMANIZATION"
+          - "LBL:TARGET_RACIAL"
+      - archetype: "misinfo"
+        weight: 0.1
+        tokens:
+          - "LBL:MISINFO_CLAIM"
+
+  mexican:
+    target_marker: "LBL:TARGET_NATIONAL"
+    archetypes:
+      - archetype: "hate_speech"
+        weight: 0.85
+        tokens:
+          - "LBL:HATE_SLUR"
+          - "LBL:DEHUMANIZATION"
+          - "LBL:TARGET_NATIONAL"
+          - "LBL:VERMIN_COMPARISON"
+      - archetype: "misinfo"
+        weight: 0.15
+        tokens:
+          - "LBL:MISINFO_CLAIM"
+          - "LBL:ANTI_INSTITUTION"
+          - "LBL:REPLACEMENT_RHETORIC"
+
+  # Religious groups
+  jewish:
+    target_marker: "LBL:TARGET_RELIGIOUS"
+    archetypes:
+      - archetype: "hate_speech"
+        weight: 0.6
+        tokens:
+          - "LBL:HATE_SLUR"
+          - "LBL:DEHUMANIZATION"
+          - "LBL:TARGET_RELIGIOUS"
+      - archetype: "conspiracy"
+        weight: 0.3
+        tokens:
+          - "LBL:CONSPIRACY"
+          - "LBL:CONSPIRACY_NARRATIVE"
+          - "LBL:DEEPSTATE"
+          - "LBL:REPLACEMENT_RHETORIC"
+      - archetype: "extremist"
+        weight: 0.1
+        tokens:
+          - "LBL:ACCELERATIONISM"
+
+  muslim:
+    target_marker: "LBL:TARGET_RELIGIOUS"
+    archetypes:
+      - archetype: "hate_speech"
+        weight: 0.7
+        tokens:
+          - "LBL:HATE_SLUR"
+          - "LBL:DEHUMANIZATION"
+          - "LBL:TARGET_RELIGIOUS"
+      - archetype: "misinfo"
+        weight: 0.2
+        tokens:
+          - "LBL:MISINFO_CLAIM"
+      - archetype: "extremist"
+        weight: 0.1
+        tokens:
+          - "LBL:VIOLENT_THREAT"
+
+  # Regional/National groups
+  immigrant:
+    target_marker: "LBL:TARGET_NATIONAL"
+    archetypes:
+      - archetype: "hate_speech"
+        weight: 0.6
+        tokens:
+          - "LBL:HATE_SLUR"
+          - "LBL:DEHUMANIZATION"
+          - "LBL:TARGET_NATIONAL"
+          - "LBL:VERMIN_COMPARISON"
+      - archetype: "misinfo"
+        weight: 0.25
+        tokens:
+          - "LBL:MISINFO_CLAIM"
+          - "LBL:ANTI_INSTITUTION"
+          - "LBL:REPLACEMENT_RHETORIC"
+      - archetype: "conspiracy"
+        weight: 0.15
+        tokens:
+          - "LBL:CONSPIRACY"
+          - "LBL:GRIEVANCE_FRAMING"
+
+  middle_east:
+    target_marker: "LBL:TARGET_RACIAL"
+    archetypes:
+      - archetype: "hate_speech"
+        weight: 0.7
+        tokens:
+          - "LBL:HATE_SLUR"
+          - "LBL:DEHUMANIZATION"
+          - "LBL:TARGET_RACIAL"
+      - archetype: "misinfo"
+        weight: 0.2
+        tokens:
+          - "LBL:MISINFO_CLAIM"
+      - archetype: "conspiracy"
+        weight: 0.1
+        tokens:
+          - "LBL:CONSPIRACY"
+
+  native_american:
+    target_marker: "LBL:TARGET_RACIAL"
+    archetypes:
+      - archetype: "hate_speech"
+        weight: 0.9
+        tokens:
+          - "LBL:HATE_SLUR"
+          - "LBL:DEHUMANIZATION"
+          - "LBL:TARGET_RACIAL"
+          - "LBL:STEREOTYPE"
+      - archetype: "misinfo"
+        weight: 0.1
+        tokens:
+          - "LBL:MISINFO_CLAIM"
+
+  # Disability groups
+  mental_disability:
+    target_marker: "LBL:TARGET_DISABILITY"
+    archetypes:
+      - archetype: "hate_speech"
+        weight: 0.6
+        tokens:
+          - "LBL:HATE_SLUR"
+          - "LBL:DEHUMANIZATION"
+          - "LBL:TARGET_DISABILITY"
+          - "LBL:INFERIORITY_CLAIM"
+      - archetype: "bullying"
+        weight: 0.4
+        tokens:
+          - "LBL:PERSONAL_ATTACK"
+
+  physical_disability:
+    target_marker: "LBL:TARGET_DISABILITY"
+    archetypes:
+      - archetype: "hate_speech"
+        weight: 0.6
+        tokens:
+          - "LBL:HATE_SLUR"
+          - "LBL:DEHUMANIZATION"
+          - "LBL:TARGET_DISABILITY"
+          - "LBL:INFERIORITY_CLAIM"
+      - archetype: "bullying"
+        weight: 0.4
+        tokens:
+          - "LBL:PERSONAL_ATTACK"
+
+# Combination rules for annotated data (when multiple labels present)
+combination_rules:
+  # High toxicity scores (from annotated data)
+  - condition:
+      toxicity_human_gte: 4.0
+    override_archetype: "extremist"
+    priority_tokens:
+      - "LBL:HATE_SLUR"
+      - "LBL:VIOLENT_THREAT"
+      - "LBL:DEHUMANIZATION"
+
+  # Moderate toxicity
+  - condition:
+      toxicity_human_gte: 2.5
+      toxicity_human_lt: 4.0
+    priority_tokens:
+      - "LBL:HATE_SLUR"
+      - "LBL:DEHUMANIZATION"
+
+  # Stereotyping content
+  - condition:
+      stereotyping_eq: 1
+    additional_tokens:
+      - "LBL:DEHUMANIZATION"
+
+  # Threatening content
+  - condition:
+      intent_eq: "threatening"
+    override_archetype: "extremist"
+    priority_tokens:
+      - "LBL:VIOLENT_THREAT"
+
+# Fallback mappings
+fallback_mappings:
+  # Default for unknown hate content
+  default_archetype: "hate_speech"
+  default_tokens:
+    - "LBL:HATE_SLUR"
+
+  # For content that doesn't match any pattern
+  low_confidence_archetype: "benign"
+  low_confidence_tokens:
+    - "LBL:SUPPORTIVE"
+
+# Token aliases for compatibility with ontology_unified.yaml
+token_aliases:
+  "LBL:RACIAL_SLUR": "LBL:HATE_SLUR"
+  "LBL:ETHNIC_ATTACK": "LBL:HATE_SLUR"
+  "LBL:RELIGIOUS_HATE": "LBL:HATE_SLUR"
+  "LBL:HOMOPHOBIC_SLUR": "LBL:HATE_SLUR"
+  "LBL:TRANSPHOBIC_SLUR": "LBL:HATE_SLUR"
+  "LBL:ABLEIST_SLUR": "LBL:HATE_SLUR"
+
+# Metadata
+metadata:
+  version: "1.0.0"
+  created: "2024-11-28"
+  author: "OASIS Team"
+  source_dataset: "toxigen/toxigen-data"
+  description: |
+    Maps ToxiGen explicit hate speech dataset to OASIS ontology.
+    ToxiGen contains hate speech and neutral content targeting 16 demographic groups.
+    This mapping handles both the general hate/neutral split and demographic-specific refinements.
+
+  statistics:
+    total_demographics: 16
+    hate_prompts_per_demo: 1000
+    neutral_prompts_per_demo: 1000
+    primary_archetypes: ["hate_speech", "incel_misogyny", "extremist", "conspiracy", "misinfo", "trad"]
+    coverage: "Maps 16 demographic groups to 6 OASIS archetypes with 15+ label tokens"

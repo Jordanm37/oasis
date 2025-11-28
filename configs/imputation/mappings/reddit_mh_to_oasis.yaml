@@ -1,0 +1,116 @@
+# Label Mapping: Reddit Mental Health -> OASIS Ontology
+# Maps Reddit mental health categories to OASIS archetypes and label tokens
+
+label_mappings:
+  eating_disorders:
+    archetypes:
+      - archetype: "ed_risk"
+        weight: 0.7
+        tokens:
+          - "LBL:ED_RISK"
+          - "LBL:ED_METHOD"
+          - "LBL:SELF_HARM"
+      - archetype: "pro_ana"
+        weight: 0.3
+        tokens:
+          - "LBL:THINSPO"
+          - "LBL:GOAL_WEIGHT"
+
+  pro_ed:
+    archetypes:
+      - archetype: "pro_ana"
+        weight: 0.9
+        tokens:
+          - "LBL:MEANSPO"
+          - "LBL:ED_COACHING"
+          - "LBL:THINSPO"
+          - "LBL:PURGE_TIP"
+
+  recovery:
+    archetypes:
+      - archetype: "recovery_support"
+        weight: 1.0
+        tokens:
+          - "LBL:RECOVERY_SUPPORT"
+          - "LBL:SUPPORTIVE"
+          - "LBL:PEER_SUPPORT"
+          - "LBL:COPING_TIP"
+          - "LBL:MILESTONE"
+
+  self_harm:
+    archetypes:
+      - archetype: "ed_risk"
+        weight: 0.6
+        tokens:
+          - "LBL:SELF_HARM"
+          - "LBL:ED_RISK"
+      - archetype: "recovery_support"
+        weight: 0.4
+        tokens:
+          - "LBL:RECOVERY_SUPPORT"
+          - "LBL:PEER_SUPPORT"
+
+  support_seeking:
+    archetypes:
+      - archetype: "recovery_support"
+        weight: 0.8
+        tokens:
+          - "LBL:SUPPORTIVE"
+          - "LBL:PEER_SUPPORT"
+      - archetype: "benign"
+        weight: 0.2
+        tokens:
+          - "LBL:SUPPORTIVE"
+          - "LBL:HELPFUL"
+
+  depression:
+    archetypes:
+      - archetype: "recovery_support"
+        weight: 0.6
+        tokens:
+          - "LBL:PEER_SUPPORT"
+          - "LBL:COPING_TIP"
+      - archetype: "benign"
+        weight: 0.4
+        tokens:
+          - "LBL:SUPPORTIVE"
+
+  anxiety:
+    archetypes:
+      - archetype: "recovery_support"
+        weight: 0.5
+        tokens:
+          - "LBL:COPING_TIP"
+          - "LBL:PEER_SUPPORT"
+      - archetype: "benign"
+        weight: 0.5
+        tokens:
+          - "LBL:SUPPORTIVE"
+          - "LBL:HELPFUL"
+
+combination_rules:
+  - condition:
+      all_of: ["eating_disorders", "recovery"]
+    override_archetype: "recovery_support"
+    priority_tokens:
+      - "LBL:RECOVERY_SUPPORT"
+      - "LBL:MILESTONE"
+
+  - condition:
+      all_of: ["pro_ed", "self_harm"]
+    override_archetype: "pro_ana"
+    priority_tokens:
+      - "LBL:ED_COACHING"
+      - "LBL:PURGE_TIP"
+
+fallback_mappings:
+  default_archetype: "benign"
+  default_tokens:
+    - "LBL:SUPPORTIVE"
+    - "LBL:FRIENDLY"
+
+metadata:
+  version: "1.0.0"
+  created: "2024-01-01"
+  author: "OASIS Team"
+  description: "Maps Reddit mental health categories to OASIS ontology with focus on ED and recovery content"

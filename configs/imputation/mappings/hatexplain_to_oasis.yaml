@@ -1,0 +1,144 @@
+# Label Mapping: HateXplain -> OASIS Ontology
+# Maps HateXplain's 3-class scheme with target annotations to OASIS archetypes
+#
+# HateXplain Structure:
+# - label: hatespeech, offensive, normal
+# - target_groups: African, Islam, Jewish, LGBTQ, Women, etc.
+# - rationales: token-level explanations (unique feature)
+
+label_mappings:
+  # === HATESPEECH ===
+  hatespeech:
+    archetypes:
+      - archetype: "hate_speech"
+        weight: 0.85
+        tokens:
+          - "LBL:HATE_SLUR"
+          - "LBL:DEHUMANIZATION"
+          - "LBL:EXPLICIT_HATE"
+      - archetype: "extremist"
+        weight: 0.15
+        tokens:
+          - "LBL:VIOLENT_THREAT"
+          - "LBL:CALL_TO_VIOLENCE"
+
+  # === OFFENSIVE ===
+  offensive:
+    archetypes:
+      - archetype: "bullying"
+        weight: 0.7
+        tokens:
+          - "LBL:OFFENSIVE_LANGUAGE"
+          - "LBL:PERSONAL_ATTACK"
+          - "LBL:PROFANITY"
+      - archetype: "hate_speech"
+        weight: 0.3
+        tokens:
+          - "LBL:OFFENSIVE_LANGUAGE"
+          - "LBL:DOGWHISTLE"
+
+  # === NORMAL ===
+  normal:
+    archetypes:
+      - archetype: "benign"
+        weight: 1.0
+        tokens:
+          - "LBL:SUPPORTIVE"
+
+# Target group mappings (similar to ToxiGen)
+target_mappings:
+  African:
+    target_marker: "LBL:TARGET_RACIAL"
+    additional_tokens:
+      - "LBL:DEHUMANIZATION"
+      - "LBL:INFERIORITY_CLAIM"
+
+  Islam:
+    target_marker: "LBL:TARGET_RELIGIOUS"
+    additional_tokens:
+      - "LBL:DEHUMANIZATION"
+
+  Jewish:
+    target_marker: "LBL:TARGET_RELIGIOUS"
+    additional_tokens:
+      - "LBL:CONSPIRACY"
+      - "LBL:DEEPSTATE"
+
+  LGBTQ:
+    target_marker: "LBL:TARGET_SEXUALITY"
+    additional_tokens:
+      - "LBL:GENDER_ESSENTIALISM"
+
+  Women:
+    target_marker: "LBL:TARGET_GENDER"
+    additional_tokens:
+      - "LBL:MISOGYNISTIC_LECTURE"
+      - "LBL:OBJECTIFICATION"
+
+  Refugee:
+    target_marker: "LBL:TARGET_NATIONAL"
+    additional_tokens:
+      - "LBL:REPLACEMENT_RHETORIC"
+
+  Arab:
+    target_marker: "LBL:TARGET_RACIAL"
+    additional_tokens:
+      - "LBL:STEREOTYPE"
+
+  Caucasian:
+    target_marker: "LBL:TARGET_RACIAL"
+    additional_tokens: []
+
+  Hispanic:
+    target_marker: "LBL:TARGET_RACIAL"
+    additional_tokens:
+      - "LBL:STEREOTYPE"
+
+  Asian:
+    target_marker: "LBL:TARGET_RACIAL"
+    additional_tokens:
+      - "LBL:STEREOTYPE"
+
+# Combination rules
+combination_rules:
+  # Multiple target groups = more severe
+  - condition:
+      num_targets_gte: 2
+    priority_tokens:
+      - "LBL:DEHUMANIZATION"
+      - "LBL:EXPLICIT_HATE"
+
+  # Hate speech with Women target = check for misogyny
+  - condition:
+      label_eq: "hatespeech"
+      has_target: "Women"
+    override_archetype: "incel_misogyny"
+    priority_tokens:
+      - "LBL:INCEL_MISOGYNY"
+      - "LBL:MISOGYNISTIC_LECTURE"
+
+fallback_mappings:
+  default_archetype: "hate_speech"
+  default_tokens:
+    - "LBL:HATE_SLUR"
+
+  low_confidence_archetype: "benign"
+  low_confidence_tokens:
+    - "LBL:SUPPORTIVE"
+
+metadata:
+  version: "1.0.0"
+  created: "2024-11-28"
+  author: "OASIS Team"
+  source_dataset: "Hate-speech-CNERG/hatexplain"
+  description: |
+    Maps HateXplain dataset to OASIS ontology.
+    Unique feature: This dataset includes token-level rationales explaining
+    why content was labeled as hate/offensive, enabling explainable hate detection.
+
+  statistics:
+    total_samples: 20148
+    classes: 3
+    target_groups: 10
+    has_rationales: true
+    primary_archetypes: ["hate_speech", "bullying", "benign", "incel_misogyny"]

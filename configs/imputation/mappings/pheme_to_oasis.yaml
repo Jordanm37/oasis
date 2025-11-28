@@ -1,0 +1,138 @@
+# Label Mapping: PHEME Rumour Dataset -> OASIS Ontology
+# Maps PHEME rumour/non-rumour labels to OASIS archetypes
+#
+# PHEME Structure:
+# - label: rumour / non-rumour (from directory structure)
+# - events: charliehebdo, ferguson, germanwings-crash, ottawashooting, sydneysiege
+# - tweet metadata: user verification, retweets, reactions
+
+label_mappings:
+  # === RUMOUR ===
+  # Unverified claims spreading during breaking news
+  rumour:
+    archetypes:
+      - archetype: "misinfo"
+        weight: 0.7
+        tokens:
+          - "LBL:RUMOUR"
+          - "LBL:MISINFO_CLAIM"
+      - archetype: "conspiracy"
+        weight: 0.2
+        tokens:
+          - "LBL:RUMOUR"
+          - "LBL:CONSPIRACY"
+      - archetype: "benign"
+        weight: 0.1
+        tokens:
+          - "LBL:RUMOUR"
+
+  # === NON-RUMOUR ===
+  # Verified or factual breaking news
+  non-rumour:
+    archetypes:
+      - archetype: "benign"
+        weight: 1.0
+        tokens:
+          - "LBL:SUPPORTIVE"
+
+# Event-specific adjustments
+event_mappings:
+  # Charlie Hebdo - terrorism, religious conflict context
+  charliehebdo:
+    rumour_adjustments:
+      additional_tokens:
+        - "LBL:TARGET_RELIGIOUS"
+      archetype_weights:
+        conspiracy: 0.25
+
+  # Ferguson - racial justice, police violence context
+  ferguson:
+    rumour_adjustments:
+      additional_tokens:
+        - "LBL:TARGET_RACIAL"
+      archetype_weights:
+        misinfo: 0.8
+
+  # Germanwings - disaster, mental health context
+  germanwings-crash:
+    rumour_adjustments:
+      archetype_weights:
+        misinfo: 0.85
+
+  # Ottawa shooting - terrorism context
+  ottawashooting:
+    rumour_adjustments:
+      additional_tokens:
+        - "LBL:TARGET_RELIGIOUS"
+      archetype_weights:
+        conspiracy: 0.25
+
+  # Sydney siege - terrorism context
+  sydneysiege:
+    rumour_adjustments:
+      additional_tokens:
+        - "LBL:TARGET_RELIGIOUS"
+      archetype_weights:
+        conspiracy: 0.3
+
+# Rules based on engagement metrics
+combination_rules:
+  # High engagement rumours may be more harmful
+  - condition:
+      is_rumour: true
+      retweet_count_gte: 100
+    priority_tokens:
+      - "LBL:RUMOUR"
+      - "LBL:MISINFO_CLAIM"
+
+  # Verified user spreading rumour - unusual pattern
+  - condition:
+      is_rumour: true
+      user_verified: true
+    priority_tokens:
+      - "LBL:MISINFO_CLAIM"
+
+  # Many reactions = contentious/polarizing
+  - condition:
+      is_rumour: true
+      num_reactions_gte: 10
+    additional_tokens:
+      - "LBL:RUMOUR"
+
+fallback_mappings:
+  default_archetype: "misinfo"
+  default_tokens:
+    - "LBL:RUMOUR"
+
+  low_confidence_archetype: "benign"
+  low_confidence_tokens:
+    - "LBL:SUPPORTIVE"
+
+# Rumour severity levels based on event type
+severity_by_event:
+  high:
+    - "charliehebdo"
+    - "ottawashooting"
+    - "sydneysiege"
+  medium:
+    - "ferguson"
+  low:
+    - "germanwings-crash"
+
+metadata:
+  version: "1.0.0"
+  created: "2024-11-28"
+  author: "OASIS Team"
+  source_dataset: "PHEME rumour dataset"
+  description: |
+    Maps PHEME rumour detection dataset to OASIS ontology.
+    Key insight: Rumours during breaking news are distinct from deliberate
+    misinformation - they often spread due to information vacuum and uncertainty
+    rather than malicious intent. The RUMOUR token captures this nuance.
+
+  statistics:
+    total_samples: 5802
+    rumours: 1972
+    non_rumours: 3830
+    events: 5
+    primary_archetypes: ["misinfo", "conspiracy", "benign"]

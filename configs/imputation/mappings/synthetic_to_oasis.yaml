@@ -1,0 +1,195 @@
+# Label Mapping: Synthetic Harmful Content -> OASIS Ontology
+# Direct mapping since synthetic data uses OASIS archetypes
+
+# Direct 1:1 mappings since synthetic data already uses OASIS archetypes
+label_mappings:
+  benign:
+    archetypes:
+      - archetype: "benign"
+        weight: 1.0
+        tokens:
+          - "LBL:SUPPORTIVE"
+          - "LBL:FRIENDLY"
+          - "LBL:HELPFUL"
+          - "LBL:POSITIVE"
+
+  recovery_support:
+    archetypes:
+      - archetype: "recovery_support"
+        weight: 1.0
+        tokens:
+          - "LBL:RECOVERY_SUPPORT"
+          - "LBL:SUPPORTIVE"
+          - "LBL:SELF_HARM"
+          - "LBL:PEER_SUPPORT"
+          - "LBL:COPING_TIP"
+          - "LBL:MILESTONE"
+
+  ed_risk:
+    archetypes:
+      - archetype: "ed_risk"
+        weight: 1.0
+        tokens:
+          - "LBL:ED_RISK"
+          - "LBL:ED_METHOD"
+          - "LBL:ED_PROMO"
+          - "LBL:SELF_HARM"
+          - "LBL:RESTRICTION_TIP"
+          - "LBL:BODY_CHECK"
+          - "LBL:CALORIE_OBSESSION"
+          - "LBL:FASTING_GLORIFY"
+
+  pro_ana:
+    archetypes:
+      - archetype: "pro_ana"
+        weight: 1.0
+        tokens:
+          - "LBL:MEANSPO"
+          - "LBL:ED_COACHING"
+          - "LBL:THINSPO"
+          - "LBL:PURGE_TIP"
+          - "LBL:ACCOUNTABILITY_THREAT"
+          - "LBL:GOAL_WEIGHT"
+
+  incel_misogyny:
+    archetypes:
+      - archetype: "incel_misogyny"
+        weight: 1.0
+        tokens:
+          - "LBL:INCEL_MISOGYNY"
+          - "LBL:INCEL_SLANG"
+          - "LBL:MISOGYNY"
+          - "LBL:HARASSMENT"
+          - "LBL:BLACKPILL"
+          - "LBL:FOID_SLUR"
+          - "LBL:CHAD_COPE"
+          - "LBL:DATING_RANT"
+          - "LBL:LOOKISM"
+
+  alpha:
+    archetypes:
+      - archetype: "alpha"
+        weight: 1.0
+        tokens:
+          - "LBL:MISOGYNISTIC_LECTURE"
+          - "LBL:OBJECTIFICATION"
+          - "LBL:SMV_THEORY"
+          - "LBL:REDPILL_WISDOM"
+          - "LBL:HYPERGAMY_CLAIM"
+          - "LBL:FRAME_CONTROL"
+          - "LBL:PLATE_SPINNING"
+
+  misinfo:
+    archetypes:
+      - archetype: "misinfo"
+        weight: 1.0
+        tokens:
+          - "LBL:MISINFO_CLAIM"
+          - "LBL:MISINFO_SOURCE"
+          - "LBL:ANTI_INSTITUTION"
+          - "LBL:FAKE_STAT"
+          - "LBL:DEBUNKED_CLAIM"
+          - "LBL:FEAR_MONGER"
+          - "LBL:SUPPRESSED_TRUTH"
+
+  conspiracy:
+    archetypes:
+      - archetype: "conspiracy"
+        weight: 1.0
+        tokens:
+          - "LBL:CONSPIRACY"
+          - "LBL:CONSPIRACY_NARRATIVE"
+          - "LBL:DEEPSTATE"
+          - "LBL:ANTI_INSTITUTION"
+          - "LBL:HIDDEN_AGENDA"
+          - "LBL:FALSE_FLAG"
+          - "LBL:COVER_UP"
+          - "LBL:CONTROLLED_OPP"
+          - "LBL:WAKE_UP"
+
+  trad:
+    archetypes:
+      - archetype: "trad"
+        weight: 1.0
+        tokens:
+          - "LBL:DOGWHISTLE"
+          - "LBL:GENDER_ESSENTIALISM"
+          - "LBL:TRAD_AESTHETIC"
+          - "LBL:MODERNITY_CRITIQUE"
+          - "LBL:FAMILY_VALUES"
+          - "LBL:NATURAL_ORDER"
+          - "LBL:DECLINE_NARRATIVE"
+
+  gamergate:
+    archetypes:
+      - archetype: "gamergate"
+        weight: 1.0
+        tokens:
+          - "LBL:CULTURE_WAR"
+          - "LBL:GATEKEEPING"
+          - "LBL:WOKE_AGENDA"
+          - "LBL:FORCED_DIVERSITY"
+          - "LBL:SJW_ATTACK"
+          - "LBL:BOYCOTT_CALL"
+          - "LBL:GAMER_DEFENSE"
+
+  extremist:
+    archetypes:
+      - archetype: "extremist"
+        weight: 1.0
+        tokens:
+          - "LBL:VIOLENT_THREAT"
+          - "LBL:HATE_SLUR"
+          - "LBL:ACCELERATIONISM"
+          - "LBL:RACE_WAR"
+          - "LBL:BOOGALOO"
+          - "LBL:COLLAPSE_WISH"
+          - "LBL:ENEMY_DEHUMANIZE"
+          - "LBL:MARTYR_GLORIFY"
+
+  hate_speech:
+    archetypes:
+      - archetype: "hate_speech"
+        weight: 1.0
+        tokens:
+          - "LBL:HATE_SLUR"
+          - "LBL:DEHUMANIZATION"
+          - "LBL:REPLACEMENT_THEORY"
+          - "LBL:RACIAL_SLUR"
+          - "LBL:RELIGIOUS_HATE"
+          - "LBL:ETHNIC_ATTACK"
+          - "LBL:SUPREMACIST"
+          - "LBL:VERMIN_RHETORIC"
+
+  bullying:
+    archetypes:
+      - archetype: "bullying"
+        weight: 1.0
+        tokens:
+          - "LBL:PERSONAL_ATTACK"
+          - "LBL:DOXXING_THREAT"
+          - "LBL:SUICIDE_BAIT"
+          - "LBL:APPEARANCE_MOCK"
+          - "LBL:PILE_ON"
+          - "LBL:SCREENSHOT_SHAME"
+          - "LBL:GASLIGHT"
+          - "LBL:SOCIAL_EXCLUSION"
+
+# No combination rules needed for direct mapping
+combination_rules: []
+
+# Simple fallback since synthetic data should always have labels
+fallback_mappings:
+  default_archetype: "benign"
+  default_tokens:
+    - "LBL:FRIENDLY"
+    - "LBL:SUPPORTIVE"
+
+metadata:
+  version: "1.0.0"
+  created: "2024-01-01"
+  author: "OASIS Team"
+  description: "Direct 1:1 mapping for synthetic data that already uses OASIS archetypes"
+  statistics:
+    coverage: "Complete coverage of all 13 OASIS archetypes"
+    mapping_type: "direct"

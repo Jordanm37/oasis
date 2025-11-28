@@ -1,0 +1,141 @@
+# Label Mapping: Jigsaw Toxic Comments -> OASIS Ontology
+# Maps Jigsaw dataset labels to OASIS archetypes and label tokens
+
+# Mapping strategy:
+# - Each Jigsaw label can map to multiple OASIS archetypes
+# - Priority weights determine which archetype is selected when multiple labels present
+# - Token preferences specify which label tokens to use for imputation
+
+label_mappings:
+  toxic:
+    # General toxicity can map to multiple archetypes
+    archetypes:
+      - archetype: "hate_speech"
+        weight: 0.3
+        tokens:
+          - "LBL:HATE_SLUR"
+          - "LBL:DEHUMANIZATION"
+      - archetype: "bullying"
+        weight: 0.5
+        tokens:
+          - "LBL:PERSONAL_ATTACK"
+          - "LBL:HARASSMENT"
+      - archetype: "extremist"
+        weight: 0.2
+        tokens:
+          - "LBL:VIOLENT_THREAT"
+
+  severe_toxic:
+    archetypes:
+      - archetype: "hate_speech"
+        weight: 0.6
+        tokens:
+          - "LBL:HATE_SLUR"
+          - "LBL:DEHUMANIZATION"
+          - "LBL:SUPREMACIST"
+      - archetype: "extremist"
+        weight: 0.4
+        tokens:
+          - "LBL:VIOLENT_THREAT"
+          - "LBL:ENEMY_DEHUMANIZE"
+
+  obscene:
+    archetypes:
+      - archetype: "incel_misogyny"
+        weight: 0.3
+        tokens:
+          - "LBL:MISOGYNY"
+          - "LBL:OBJECTIFICATION"
+      - archetype: "bullying"
+        weight: 0.7
+        tokens:
+          - "LBL:PERSONAL_ATTACK"
+          - "LBL:APPEARANCE_MOCK"
+
+  threat:
+    archetypes:
+      - archetype: "extremist"
+        weight: 0.7
+        tokens:
+          - "LBL:VIOLENT_THREAT"
+          - "LBL:DOXXING_THREAT"
+      - archetype: "bullying"
+        weight: 0.3
+        tokens:
+          - "LBL:DOXXING_THREAT"
+          - "LBL:SUICIDE_BAIT"
+
+  insult:
+    archetypes:
+      - archetype: "bullying"
+        weight: 0.8
+        tokens:
+          - "LBL:PERSONAL_ATTACK"
+          - "LBL:APPEARANCE_MOCK"
+          - "LBL:GASLIGHT"
+      - archetype: "hate_speech"
+        weight: 0.2
+        tokens:
+          - "LBL:DEHUMANIZATION"
+
+  identity_hate:
+    archetypes:
+      - archetype: "hate_speech"
+        weight: 0.9
+        tokens:
+          - "LBL:RACIAL_SLUR"
+          - "LBL:RELIGIOUS_HATE"
+          - "LBL:ETHNIC_ATTACK"
+          - "LBL:SUPREMACIST"
+      - archetype: "extremist"
+        weight: 0.1
+        tokens:
+          - "LBL:HATE_SLUR"
+
+# Combination rules for multiple labels
+combination_rules:
+  # When multiple labels are present, how to combine them
+  - condition:
+      all_of: ["severe_toxic", "threat"]
+    override_archetype: "extremist"
+    priority_tokens:
+      - "LBL:VIOLENT_THREAT"
+      - "LBL:ENEMY_DEHUMANIZE"
+
+  - condition:
+      all_of: ["identity_hate", "threat"]
+    override_archetype: "hate_speech"
+    priority_tokens:
+      - "LBL:HATE_SLUR"
+      - "LBL:SUPREMACIST"
+
+  - condition:
+      all_of: ["obscene", "insult"]
+    override_archetype: "bullying"
+    priority_tokens:
+      - "LBL:PERSONAL_ATTACK"
+      - "LBL:HARASSMENT"
+
+# Fallback mappings for unlabeled or ambiguous content
+fallback_mappings:
+  default_archetype: "bullying"
+  default_tokens:
+    - "LBL:PERSONAL_ATTACK"
+
+  # If confidence is low, use benign
+  low_confidence_archetype: "benign"
+  low_confidence_tokens:
+    - "LBL:FRIENDLY"
+
+# Metadata for tracking and versioning
+metadata:
+  version: "1.0.0"
+  created: "2024-01-01"
+  author: "OASIS Team"
+  description: "Maps Jigsaw Toxic Comment Classification labels to OASIS ontology"
+
+  # Statistics about the mapping (to be updated after analysis)
+  statistics:
+    coverage: "Covers 6 Jigsaw labels mapping to 5 OASIS archetypes"
+    primary_archetypes: ["hate_speech", "bullying", "extremist"]
+    total_token_variants: 15
