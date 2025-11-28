@@ -105,7 +105,7 @@ class AdaptiveRateLimiter:
         model: str = None,
         initial_concurrency: int = None,
         min_concurrency: int = 2,
-        max_concurrency: int = 64,
+        max_concurrency: int = 16,
         tpm_limit: int = None,
         rpm_limit: int = None,
         num_keys: int = None,
@@ -188,27 +188,55 @@ class AdaptiveRateLimiter:
         self._semaphore.release()
     
     async def _wait_for_tokens(self, estimated_tokens: int = None):
-        """Wait until we have enough tokens in the bucket."""
+        """Wait until we have enough tokens in the bucket.
+        
+        Uses a lightweight token bucket that:
+        1. Refills at TPM rate over time
+        2. Uses short, non-blocking waits to smooth out bursts
+        3. Respects retry-after hints from rate limit errors
+        """
         if estimated_tokens is None:
             estimated_tokens = self.est_tokens
         
-        async with self._token_lock:
-            # Refill bucket based on time elapsed
+        # First check if we need to wait due to a recent rate limit
+        if hasattr(self, '_retry_after_until'):
             now = time.time()
-            elapsed = now - self._last_token_refill
-            refill_amount = (self.tpm_limit / 60) * elapsed
-            self._token_bucket = min(self._token_bucket + refill_amount, self._token_bucket_max)
-            self._last_token_refill = now
-            
-            # If not enough tokens, wait
-            if self._token_bucket < estimated_tokens:
-                wait_time = (estimated_tokens - self._token_bucket) / (self.tpm_limit / 60)
-                logger.debug(f"Token bucket low, waiting {wait_time:.2f}s")
-                await asyncio.sleep(wait_time)
-                self._token_bucket = estimated_tokens  # Refilled during wait
-            
-            # Consume tokens
+            if now < self._retry_after_until:
+                wait_time = self._retry_after_until - now
+                if wait_time > 0.01:
+                    logger.debug(f"Respecting retry-after: waiting {wait_time:.2f}s")
+                    await asyncio.sleep(min(wait_time, 2.0))
+        
+        # Quick check without lock - if we have plenty of tokens, proceed
+        now = time.time()
+        elapsed = now - self._last_token_refill
+        
+        # Refill tokens (TPM / 60 = tokens per second)
+        refill_rate = self.tpm_limit / 60.0
+        self._token_bucket = min(
+            self._token_bucket + refill_rate * elapsed,
+            self._token_bucket_max
+        )
+        self._last_token_refill = now
+        
+        # If we have enough tokens, deduct and proceed
+        if self._token_bucket >= estimated_tokens:
             self._token_bucket -= estimated_tokens
+            return
+        
+        # Calculate wait time needed to accumulate enough tokens
+        tokens_needed = estimated_tokens - self._token_bucket
+        wait_time = tokens_needed / refill_rate
+        
+        # Cap wait time to prevent long stalls (let rate limit errors handle overflow)
+        wait_time = min(wait_time, 2.0)
+        
+        if wait_time > 0.01:
+            logger.debug(f"TPM throttle: waiting {wait_time:.2f}s for {tokens_needed:.0f} tokens")
+            await asyncio.sleep(wait_time)
+        
+        # After waiting, deduct what we can
+        self._token_bucket = max(0, self._token_bucket - estimated_tokens)
     
     def record_success(self, tokens_used: int = None):
         """Record a successful API call.
@@ -221,17 +249,35 @@ class AdaptiveRateLimiter:
         
         self.stats.record_request(tokens=tokens_used, rate_limited=False)
         
+        # Reset consecutive rate limit counter on success
+        if hasattr(self, '_consecutive_rate_limits'):
+            self._consecutive_rate_limits = 0
+        
         # Check if we should increase concurrency
         self._maybe_increase_concurrency()
     
-    def record_rate_limit(self):
-        """Record a rate limit error (429)."""
+    def record_rate_limit(self, retry_after_ms: int = None):
+        """Record a rate limit error (429).
+        
+        Args:
+            retry_after_ms: If provided, the retry-after hint from the API (in ms)
+        """
         self.stats.record_request(tokens=0, rate_limited=True)
         self._last_rate_limit_time = time.time()
         self._consecutive_success_windows = 0
         
-        # Immediately reduce concurrency
-        self._reduce_concurrency()
+        # Track consecutive rate limits for exponential backoff
+        if not hasattr(self, '_consecutive_rate_limits'):
+            self._consecutive_rate_limits = 0
+        self._consecutive_rate_limits += 1
+        
+        # Store retry-after hint for next request
+        if retry_after_ms is not None:
+            self._retry_after_until = time.time() + (retry_after_ms / 1000.0)
+            logger.debug(f"Rate limit: will wait {retry_after_ms}ms before next request")
+        
+        # Immediately reduce concurrency (more aggressive with consecutive limits)
+        self._reduce_concurrency(aggressive=self._consecutive_rate_limits > 2)
     
     def record_error(self, is_rate_limit: bool = False):
         """Record an API error.
@@ -245,21 +291,31 @@ class AdaptiveRateLimiter:
             # Other errors don't affect rate limiting
             self.stats.record_request(tokens=0, rate_limited=False)
     
-    def _reduce_concurrency(self):
-        """Reduce concurrency after a rate limit error."""
+    def _reduce_concurrency(self, aggressive: bool = False):
+        """Reduce concurrency after a rate limit error.
+        
+        Args:
+            aggressive: If True, reduce by 50% instead of 25%
+        """
         now = time.time()
-        if now - self._last_adjustment_time < self.adjustment_interval:
+        # Allow faster adjustments when aggressive (consecutive rate limits)
+        min_interval = self.adjustment_interval / 2 if aggressive else self.adjustment_interval
+        if now - self._last_adjustment_time < min_interval:
             return  # Too soon since last adjustment
         
         old_concurrency = self.current_concurrency
-        # Reduce by 25%, minimum 1
-        reduction = max(1, self.current_concurrency // 4)
+        # Reduce by 50% if aggressive, 25% otherwise
+        if aggressive:
+            reduction = max(1, self.current_concurrency // 2)
+        else:
+            reduction = max(1, self.current_concurrency // 4)
         self.current_concurrency = max(self.min_concurrency, self.current_concurrency - reduction)
         
         if self.current_concurrency != old_concurrency:
             self._last_adjustment_time = now
             logger.warning(
                 f"Rate limit hit! Reducing concurrency: {old_concurrency} -> {self.current_concurrency}"
+                f"{' (aggressive)' if aggressive else ''}"
             )
             # Note: We don't actually resize the semaphore mid-run
             # The new limit takes effect as slots are released
@@ -366,7 +422,14 @@ class AdaptiveRateLimiterContext:
         if exc_type is not None:
             error_str = str(exc_val).lower()
             if "429" in error_str or "rate limit" in error_str or "too many requests" in error_str:
-                self.limiter.record_rate_limit()
+                # Try to extract retry-after hint from error message
+                # Format: "Please try again in 481ms"
+                retry_after_ms = None
+                import re
+                match = re.search(r'try again in (\d+)ms', error_str)
+                if match:
+                    retry_after_ms = int(match.group(1))
+                self.limiter.record_rate_limit(retry_after_ms=retry_after_ms)
         
         return False  # Don't suppress exceptions
 

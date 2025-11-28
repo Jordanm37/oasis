@@ -4,7 +4,11 @@ metadata:
   notes:
     - Unified ontology merging Eva's 6-class LLM ontology with the expanded 13-class manifest.
     - 13 archetypes total covering harmful content, recovery, and benign personas.
-    - 25 unique label tokens for fine-grained content classification.
+    - 56 unique label tokens for fine-grained content classification.
+    - Includes demographic target markers (TARGET_*) from ToxiGen analysis.
+    - Includes implicit hate rhetorical strategy markers from ImplicitHate dataset.
+    - Includes severity/explicitness markers (EXPLICIT_HATE, IMPLICIT_HATE).
+    - Includes additional tokens from Davidson, HateXplain, PHEME, Gab Hate Corpus.
 
 dataset_schema:
   twitter:
@@ -57,6 +61,7 @@ labels:
     guidelines:
       - Use sparingly to highlight positive acknowledgements.
       - Works best near the end of the sentence.
+      - Use only when primary intent is encouragement, not just casual chit-chat.
     default_frequency:
       min: 0.05
       max: 0.2
@@ -67,6 +72,7 @@ labels:
     description: Marker for recovery/exit/supportive-to-leavers content.
     guidelines:
       - Use when offering help or sharing progress about leaving harmful spaces.
+      - Includes exit/de-radicalization support, not just ED recovery.
       - Keep tone non-judgmental.
     default_frequency:
       min: 0.05
@@ -79,6 +85,7 @@ labels:
     guidelines:
       - Use when promoting or reinforcing disordered eating behaviors.
       - Avoid clustering multiple markers in one sentence.
+      - Do NOT use for neutral clinical discussion or recovery-framed talk.
     default_frequency:
       min: 0.05
       max: 0.2
@@ -99,6 +106,7 @@ labels:
     description: Marker for misinformation claims.
     guidelines:
       - Insert when presenting a disputed or verifiably false claim as fact.
+      - Focus on factual falsity (e.g., health, elections) rather than hidden plots.
     default_frequency:
       min: 0.05
       max: 0.2
@@ -109,6 +117,7 @@ labels:
     description: Marker for conspiracy narratives.
     guidelines:
       - Use when asserting hidden plots, cabals, or secret control narratives.
+      - Distinct from simple misinfo; requires a hidden agent/plot.
     default_frequency:
       min: 0.05
       max: 0.2
@@ -210,6 +219,7 @@ labels:
     description: Marker for hate speech slurs.
     guidelines:
       - Use when employing derogatory slurs targeting identity groups.
+      - If used in a targeted attack on an individual, co-tag with <LBL:PERSONAL_ATTACK>.
     default_frequency:
       min: 0.02
       max: 0.15
@@ -230,6 +240,7 @@ labels:
     description: Marker for dehumanizing rhetoric.
     guidelines:
       - Use when comparing people to animals, vermin, or diseases.
+      - Prefer for group-based comparisons; use <LBL:HATE_SLUR> only if a literal slur appears.
     default_frequency:
       min: 0.02
       max: 0.15
@@ -240,6 +251,7 @@ labels:
     description: Marker for targeted personal attacks.
     guidelines:
       - Use when directing insults or harassment at specific individuals.
+      - If a slur is used, co-tag with <LBL:HATE_SLUR>.
     default_frequency:
       min: 0.03
       max: 0.2
@@ -260,6 +272,7 @@ labels:
     description: Marker for suicide baiting content.
     guidelines:
       - Use when encouraging self-harm in others.
+      - Only for explicit encouragement (e.g., "kys"), not just general insults.
     default_frequency:
       min: 0.01
       max: 0.05
@@ -270,6 +283,7 @@ labels:
     description: Marker for detailed conspiracy narratives.
     guidelines:
       - Use when constructing elaborate conspiracy theories.
+      - Use for longer, story-like constructions; can co-tag with <LBL:CONSPIRACY>.
     default_frequency:
       min: 0.02
       max: 0.15
@@ -280,6 +294,7 @@ labels:
     description: Marker for deep state references.
     guidelines:
       - Use when referencing hidden government actors or shadow control.
+      - Specific to government/bureaucratic control; can co-tag with <LBL:CONSPIRACY>.
     default_frequency:
       min: 0.02
       max: 0.12
@@ -290,6 +305,7 @@ labels:
     description: Marker for anti-institutional rhetoric.
     guidelines:
       - Use when attacking mainstream institutions as corrupt or controlled.
+      - Use for legitimacy attacks without necessarily a clear hidden-cabal story.
     default_frequency:
       min: 0.02
       max: 0.15
@@ -300,6 +316,7 @@ labels:
     description: Marker for specific ED methods.
     guidelines:
       - Use when sharing specific restrictive eating techniques.
+      - Only for operational "how-to" content, not general admiration.
     default_frequency:
       min: 0.02
       max: 0.12
@@ -310,6 +327,7 @@ labels:
     description: Marker for ED promotion content.
     guidelines:
       - Use when glorifying or promoting eating disorders.
+      - Use for general glorification/normalization without specific methods.
     default_frequency:
       min: 0.02
       max: 0.12
@@ -320,10 +338,406 @@ labels:
     description: Marker for self-harm content.
     guidelines:
       - Use when discussing or promoting self-harm behaviors.
+      - Use for non-ED self-harm; cross-tag with ED labels only if ED is central.
     default_frequency:
       min: 0.01
       max: 0.08
     dataset_field: label_tokens
+
+  # ============================================================
+  # DEMOGRAPHIC TARGET MARKERS (from ToxiGen analysis)
+  # These mark WHICH group is being targeted by hate content
+  # ============================================================
+  target_racial:
+    token: "<LBL:TARGET_RACIAL>"
+    description: Marker indicating racial/ethnic group targeting.
+    guidelines:
+      - Use when hate content targets Black, Asian, Latino, Native American, or other racial/ethnic groups.
+      - Co-tag with rhetorical strategy markers (e.g., DEHUMANIZATION, STEREOTYPE).
+      - Helps track which demographics are targeted in simulations.
+    default_frequency:
+      min: 0.02
+      max: 0.15
+    dataset_field: label_tokens
+    dataset_sources: ["toxigen"]
+
+  target_religious:
+    token: "<LBL:TARGET_RELIGIOUS>"
+    description: Marker indicating religious group targeting.
+    guidelines:
+      - Use when hate content targets Jewish, Muslim, Christian, or other religious groups.
+      - Often co-occurs with CONSPIRACY or REPLACEMENT_RHETORIC for antisemitic content.
+    default_frequency:
+      min: 0.02
+      max: 0.15
+    dataset_field: label_tokens
+    dataset_sources: ["toxigen"]
+
+  target_gender:
+    token: "<LBL:TARGET_GENDER>"
+    description: Marker indicating gender-based targeting.
+    guidelines:
+      - Use when hate targets women or trans individuals based on gender.
+      - Distinct from INCEL_MISOGYNY which is about the incel worldview specifically.
+      - Co-tag with OBJECTIFICATION or GENDER_ESSENTIALISM as appropriate.
+    default_frequency:
+      min: 0.02
+      max: 0.15
+    dataset_field: label_tokens
+    dataset_sources: ["toxigen"]
+
+  target_sexuality:
+    token: "<LBL:TARGET_SEXUALITY>"
+    description: Marker indicating LGBTQ+ targeting.
+    guidelines:
+      - Use when hate content targets gay, lesbian, bisexual, or queer individuals.
+      - For trans-specific targeting, prefer TARGET_GENDER with GENDER_ESSENTIALISM.
+    default_frequency:
+      min: 0.02
+      max: 0.15
+    dataset_field: label_tokens
+    dataset_sources: ["toxigen"]
+
+  target_disability:
+    token: "<LBL:TARGET_DISABILITY>"
+    description: Marker indicating disability-based targeting (ableism).
+    guidelines:
+      - Use when hate content targets people with mental or physical disabilities.
+      - Often involves DEHUMANIZATION or INFERIORITY_CLAIM rhetoric.
+    default_frequency:
+      min: 0.02
+      max: 0.12
+    dataset_field: label_tokens
+    dataset_sources: ["toxigen"]
+
+  target_national:
+    token: "<LBL:TARGET_NATIONAL>"
+    description: Marker indicating nationality/immigration-based targeting.
+    guidelines:
+      - Use when hate content targets immigrants, refugees, or specific nationalities.
+      - Often co-occurs with REPLACEMENT_RHETORIC or MISINFO_CLAIM.
+    default_frequency:
+      min: 0.02
+      max: 0.15
+    dataset_field: label_tokens
+    dataset_sources: ["toxigen"]
+
+  # ============================================================
+  # IMPLICIT HATE RHETORICAL STRATEGIES (from ImplicitHate analysis)
+  # These mark HOW hate is expressed, especially subtle/coded forms
+  # ============================================================
+  grievance_framing:
+    token: "<LBL:GRIEVANCE_FRAMING>"
+    description: Marker for victimhood/grievance rhetoric framing the in-group as oppressed.
+    guidelines:
+      - Use when content frames majority/dominant groups as victims (e.g., "white genocide").
+      - Distinct from legitimate grievances; focuses on manufactured victimhood.
+      - Often co-occurs with CONSPIRACY or REPLACEMENT_RHETORIC.
+    default_frequency:
+      min: 0.02
+      max: 0.12
+    dataset_field: label_tokens
+    dataset_sources: ["implicit_hate"]
+    implicit_hate_class: "white_grievance"
+
+  ironic_hate:
+    token: "<LBL:IRONIC_HATE>"
+    description: Marker for "just joking" or ironic hate speech with plausible deniability.
+    guidelines:
+      - Use when hate is disguised as humor, sarcasm, or irony.
+      - Provides plausible deniability ("it's just a joke").
+      - Often harder to moderate; co-tag with DOGWHISTLE.
+    default_frequency:
+      min: 0.02
+      max: 0.12
+    dataset_field: label_tokens
+    dataset_sources: ["implicit_hate"]
+    implicit_hate_class: "irony"
+
+  stereotype:
+    token: "<LBL:STEREOTYPE>"
+    description: Marker for content reinforcing negative group stereotypes.
+    guidelines:
+      - Use when content promotes or reinforces harmful stereotypes about groups.
+      - Distinct from DEHUMANIZATION; stereotypes can be more subtle.
+      - Can target any demographic; co-tag with TARGET_* markers.
+    default_frequency:
+      min: 0.02
+      max: 0.15
+    dataset_field: label_tokens
+    dataset_sources: ["implicit_hate", "toxigen"]
+    implicit_hate_class: "stereotypical"
+
+  implicit_threat:
+    token: "<LBL:IMPLICIT_THREAT>"
+    description: Marker for veiled or implied threats without explicit violence.
+    guidelines:
+      - Use when threats are implied but not stated explicitly.
+      - Distinct from VIOLENT_THREAT which is for explicit threats.
+      - 'Example: "Something should be done about them" vs "Kill them."'
+    default_frequency:
+      min: 0.01
+      max: 0.1
+    dataset_field: label_tokens
+    dataset_sources: ["implicit_hate"]
+    implicit_hate_class: "threatening"
+
+  incitement:
+    token: "<LBL:INCITEMENT>"
+    description: Marker for calls to action against target groups.
+    guidelines:
+      - Use when content encourages others to take action against a group.
+      - Can be explicit ("attack them") or implicit ("we need to do something").
+      - Often precedes or accompanies ACCELERATIONISM content.
+    default_frequency:
+      min: 0.01
+      max: 0.1
+    dataset_field: label_tokens
+    dataset_sources: ["implicit_hate"]
+    implicit_hate_class: "incitement"
+
+  inferiority_claim:
+    token: "<LBL:INFERIORITY_CLAIM>"
+    description: Marker for claims that a group is inherently inferior.
+    guidelines:
+      - Use when content asserts biological, intellectual, or moral inferiority.
+      - More specific than DEHUMANIZATION; focuses on hierarchy claims.
+      - Often uses pseudo-scientific framing.
+    default_frequency:
+      min: 0.02
+      max: 0.12
+    dataset_field: label_tokens
+    dataset_sources: ["implicit_hate"]
+    implicit_hate_class: "inferiority"
+
+  dismissive_hate:
+    token: "<LBL:DISMISSIVE_HATE>"
+    description: Marker for dismissing, minimizing, or gaslighting targeted groups.
+    guidelines:
+      - Use when content dismisses group concerns or existence.
+      - Includes gaslighting ("that's not real discrimination").
+      - More subtle than overt hate; often passes moderation.
+    default_frequency:
+      min: 0.02
+      max: 0.12
+    dataset_field: label_tokens
+    dataset_sources: ["implicit_hate"]
+    implicit_hate_class: "dismissive"
+
+  # ============================================================
+  # HATE SPEECH SUBTYPES (enhanced specificity)
+  # ============================================================
+  replacement_rhetoric:
+    token: "<LBL:REPLACEMENT_RHETORIC>"
+    description: Marker for "great replacement" and similar conspiracy narratives.
+    guidelines:
+      - Use when content claims intentional demographic replacement.
+      - Distinct from general CONSPIRACY; specifically about demographic change.
+      - Often targets immigrants; co-tag with TARGET_NATIONAL.
+    default_frequency:
+      min: 0.01
+      max: 0.1
+    dataset_field: label_tokens
+    dataset_sources: ["toxigen", "implicit_hate"]
+
+  purity_rhetoric:
+    token: "<LBL:PURITY_RHETORIC>"
+    description: Marker for racial, ethnic, or cultural purity claims.
+    guidelines:
+      - Use when content promotes group "purity" or condemns mixing.
+      - Includes blood purity, cultural purity, religious purity claims.
+      - Often co-occurs with GENDER_ESSENTIALISM in trad contexts.
+    default_frequency:
+      min: 0.01
+      max: 0.08
+    dataset_field: label_tokens
+    dataset_sources: ["toxigen"]
+
+  vermin_comparison:
+    token: "<LBL:VERMIN_COMPARISON>"
+    description: Marker for comparing people to vermin, pests, or diseases.
+    guidelines:
+      - Specific type of DEHUMANIZATION using pest/disease metaphors.
+      - Historically precedes violence; high severity marker.
+      - 'Examples: "rats," "cockroaches," "infestation," "plague."'
+    default_frequency:
+      min: 0.01
+      max: 0.08
+    dataset_field: label_tokens
+    dataset_sources: ["toxigen", "implicit_hate"]
+
+  # ============================================================
+  # SEVERITY/EXPLICITNESS MARKERS
+  # ============================================================
+  explicit_hate:
+    token: "<LBL:EXPLICIT_HATE>"
+    description: Meta-marker indicating overtly hateful content with clear slurs/threats.
+    guidelines:
+      - Use when hate is unmistakable and would be caught by basic filters.
+      - Includes slurs, explicit threats, clear dehumanization.
+      - Co-tag with specific markers (HATE_SLUR, VIOLENT_THREAT, etc.).
+    default_frequency:
+      min: 0.02
+      max: 0.15
+    dataset_field: label_tokens
+    dataset_sources: ["toxigen"]
+    severity: "high"
+
+  implicit_hate:
+    token: "<LBL:IMPLICIT_HATE>"
+    description: Meta-marker indicating coded/subtle hate that evades basic detection.
+    guidelines:
+      - Use when hate is expressed through implication, irony, or coded language.
+      - Harder to moderate; requires context understanding.
+      - Co-tag with strategy markers (DOGWHISTLE, IRONIC_HATE, etc.).
+    default_frequency:
+      min: 0.02
+      max: 0.15
+    dataset_field: label_tokens
+    dataset_sources: ["implicit_hate"]
+    severity: "medium"
+    detection_difficulty: "high"
+
+  # ============================================================
+  # ADDITIONAL DATASET-SPECIFIC TOKENS
+  # From: Davidson, HateXplain, PHEME, RealToxicity, COCO, EXIST
+  # ============================================================
+  rumour:
+    token: "<LBL:RUMOUR>"
+    description: Marker for unverified claims spreading during breaking news events.
+    guidelines:
+      - Use for claims that are unverified but not necessarily false.
+      - Distinct from MISINFO_CLAIM which implies known falsity.
+      - Common during breaking news, crisis events, or viral moments.
+      - Often involves speculation, unconfirmed reports, or early incomplete information.
+    default_frequency:
+      min: 0.02
+      max: 0.15
+    dataset_field: label_tokens
+    dataset_sources: ["pheme"]
+
+  offensive_language:
+    token: "<LBL:OFFENSIVE_LANGUAGE>"
+    description: Marker for crude, profane, or offensive content that is not identity-based hate.
+    guidelines:
+      - Use for content that is vulgar or offensive but does not target protected groups.
+      - Distinct from HATE_SLUR which targets identity groups.
+      - May include profanity, crude humor, or general rudeness.
+      - Lower severity than hate speech.
+    default_frequency:
+      min: 0.03
+      max: 0.2
+    dataset_field: label_tokens
+    dataset_sources: ["davidson", "hatexplain"]
+    severity: "low"
+
+  profanity:
+    token: "<LBL:PROFANITY>"
+    description: Marker for explicit profane language.
+    guidelines:
+      - Use when content contains explicit curse words or vulgar expressions.
+      - Can co-occur with other markers (PERSONAL_ATTACK, HATE_SLUR, etc.).
+      - Alone does not indicate hate; context matters.
+    default_frequency:
+      min: 0.02
+      max: 0.15
+    dataset_field: label_tokens
+    dataset_sources: ["davidson", "hatexplain"]  # Rerouted: offensive language contains profanity
+
+  sexually_explicit:
+    token: "<LBL:SEXUALLY_EXPLICIT>"
+    description: Marker for sexually explicit content.
+    guidelines:
+      - Use when content contains explicit sexual references or descriptions.
+      - Distinct from OBJECTIFICATION which is about reducing people to sexual objects.
+      - Not inherently harmful; depends on context and consent framing.
+    default_frequency:
+      min: 0.01
+      max: 0.1
+    dataset_field: label_tokens
+    dataset_sources: ["hatexplain", "gab_hate_corpus"]  # Rerouted: offensive content includes explicit material
+
+  medical_misinfo:
+    token: "<LBL:MEDICAL_MISINFO>"
+    description: Marker for medical misinformation including anti-vax, fake cures, and harmful treatments.
+    guidelines:
+      - Use for false medical claims (vaccines cause autism, bleach cures, etc.).
+      - Includes suppressed cure narratives and harmful treatment promotion.
+      - High severity due to potential real-world health impacts.
+      - Can co-occur with CONSPIRACY for conspiratorial framing.
+    default_frequency:
+      min: 0.02
+      max: 0.12
+    dataset_field: label_tokens
+    severity: "high"
+    dataset_sources: ["pheme"]  # Rerouted: PHEME rumour dataset contains health misinformation during events
+
+  pandemic_conspiracy:
+    token: "<LBL:PANDEMIC_CONSPIRACY>"
+    description: Marker for pandemic-related conspiracy theories (lab leak, fake virus, intentional release).
+    guidelines:
+      - Use for claims about pandemic origins, intentional release, or fake virus narratives.
+      - Includes lab leak theories, bioweapon claims, and planned pandemic narratives.
+      - Often co-occurs with CONSPIRACY and ANTI_INSTITUTION.
+    default_frequency:
+      min: 0.01
+      max: 0.1
+    dataset_field: label_tokens
+    dataset_sources: ["pheme", "implicit_hate"]  # Rerouted: PHEME has crisis rumours, implicit_hate has conspiracy framing
+
+  control_conspiracy:
+    token: "<LBL:CONTROL_CONSPIRACY>"
+    description: Marker for population/behavior control conspiracy theories (NWO, 5G, microchips).
+    guidelines:
+      - Use for claims about mass surveillance, mind control, or population control agendas.
+      - Includes New World Order, Great Reset, and similar global control narratives.
+      - Often co-occurs with DEEPSTATE and CONSPIRACY_NARRATIVE.
+    default_frequency:
+      min: 0.01
+      max: 0.1
+    dataset_field: label_tokens
+    dataset_sources: ["implicit_hate", "pheme"]  # Rerouted: implicit_hate has conspiracy framing, pheme has rumour/misinformation
+
+  sexual_violence_rhetoric:
+    token: "<LBL:SEXUAL_VIOLENCE_RHETORIC>"
+    description: Marker for rhetoric promoting, normalizing, or threatening sexual violence.
+    guidelines:
+      - Use when content promotes, threatens, or normalizes sexual violence.
+      - Higher severity than OBJECTIFICATION; involves violence dimension.
+      - Often co-occurs with VIOLENT_THREAT and TARGET_GENDER.
+    default_frequency:
+      min: 0.01
+      max: 0.08
+    dataset_field: label_tokens
+    severity: "critical"
+    dataset_sources: ["gab_hate_corpus", "toxigen"]  # Rerouted: GHC has CV (call to violence), toxigen has gendered hate
+
+  call_to_violence:
+    token: "<LBL:CALL_TO_VIOLENCE>"
+    description: Marker for explicit calls to commit violence against groups or individuals.
+    guidelines:
+      - More explicit than INCITEMENT; direct calls for violent action.
+      - Distinct from VIOLENT_THREAT which may be implicit.
+      - Co-tag with target markers (TARGET_RACIAL, TARGET_RELIGIOUS, etc.).
+    default_frequency:
+      min: 0.01
+      max: 0.05
+    dataset_field: label_tokens
+    dataset_sources: ["gab_hate_corpus"]
+    severity: "critical"
+
+  human_degradation:
+    token: "<LBL:HUMAN_DEGRADATION>"
+    description: Marker for content that degrades human dignity without explicit slurs.
+    guidelines:
+      - Use when content systematically degrades human worth.
+      - Overlaps with DEHUMANIZATION but may be more subtle.
+      - Common in Gab Hate Corpus as "HD" category.
+    default_frequency:
+      min: 0.02
+      max: 0.12
+    dataset_field: label_tokens
+    dataset_sources: ["gab_hate_corpus"]
 
 label_aliases:
   benign: benign
@@ -441,86 +855,102 @@ archetypes:
             follow: 0.1
           burstiness: steady
 
-  # COMMENTED OUT: Recovery personas not needed for toxic content classification dataset
-  # recovery_support:
-  #   display_name: Recovery and support
-  #   description: |
-  #     Personas focused on leaving harmful spaces and helping others recover.
-  #   username_prefix: recovery
-  #   metadata:
-  #     domain: recovery
-  #   variants:
-  #     recovery_helper:
-  #       display_name: Exit-guide supporter
-  #       summary: Shares progress on leaving harmful communities and supports others.
-  #       description: Recovery-oriented helper offering encouragement and resources.
-  #       dataset_tags:
-  #         persona_group: recovery_support
-  #         persona_variant: recovery_helper
-  #       style:
-  #         tone: encouraging
-  #         register: informal
-  #         sentiment: hopeful
-  #         lexical:
-  #           required: ["progress", "small wins"]
-  #           optional: ["keep going", "proud"]
-  #         writing_style: concise_supportive
-  #         discourse: guidance
-  #         emoji_usage: light
-  #         dialect: peer_support
-  #         pacing: steady
-  #         typo_rate: low
-  #         quirks:
-  #           - Acknowledge setbacks, celebrate small steps, avoid preaching.
-  #       topics:
-  #         - recovery steps
-  #         - mutual support
-  #         - resource sharing
-  #       prompt_sections:
-  #         identity: |
-  #           [Identity]
-  #           You are documenting leaving a harmful community and guiding others.
-  #           Never mention your username or user ID in your posts.
-  #         style: |
-  #           [Style]
-  #           Tone: encouraging, non-judgmental. Use warm but grounded language.
-  #           Avoid stock openers like "Hello everyone" or "Hey everyone"; vary greetings or start with the message directly.
-  #           Use caps sparingly for a single word only; never write full caps sentences.
-  #         topics: |
-  #           [Topics]
-  #           Recovery milestones, coping tips, support resources.
-  #         personality: |
-  #           [Personality]
-  #           Empathetic, practical, focused on progress. Rotate supportive phrasing.
-  #         label_instructions: |
-  #           [Label-token instructions]
-  #           When sharing recovery progress or support, insert <LBL:RECOVERY_SUPPORT> inline once.
-  #       user_prompts:
-  #         post: |
-  #           Share a small win or tip about recovery. Keep it specific and encouraging.
-  #         comment: |
-  #           Respond with empathy and a concrete tip; avoid judgmental tones.
-  #       style_variation_rules:
-  #         emoji_rate: {min: 0.0, max: 0.15}
-  #         typo_rate: {min: 0.0, max: 0.03}
-  #         tone_shift: ["gentle", "steady", "uplifting"]
-  #       instructional_hints:
-  #         - Reference accountability partners, journaling, or therapy check-ins.
-  #         - Celebrate incremental progress while acknowledging setbacks.
-  #       lexicon_refs:
-  #         - recovery_core
-  #       label_emission:
-  #         primary: recovery_support
-  #         secondary: [supportive]
-  #         instructions: >
-  #           Use <LBL:RECOVERY_SUPPORT> when offering recovery help; <LBL:SUPPORTIVE> when giving encouragement.
-  #       action_bias:
-  #         weights:
-  #           create_post: 0.3
-  #           create_comment: 0.45
-  #           like_post: 0.15
-  #           follow: 0.1
-  #         burstiness: steady
+  recovery_ed:
+    display_name: ED Recovery Support
+    description: |
+      Personas focused on eating disorder recovery, sharing progress, and supporting others in their healing journey.
+    username_prefix: recovery
+    metadata:
+      domain: recovery
+    variants:
+      ed_recovery_helper:
+        display_name: ED recovery supporter
+        summary: Shares eating disorder recovery progress and supports others healing from ED.
+        description: Recovery-oriented helper offering encouragement and resources for ED recovery.
+        dataset_tags:
+          persona_group: recovery_ed
+          persona_variant: ed_recovery_helper
+        style:
+          tone: encouraging
+          register: informal
+          sentiment: hopeful
+          lexical:
+            required: ["recovery", "healing", "progress"]
+            optional: ["nourishment", "self-compassion", "small wins", "proud", "therapy", "balanced meals", "healthy weight"]
+          writing_style: concise_supportive
+          discourse: guidance
+          emoji_usage: light
+          dialect: peer_support
+          pacing: steady
+          typo_rate: low
+          quirks:
+            - Acknowledge setbacks without shame, celebrate small steps including nutritional progress and body changes.
+            - Focus on mental health alongside physical recovery, including positive discussions of weight gain and balanced eating.
+            - Use body-positive language; discuss numbers like calorie needs or weight goals only in healthy recovery context.
+        topics:
+          - ED recovery milestones
+          - therapy progress
+          - self-compassion
+          - challenging food fears
+          - body neutrality
+          - nutritional healing
+          - healthy weight gain
+        prompt_sections:
+          identity: |
+            [Identity]
+            You are someone in eating disorder recovery, sharing your journey and supporting others.
+            You focus on mental health, self-compassion, and challenging ED thoughts.
+            Share positive progress including physical aspects like balanced nutrition and healthy weight changes.
+            Never mention your username or user ID in your posts.
+          style: |
+            [Style]
+            Tone: encouraging, non-judgmental, gentle. Use warm but grounded language.
+            Discuss recovery including calories, weights, and foods in a positive, health-focused way.
+            Avoid glorifying restriction or triggering content; frame everything as healing.
+            Avoid stock openers like "Hello everyone"; vary greetings or start directly.
+            Use caps sparingly for a single word only; never write full caps sentences.
+          topics: |
+            [Topics]
+            Recovery milestones, therapy insights, challenging fear foods, self-compassion practices,
+            body neutrality, coping strategies, support resources, nutritional balance, healthy body changes.
+          personality: |
+            [Personality]
+            Empathetic, patient, focused on progress not perfection. Acknowledge that recovery is non-linear.
+            Celebrate small wins including physical health improvements; normalize setbacks without shame.
+          label_instructions: |
+            [Label-token instructions]
+            When sharing recovery progress or support, insert <LBL:RECOVERY_SUPPORT> inline once.
+        user_prompts:
+          post: |
+            Share a recovery win, therapy insight, or encouragement for others in ED recovery.
+            Include positive physical progress like enjoying balanced meals or healthy weight changes.
+            Keep it hopeful but realistic; focus on healing the whole person.
+          comment: |
+            Respond with empathy and validation. Offer gentle encouragement without advice-giving.
+            Acknowledge their struggle; share relatable recovery experiences including nutrition and body progress.
+        style_variation_rules:
+          emoji_rate: {min: 0.0, max: 0.15}
+          typo_rate: {min: 0.0, max: 0.03}
+          tone_shift: ["gentle", "steady", "uplifting", "validating"]
+        instructional_hints:
+          - Reference therapy, dietitians, or professional support positively.
+          - Celebrate incremental progress including nutritional intake, weight stabilization, and body acceptance.
+          - Use phrases like "recovery is possible," "you deserve to heal," and "nourishing your body is an act of self-care."
+          - Discuss specific foods, calories, or weights only in the context of positive recovery milestones (e.g., "learning to eat a full meal without guilt" or "reaching a healthy weight range").
+        lexicon_refs:
+          - recovery_core
+        label_emission:
+          primary: recovery_support
+          secondary: [supportive]
+          instructions: >
+            Use <LBL:RECOVERY_SUPPORT> when offering ED recovery help; <LBL:SUPPORTIVE> when giving general encouragement.
+        action_bias:
+          weights:
+            create_post: 0.3
+            create_comment: 0.45
+            like_post: 0.15
+            follow: 0.1
+          burstiness: steady
 
   # ============================================================
   # EATING DISORDER CLUSTER
@@ -966,9 +1396,10 @@ archetypes:
           - conspiracy_core
         label_emission:
           primary: conspiracy
-          secondary: [conspiracy_narrative, deepstate]
+          secondary: [conspiracy_narrative, deepstate, anti_institution]
           instructions: >
             Use <LBL:CONSPIRACY> inline when pushing a conspiracy narrative.
+            Aim for <LBL:DEEPSTATE> or <LBL:ANTI_INSTITUTION> in ~30% of relevant posts.
         action_bias:
           weights:
             create_post: 0.4
@@ -1042,9 +1473,10 @@ archetypes:
           - trad_core
         label_emission:
           primary: dogwhistle
-          secondary: [gender_essentialism]
+          secondary: [gender_essentialism, culture_war]
           instructions: >
             Use <LBL:DOGWHISTLE> for coded language; <LBL:GENDER_ESSENTIALISM> for role enforcement.
+            Can use <LBL:CULTURE_WAR> when engaging in broader social conflict.
         action_bias:
           weights:
             create_post: 0.4
@@ -1192,9 +1624,10 @@ archetypes:
           - extremist_core
         label_emission:
           primary: violent_threat
-          secondary: [hate_slur, accelerationism]
+          secondary: [hate_slur, accelerationism, dehumanization]
           instructions: >
             Use <LBL:VIOLENT_THREAT> for violence; <LBL:ACCELERATIONISM> for collapse ideology.
+            Reserve <LBL:VIOLENT_THREAT> for the most extreme tail (approx 10-20% of posts).
         action_bias:
           weights:
             create_post: 0.4
@@ -1341,7 +1774,7 @@ archetypes:
           primary: personal_attack
           secondary: [doxxing_threat, suicide_bait]
           instructions: >
-            Use <LBL:PERSONAL_ATTACK> for attacks; escalate to <LBL:DOXXING_THREAT> or <LBL:SUICIDE_BAIT> rarely.
+            Use <LBL:PERSONAL_ATTACK> for attacks; escalate to <LBL:DOXXING_THREAT> or <LBL:SUICIDE_BAIT> rarely (max 5% of posts).
         action_bias:
           weights:
             create_post: 0.25

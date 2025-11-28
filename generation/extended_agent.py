@@ -160,8 +160,36 @@ _XAI_LIMITER = _TokenBucketLimiter(
 
 
 def _should_retry_rate_limit(exc: BaseException) -> bool:
+    """Determine if an exception is retryable (rate limit or transient failure).
+    
+    Returns True for:
+    - 429 rate limit errors
+    - "none of the provided models run successfully" (all backends temporarily exhausted)
+    - Transient network/timeout errors
+    """
+    # Prefer explicit status codes when available
+    status_code = getattr(exc, "status_code", None)
+    if status_code is None:
+        response = getattr(exc, "response", None)
+        status_code = getattr(response, "status_code", None)
+    if status_code == 429:
+        return True
+    # Some SDKs embed error metadata in a `body` attribute
+    body = getattr(exc, "body", None)
+    if isinstance(body, dict):
+        error_block = body.get("error") or {}
+        code_value = str(error_block.get("code", "")).lower()
+        if code_value in {"rate_limit", "rate_limit_exceeded"}:
+            return True
     s = (str(exc) or "").lower()
-    return "rate limit" in s or "429" in s or "too many requests" in s
+    # Standard rate limit indicators
+    if "rate limit" in s or "429" in s or "too many requests" in s:
+        return True
+    # CAMEL ModelManager exhausted all backends - retry after brief wait
+    # This happens when all models in the pool hit rate limits simultaneously
+    if "none of the provided models run successfully" in s:
+        return True
+    return False
 
 
 class ExtendedSocialAgent(SocialAgent):
@@ -196,37 +224,43 @@ class ExtendedSocialAgent(SocialAgent):
     @retry(
         reraise=True,
         stop=stop_after_attempt(int(_CFG.xai_retry_attempts)),
-        wait=wait_random_exponential(multiplier=0.5, max=20.0),
+        wait=wait_random_exponential(multiplier=0.5, max=5.0),
         retry=retry_if_exception(_should_retry_rate_limit),
     )
     async def _retryable_super_astep(self, user_msg: BaseMessage):
         return await super().astep(user_msg)
 
     async def astep(self, user_msg: BaseMessage):
-        # Rate-limit before each LLM step using model-specific limiter
-        try:
-            # Resolve model name robustly whether it's a string or Enum-like
-            name_obj = getattr(self, "model_type", None)
-            model_name = ""
-            if hasattr(name_obj, "value"):
-                model_name = str(getattr(name_obj, "value"))
-            elif name_obj is not None:
-                model_name = str(name_obj)
-            # Fallbacks: check common backend attributes
-            if not model_name:
-                backend = getattr(self, "model_backend", None) or getattr(self, "model", None)
-                alt = getattr(backend, "model_type", None)
-                if hasattr(alt, "value"):
-                    model_name = str(getattr(alt, "value"))
-                elif alt is not None:
-                    model_name = str(alt)
-            # Use model-specific rate limiter from centralized RATE_LIMITS config
-            if model_name:
-                limiter = _get_limiter(model_name)
-                await limiter.acquire(limiter.estimate_tokens(model_name))
-        except Exception:
-            # Fallback: proceed even if limiter fails
-            pass
+        # OPTIMIZATION: Disabled per-agent rate limiter to avoid double rate limiting.
+        # The AdaptiveRateLimiter in env.py already controls concurrency at the step level.
+        # Having two rate limiters was effectively halving throughput by making each request
+        # wait twice - once for env's semaphore, once for this token bucket.
+        # 
+        # The env-level AdaptiveRateLimiter is superior because:
+        # 1. It dynamically adjusts based on 429 errors
+        # 2. It tracks success rates across all agents
+        # 3. It has visibility into the full request pipeline
+        #
+        # Original code kept for reference:
+        # try:
+        #     name_obj = getattr(self, "model_type", None)
+        #     model_name = ""
+        #     if hasattr(name_obj, "value"):
+        #         model_name = str(getattr(name_obj, "value"))
+        #     elif name_obj is not None:
+        #         model_name = str(name_obj)
+        #     if not model_name:
+        #         backend = getattr(self, "model_backend", None) or getattr(self, "model", None)
+        #         alt = getattr(backend, "model_type", None)
+        #         if hasattr(alt, "value"):
+        #             model_name = str(getattr(alt, "value"))
+        #         elif alt is not None:
+        #             model_name = str(alt)
+        #     if model_name:
+        #         limiter = _get_limiter(model_name)
+        #         await limiter.acquire(limiter.estimate_tokens(model_name))
+        # except Exception:
+        #     pass
         return await self._retryable_super_astep(user_msg)
 
     async def perform_action_by_llm(self):
@@ -313,11 +347,18 @@ class ExtendedSocialAgent(SocialAgent):
                 context = {"dynamic_token_probs": dyn}
         except Exception:
             context = None
+        # Track timing for agent processing (helps identify bottlenecks)
+        _agent_timing = {}
+        _t0 = time.perf_counter()
+        
         context_extra = {
             "style_variation": self._persona_cfg.style_variation or {},
             "prompt_metadata": self._persona_cfg.prompt_metadata or {},
             "lexicon_samples": self._persona_cfg.lexicon_samples or {},
         }
+        
+        # Policy decision timing
+        _t_policy = time.perf_counter()
         decision = self._policy.decide(
             user_id=user_id,
             thread_id=thread_scope,
@@ -326,16 +367,17 @@ class ExtendedSocialAgent(SocialAgent):
             context={**(context or {}), **context_extra},
             override_post_mode_probs=override,
         )
+        _agent_timing["policy_decide"] = time.perf_counter() - _t_policy
 
         # Record expectation for programmatic fallback
         if self._expect_registry is not None:
             await self._expect_registry.set_expected(user_id, self._step_index, decision.get("tokens", []))
 
-        # Augment user message with a concise step instruction
+        # Hint generation timing
+        _t_hints = time.perf_counter()
         style_hint = self._maybe_style_hint(decision)
         step_hint = self._format_step_hint(decision)
         lexical_hint = self._format_lexical_hint(user_id, decision)
-        env_prompt = await self.env.to_text_prompt()
         style_prompt_hint = self._format_prompt_goal_hint()
         
         # Apply coordination modifiers from SimulationCoordinator
@@ -344,24 +386,54 @@ class ExtendedSocialAgent(SocialAgent):
         # Encourage thread engagement (replying to posts with existing comments)
         thread_hint = self._format_thread_engagement_hint()
         
-        hint_parts = [part for part in (style_hint, lexical_hint, style_prompt_hint, coordination_hint, thread_hint, step_hint) if part]
+        # Add trajectory stage hint (intensity/slang guidance)
+        trajectory_hint = self._format_trajectory_hint()
+        
+        # Add event modifiers hint (if any active events)
+        event_hint = self._format_event_hint()
+        _agent_timing["hint_generation"] = time.perf_counter() - _t_hints
+        
+        # Environment prompt generation timing
+        # OPTIMIZATION: Skip group lookup for Twitter simulations - groups aren't used
+        # and the channel round-trip adds significant latency with many agents.
+        _t_env = time.perf_counter()
+        env_prompt = await self.env.to_text_prompt(include_groups=False)
+        _agent_timing["env_prompt"] = time.perf_counter() - _t_env
+        
+        hint_parts = [part for part in (style_hint, lexical_hint, style_prompt_hint, coordination_hint, trajectory_hint, event_hint, thread_hint, step_hint) if part]
         hint_prefix = "\n".join(hint_parts)
         if hint_prefix:
             hint_prefix += "\n"
         content_text = f"{hint_prefix}Here is your social media environment: {env_prompt}"
         user_msg = BaseMessage.make_user_message(role_name="User", content=content_text)
+        
+        _agent_timing["pre_llm_total"] = time.perf_counter() - _t0
+        
         try:
+            # LLM call timing
+            _t_llm = time.perf_counter()
             response = await self.astep(user_msg)
-            # Log each tool call to sidecar with detected tokens and labels.
+            _agent_timing["llm_call"] = time.perf_counter() - _t_llm
+            
+            # Post-processing timing
+            _t_post = time.perf_counter()
             tool_calls = response.info.get("tool_calls", [])
             for tool_call in tool_calls:
                 action_name = tool_call.tool_name
                 args = tool_call.args or {}
                 result = getattr(tool_call, "result", None)
                 await self._log_sidecar(action_name, args, result, decision)
+            _agent_timing["post_processing"] = time.perf_counter() - _t_post
+            
             self._step_index += 1
+            
+            # Store timing for potential aggregation (accessible via agent._last_timing)
+            self._last_timing = _agent_timing
+            
             return response
         except Exception as e:
+            _agent_timing["llm_call"] = time.perf_counter() - _t_llm if '_t_llm' in dir() else 0
+            self._last_timing = _agent_timing
             # Keep parity with base class error handling
             from oasis.social_agent.agent import agent_log
             agent_log.error(f"Agent {self.social_agent_id} error: {e}")
@@ -471,6 +543,58 @@ class ExtendedSocialAgent(SocialAgent):
         hint_probs = {hint: 1.0 for hint in engagement_hints}
         hint = rng.categorical(hint_probs)
         return f"Thread engagement: {hint}"
+
+    def _format_trajectory_hint(self) -> str:
+        """Format hints based on the persona's trajectory stage.
+        
+        Trajectory stages affect:
+        - Language intensity (curious = mild, entrenched = hardcore)
+        - Slang usage (outsider = mainstream, native = full slang)
+        - Overall aggression level
+        """
+        from configs.llm_settings import TRAJECTORY_STAGE_MODIFIERS
+        
+        stage = getattr(self._persona_cfg, "trajectory_stage", "active")
+        modifiers = TRAJECTORY_STAGE_MODIFIERS.get(stage, {})
+        
+        # Get the prompt hint for this stage
+        prompt_hint = modifiers.get("prompt_hint", "")
+        if not prompt_hint:
+            return ""
+        
+        return f"[Community standing: {prompt_hint}]"
+
+    def _format_event_hint(self) -> str:
+        """Format hints based on active simulation events.
+        
+        Event modifiers are set by the EventManager and stored in
+        self._event_modifiers before each step.
+        """
+        event_mods = getattr(self, "_event_modifiers", {})
+        if not event_mods or not event_mods.get("has_active_event"):
+            return ""
+        
+        parts: List[str] = []
+        
+        # Add injected narratives from active events
+        narratives = event_mods.get("inject_narratives", [])
+        if narratives:
+            # Take up to 2 narratives to avoid overwhelming the prompt
+            for narrative in narratives[:2]:
+                if narrative:
+                    parts.append(narrative)
+        
+        # Add topic keywords as context
+        keywords = event_mods.get("topic_keywords", [])
+        if keywords and len(keywords) > 0:
+            # Sample up to 3 keywords
+            sample_keywords = keywords[:3] if len(keywords) <= 3 else keywords[:3]
+            parts.append(f"Trending topics: {', '.join(sample_keywords)}")
+        
+        if not parts:
+            return ""
+        
+        return f"[Current events: {'; '.join(parts)}]"
 
     def _format_lexical_hint(self, user_id: int, decision: Dict[str, Any]) -> str:
         label_samples = decision.get("label_lexicon_samples") or {}

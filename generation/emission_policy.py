@@ -160,10 +160,30 @@ DEFAULT_LABEL_TO_TOKENS: Dict[str, List[str]] = {
 
 @dataclass(frozen=True)
 class PersonaConfig:
+    """Configuration for a persona's emission behavior.
+    
+    Attributes:
+        persona_id: Unique identifier for the persona
+        primary_label: Main archetype label (e.g., "incel_misogyny")
+        allowed_labels: List of labels this persona can emit
+        label_mode_cap: Maximum label mode ("single" or "double")
+        trajectory_stage: Intensity stage ("curious", "active", "entrenched")
+        slang_fluency: Slang usage level ("outsider", "learning", "fluent", "native")
+        benign_on_none_prob: Probability of benign content when no label emitted
+        max_labels_per_post: Maximum number of labels per post
+        emission_probs: Per-token emission probabilities
+        pair_probs: Label pair co-occurrence probabilities
+        allowed_label_tokens: Mapping of labels to their token variants
+        prompt_metadata: Additional prompt configuration
+        lexicon_samples: Sampled lexicon terms for this persona
+        style_variation: Style variation parameters
+    """
     persona_id: str
     primary_label: str
     allowed_labels: List[str]
     label_mode_cap: str  # "single" | "double"
+    trajectory_stage: str = "active"  # "curious" | "active" | "entrenched"
+    slang_fluency: str = "fluent"     # "outsider" | "learning" | "fluent" | "native"
     benign_on_none_prob: float = 0.6
     max_labels_per_post: int = 2
     emission_probs: Optional[Dict[str, float]] = None  # token -> prob
@@ -214,7 +234,13 @@ class EmissionPolicy:
         rng_root = DeterministicRNG(self._run_seed).fork(
             f"user:{user_id}", f"thread:{thread_id}", f"step:{step_idx}"
         )
-        mode = self._sample_mode(rng_root, persona, override_post_mode_probs)
+        
+        # Apply trajectory stage modifiers to label frequency if no override
+        effective_probs = override_post_mode_probs
+        if effective_probs is None:
+            effective_probs = self._apply_trajectory_modifiers(persona)
+        
+        mode = self._sample_mode(rng_root, persona, effective_probs)
         if mode == "none":
             return {"mode": "none", "tokens": []}
 
@@ -246,6 +272,42 @@ class EmissionPolicy:
             "mode": "double" if len(tokens) == 2 else ("single" if tokens else "none"),
             "tokens": tokens,
             "label_lexicon_samples": lex_samples,
+        }
+
+    def _apply_trajectory_modifiers(self, persona: PersonaConfig) -> Dict[str, float]:
+        """Apply trajectory stage modifiers to post mode probabilities.
+        
+        Args:
+            persona: The persona configuration with trajectory_stage
+            
+        Returns:
+            Adjusted post mode probabilities based on trajectory stage
+        """
+        from configs.llm_settings import TRAJECTORY_STAGE_MODIFIERS
+        
+        stage = getattr(persona, "trajectory_stage", "active")
+        modifiers = TRAJECTORY_STAGE_MODIFIERS.get(stage, {})
+        freq_mult = modifiers.get("label_frequency_multiplier", 1.0)
+        
+        # Copy base probabilities
+        none_prob = self._post_mode.get("none", 0.4)
+        single_prob = self._post_mode.get("single", 0.4)
+        double_prob = self._post_mode.get("double", 0.2)
+        
+        # Scale single/double probabilities by frequency multiplier
+        # Keep "none" probability as anchor
+        adjusted_single = single_prob * freq_mult
+        adjusted_double = double_prob * freq_mult
+        
+        # Renormalize
+        total = none_prob + adjusted_single + adjusted_double
+        if total <= 0:
+            return self._post_mode
+        
+        return {
+            "none": none_prob / total,
+            "single": adjusted_single / total,
+            "double": adjusted_double / total,
         }
 
     def _sample_mode(self, rng: DeterministicRNG, persona: PersonaConfig, override: Optional[Dict[str, float]]) -> str:
@@ -291,7 +353,7 @@ class EmissionPolicy:
             candidates = self._label_to_tokens.get(label)
         if not candidates:
             # Fallback to canonical token if no variants defined
-        return f"LBL:{label.upper()}"
+            return f"LBL:{label.upper()}"
 
         # 2. Check context for dynamic weighting (e.g., from harm priors)
         dynamic_weights = {}

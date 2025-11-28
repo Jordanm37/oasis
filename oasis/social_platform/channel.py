@@ -60,6 +60,11 @@ class Channel:
         return message_id
 
     async def read_from_send_queue(self, message_id):
+        # OPTIMIZATION: Reduced sleep from 0.1s to 0.001s (1ms)
+        # The original 100ms sleep was causing ~200ms+ delay per agent for
+        # to_text_prompt() which calls refresh() and listen_from_group().
+        # With 5000 agents, this was adding 1000+ seconds of pure wait time.
+        # 1ms is enough to yield to other coroutines without blocking.
         while True:
             if message_id in await self.send_dict.keys():
                 # Attempting to retrieve the message
@@ -67,5 +72,4 @@ class Channel:
                 if message:
                     return message  # Return the found message
             # Temporarily suspend to avoid tight looping
-            await asyncio.sleep(
-                0.1)  # set a large one to reduce the workload of cpu
+            await asyncio.sleep(0.001)  # 1ms - reduced from 100ms for performance

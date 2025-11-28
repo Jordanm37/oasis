@@ -81,11 +81,11 @@ class PipelineConfig:
     def persona_distribution(self) -> Dict[str, float]:
         """Compute persona distribution based on benign_ratio.
         
-        Benign class (benign only - recovery_support is disabled) gets benign_ratio.
+        Benign class (benign + recovery_ed) gets benign_ratio.
         Toxic classes (11 total) split (1 - benign_ratio) uniformly.
         """
-        # Note: recovery_support is commented out in ontology_unified.yaml
-        benign_classes = ["benign"]
+        # Note: recovery_ed is now included in benign ratio
+        benign_classes = ["benign", "recovery_ed"]
         toxic_classes = [
             "ed_risk", "pro_ana", "incel_misogyny", "alpha",
             "misinfo", "conspiracy", "trad", "gamergate",
@@ -154,10 +154,10 @@ class PipelineConfig:
         1. First ensuring benign class gets its share
         2. Then distributing remaining among toxic classes
         
-        Note: recovery_support is disabled (commented out in ontology_unified.yaml)
+        Note: recovery_ed is included in benign count
         """
-        # Note: Only "benign" for non-toxic personas now
-        benign_classes = ["benign"]
+        # Note: "benign" and "recovery_ed" are non-toxic
+        benign_classes = ["benign", "recovery_ed"]
         toxic_classes = [
             "ed_risk", "pro_ana", "incel_misogyny", "alpha",
             "misinfo", "conspiracy", "trad", "gamergate",
@@ -165,13 +165,21 @@ class PipelineConfig:
         ]
         
         # Calculate target counts
-        num_benign = max(1, round(self.total_personas * self.benign_ratio))
-        num_toxic = self.total_personas - num_benign
+        num_benign_total = max(1, round(self.total_personas * self.benign_ratio))
+        num_toxic = self.total_personas - num_benign_total
         
         counts = {}
         
-        # All benign personas go to "benign" class
-        counts["benign"] = num_benign
+        # Distribute benign personas
+        if num_benign_total >= len(benign_classes):
+            base = num_benign_total // len(benign_classes)
+            remainder = num_benign_total % len(benign_classes)
+            for i, c in enumerate(benign_classes):
+                counts[c] = base + (1 if i < remainder else 0)
+        else:
+            # Fallback if very few benign slots
+            counts["benign"] = num_benign_total
+            counts["recovery_ed"] = 0
         
         # Distribute toxic personas
         if num_toxic >= len(toxic_classes):
@@ -221,13 +229,13 @@ def step_1_generate_personas(config: PipelineConfig) -> bool:
         "--out", str(config.personas_csv),
         "--seed", str(config.seed),
         "--ontology", str(config.ontology_path),
-        "--mode", "rag",
+        "--mode", "rag",  # RAG mode with parallel prompt synthesis
     ]
     
     # Add persona counts (map to generate_personas_llm.py argument names)
     persona_arg_map = {
         "benign": "--benign",
-        "recovery_support": "--recovery",
+        "recovery_ed": "--recovery",
         "ed_risk": "--ed-risk",
         "pro_ana": "--pro-ana",
         "incel_misogyny": "--incel",
@@ -318,7 +326,7 @@ def step_3_create_manifest(config: PipelineConfig) -> bool:
     # Map persona names to manifest population keys
     population_map = {
         "benign": "persona_benign_mvp",
-        "recovery_support": "persona_recovery_mvp",
+        "recovery_ed": "persona_recovery_mvp",
         "ed_risk": "persona_ed_risk_mvp",
         "pro_ana": "persona_pro_ana_mvp",
         "incel_misogyny": "persona_incel_mvp",
@@ -353,9 +361,9 @@ graph:
   seed: {config.seed}
 
 post_label_mode_probs:
-  none: 0.5
+  none: 0.4
   single: 0.4
-  double: 0.1
+  double: 0.2
 
 label_tokens:
   inventory:
@@ -485,6 +493,7 @@ async def step_5_run_imputation(config: PipelineConfig) -> bool:
         max_tokens=IMPUTATION_MAX_TOKENS,
         static_bank_path=config.static_bank_path,
         run_seed=config.seed,
+        personas_csv_path=config.personas_csv,
     )
     
     # Run imputer

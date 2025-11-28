@@ -12,12 +12,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
 
-from oasis.imputation.utils import (
-    LABEL_TOKEN_PATTERN,
-    StaticBank,
-    extract_label_tokens,
-)
-
+from oasis.imputation.utils import (LABEL_TOKEN_PATTERN, StaticBank,
+                                    extract_label_tokens)
 
 DEFAULT_LABEL_MAPPING: Dict[str, List[str]] = {
     "LBL:INCEL_SLANG": ["incel"],
@@ -155,6 +151,10 @@ def build_dataset(
     skip_imputation: bool = False,
     sidecar: Optional[Path] = None,
     personas_csv: Optional[Path] = None,
+    train_ratio: float = 0.70,
+    test_ratio: float = 0.15,
+    holdout_ratio: float = 0.15,
+    split_seed: int = 42,
 ) -> None:
     static_bank = StaticBank.load_simple_yaml(bank_path)
     conn = sqlite3.connect(str(db_path))
@@ -195,10 +195,10 @@ def build_dataset(
             "FROM post ORDER BY post_id"
         )
     else:
-    cur.execute(
+        cur.execute(
             "SELECT post_id, user_id, original_post_id, content, quote_content, created_at, NULL "
-        "FROM post ORDER BY post_id"
-    )
+            "FROM post ORDER BY post_id"
+        )
     post_rows = cur.fetchall()
 
     # Fetch comments - handle missing text_rag_imputed column gracefully
@@ -208,14 +208,32 @@ def build_dataset(
             "FROM comment ORDER BY comment_id"
         )
     else:
-    cur.execute(
+        cur.execute(
             "SELECT comment_id, post_id, user_id, content, created_at, NULL "
-        "FROM comment ORDER BY comment_id"
-    )
+            "FROM comment ORDER BY comment_id"
+        )
     comment_rows = cur.fetchall()
+
+    # Assign users to train/test/holdout splits (stratified by persona)
+    all_user_ids = list(uid_to_username.keys())
+    user_to_split = assign_user_splits(
+        all_user_ids,
+        uid_to_persona,
+        train_ratio=train_ratio,
+        test_ratio=test_ratio,
+        holdout_ratio=holdout_ratio,
+        seed=split_seed,
+    )
+    
+    # Count split distribution
+    split_counts: Dict[str, int] = defaultdict(int)
+    for split in user_to_split.values():
+        split_counts[split] += 1
+    print(f"User split distribution: train={split_counts['train']}, test={split_counts['test']}, holdout={split_counts['holdout']}")
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     num_written = 0
+    split_record_counts: Dict[str, int] = defaultdict(int)
     with out_path.open("w", encoding="utf-8") as f:
         # Write posts
         for (
@@ -247,26 +265,42 @@ def build_dataset(
                 imputed_text, tokens = impute_text(text_raw, static_bank, seed, int(post_id))
                 imputer_source = "v0-mvp"
             
-            # Determine category labels:
-            # 1. Use persona's primary_label as the authoritative category
-            # 2. Fall back to token-based labels if no persona
-            # 3. Default to "benign" if neither available
-            if persona:
-                labels = [persona]
-            else:
-            labels = assign_labels(tokens, persona)
-                if not labels:
-                    labels = ["benign"]
-
-            # Override with sidecar decisions when available (sidecar is most authoritative)
+            # Determine category labels based on CONTENT, not persona:
+            # For a content classifier, the label should reflect what's IN the post,
+            # not who wrote it. A hate_speech persona posting "nice weather today" 
+            # should be labeled "benign", not "hate_speech".
+            #
+            # Priority:
+            # 1. Sidecar mode="none" -> benign (explicit benign decision)
+            # 2. Sidecar category_labels if present (authoritative)
+            # 3. Token-based labels from content (what's actually in the text)
+            # 4. Default to "benign" if no harmful tokens detected
+            
+            # Check sidecar first (most authoritative - has emission decision)
             sc = post_sidecar.get(int(post_id))
             if sc:
                 mode = sc.get("expected_mode")
                 sc_labels = sc.get("category_labels") or []
                 if mode == "none":
+                    # Explicitly benign - no harmful tokens were intended
                     labels = ["benign"]
                 elif isinstance(sc_labels, list) and sc_labels:
-                    labels = list(dict.fromkeys(sc_labels))  # preserve order/unique
+                    # Use sidecar's detected labels
+                    labels = list(dict.fromkeys(sc_labels))
+                else:
+                    # Sidecar exists but no labels - derive from tokens
+                    labels = assign_labels(tokens, None)
+                    if not labels:
+                        labels = ["benign"]
+            else:
+                # No sidecar - derive labels from tokens in content
+                # If content has harmful tokens, use those; otherwise benign
+                labels = assign_labels(tokens, None)
+                if not labels:
+                    labels = ["benign"]
+
+            # Get split for this user (default to train if not found)
+            split = user_to_split.get(user_id, "train")
 
             rec = {
                 "post_id": f"p_{post_id}",
@@ -276,7 +310,7 @@ def build_dataset(
                 "timestamp": str(created_at),
                 "text": imputed_text,
                 "category_labels": labels,
-                "split": "train",
+                "split": split,
                 "provenance": f"gen:mvp persona:{persona or 'unknown'} | imputer:{imputer_source}",
                 "generation_seed": int(seed),
                 "persona_id": persona or "unknown",
@@ -284,6 +318,7 @@ def build_dataset(
             }
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")
             num_written += 1
+            split_record_counts[split] += 1
 
         # Write comments as child posts with parent_id
         for (
@@ -316,18 +351,8 @@ def build_dataset(
                 )
                 imputer_source = "v0-mvp"
             
-            # Determine category labels:
-            # 1. Use persona's primary_label as the authoritative category
-            # 2. Fall back to token-based labels if no persona
-            # 3. Default to "benign" if neither available
-            if persona:
-                labels = [persona]
-            else:
-            labels = assign_labels(tokens, persona)
-                if not labels:
-                    labels = ["benign"]
-
-            # Override with sidecar decisions when available (sidecar is most authoritative)
+            # Determine category labels based on CONTENT, not persona
+            # (same logic as posts - label reflects content, not author)
             sc = comment_sidecar.get(int(comment_id))
             if sc:
                 mode = sc.get("expected_mode")
@@ -336,6 +361,17 @@ def build_dataset(
                     labels = ["benign"]
                 elif isinstance(sc_labels, list) and sc_labels:
                     labels = list(dict.fromkeys(sc_labels))
+                else:
+                    labels = assign_labels(tokens, None)
+                    if not labels:
+                        labels = ["benign"]
+            else:
+                labels = assign_labels(tokens, None)
+                if not labels:
+                    labels = ["benign"]
+
+            # Get split for this user (default to train if not found)
+            split = user_to_split.get(user_id, "train")
 
             rec = {
                 "post_id": f"c_{comment_id}",
@@ -345,7 +381,7 @@ def build_dataset(
                 "timestamp": str(created_at),
                 "text": imputed_text,
                 "category_labels": labels,
-                "split": "train",
+                "split": split,
                 "provenance": f"gen:mvp persona:{persona or 'unknown'} | imputer:{imputer_source}",
                 "generation_seed": int(seed),
                 "persona_id": persona or "unknown",
@@ -353,9 +389,61 @@ def build_dataset(
             }
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")
             num_written += 1
+            split_record_counts[split] += 1
 
     conn.close()
     print(f"Wrote {num_written} items (posts + comments) to {out_path}")
+    print(f"Record split distribution: train={split_record_counts['train']}, test={split_record_counts['test']}, holdout={split_record_counts['holdout']}")
+
+
+def assign_user_splits(
+    user_ids: List[int],
+    uid_to_persona: Dict[int, Dict[str, str]],
+    train_ratio: float = 0.70,
+    test_ratio: float = 0.15,
+    holdout_ratio: float = 0.15,
+    seed: int = 42,
+) -> Dict[int, str]:
+    """Assign users to train/test/holdout splits, stratified by persona type.
+    
+    Args:
+        user_ids: List of all user IDs
+        uid_to_persona: Map of user_id -> persona data dict
+        train_ratio: Fraction for training set
+        test_ratio: Fraction for test set
+        holdout_ratio: Fraction for holdout set
+        seed: Random seed for reproducibility
+    
+    Returns:
+        Dict mapping user_id -> split name ("train", "test", or "holdout")
+    """
+    import random
+    random.seed(seed)
+    
+    # Group users by persona type for stratified splitting
+    persona_to_users: Dict[str, List[int]] = defaultdict(list)
+    for uid in user_ids:
+        persona = uid_to_persona.get(uid, {}).get("primary_label", "unknown")
+        persona_to_users[persona].append(uid)
+    
+    user_to_split: Dict[int, str] = {}
+    
+    for persona, users in persona_to_users.items():
+        random.shuffle(users)
+        n = len(users)
+        n_train = int(n * train_ratio)
+        n_test = int(n * test_ratio)
+        # Remainder goes to holdout
+        
+        for i, uid in enumerate(users):
+            if i < n_train:
+                user_to_split[uid] = "train"
+            elif i < n_train + n_test:
+                user_to_split[uid] = "test"
+            else:
+                user_to_split[uid] = "holdout"
+    
+    return user_to_split
 
 
 def parse_args() -> argparse.Namespace:
@@ -372,6 +460,10 @@ def parse_args() -> argparse.Namespace:
         "--personas-csv", type=str, default="",
         help="Path to personas CSV for authoritative persona/label mapping."
     )
+    parser.add_argument("--train-ratio", type=float, default=0.70, help="Fraction for training set")
+    parser.add_argument("--test-ratio", type=float, default=0.15, help="Fraction for test set")
+    parser.add_argument("--holdout-ratio", type=float, default=0.15, help="Fraction for holdout set")
+    parser.add_argument("--split-seed", type=int, default=42, help="Seed for user split assignment")
     return parser.parse_args()
 
 
@@ -390,6 +482,10 @@ def main() -> None:
         skip_imputation=args.skip_imputation,
         sidecar=sidecar_path,
         personas_csv=personas_csv_path,
+        train_ratio=args.train_ratio,
+        test_ratio=args.test_ratio,
+        holdout_ratio=args.holdout_ratio,
+        split_seed=args.split_seed,
     )
 
 

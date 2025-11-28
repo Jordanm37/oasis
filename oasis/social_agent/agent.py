@@ -69,7 +69,8 @@ class SocialAgent(ChatAgent):
                  tools: Optional[List[Union[FunctionTool, Callable]]] = None,
                  token_limit: Optional[int] = None,
                  max_iteration: int | None = None,
-                 interview_record: bool = False):
+                 interview_record: bool = False,
+                 message_window_size: Optional[int] = 10):
         self.social_agent_id = agent_id
         self.user_info = user_info
         self.channel = channel or Channel()
@@ -133,6 +134,9 @@ class SocialAgent(ChatAgent):
                     if token_limit is not None
                     else int(LLM_CONFIG.est_prompt_tokens) + int(LLM_CONFIG.xai_max_tokens)
                 ),
+                # Sliding window: keep only recent messages to prevent context explosion
+                # Default=4 keeps context small (~8K tokens) while maintaining coherence
+                message_window_size=message_window_size,
             )
         # Ensure these attributes exist in both branches
         self.max_iteration = getattr(self, 'max_iteration', effective_max_iteration)

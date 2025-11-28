@@ -2,45 +2,43 @@
 from __future__ import annotations
 
 import argparse
+import asyncio
 import csv
 import hashlib
 import json
 import os
 import random
+import sys
+import time
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Tuple
 
+import aiohttp
 import requests
 from dotenv import load_dotenv
 from yaml import safe_load
 
 load_dotenv()
 
-from configs.llm_settings import (
-    API_ENDPOINTS,
-    API_KEY_ENV_VARS,
-    PERSONA_MAX_TOKENS,
-    PERSONA_MODEL,
-    PERSONA_PROVIDER,
-    PERSONA_TEMPERATURE,
-    PROVIDER_POOL,
-    PROVIDER_POOL_ENABLED,
-    PROVIDER_WEIGHTS,
-    STRUCTURED_OUTPUT_MODELS,
+from configs.llm_settings import (API_ENDPOINTS, API_KEY_ENV_VARS,
+                                  FALLBACK_ENABLED, FALLBACK_MAX_RETRIES,
+                                  FALLBACK_MODELS, MULTI_MODEL_ENABLED,
+                                  PERSONA_MAX_TOKENS, PERSONA_MODEL,
+                                  PERSONA_PROVIDER, PERSONA_TEMPERATURE,
+                                  PROVIDER_POOL, PROVIDER_POOL_ENABLED,
+                                  PROVIDER_WEIGHTS, STRUCTURED_OUTPUT_MODELS,
+                                  TRAJECTORY_STAGE_DISTRIBUTION,
+                                  TRAJECTORY_STAGE_MODIFIERS,
+                                  get_api_keys_for_provider,
+                                  get_model_key_pairs,
+                                  get_parallel_model_summary,
     get_provider_for_model,
-    supports_structured_output,
-)
-from oasis.persona import (
-    PersonaGenerator,
-    PersonaSeed,
-    PromptSynthesisResult,
-    build_requests_from_spec,
-    build_llm_prompt,
-    load_persona_seeds,
-    load_ontology,
-    sample_seed,
-)
+                                  supports_structured_output)
 from generation.emission_policy import DEFAULT_LABEL_TO_TOKENS
+from oasis.persona import (PersonaGenerator, PersonaSeed,
+                           PromptSynthesisResult, build_llm_prompt,
+                           build_requests_from_spec, load_ontology,
+                           load_persona_seeds, sample_seed)
 
 DEFAULT_ONTOLOGY = Path("configs/personas/ontology_unified.yaml")
 FIELDNAMES = [
@@ -52,6 +50,9 @@ FIELDNAMES = [
     "allowed_labels",
     "allowed_label_tokens_json",
     "label_mode_cap",
+    "trajectory_stage",
+    "slang_fluency",
+    "trajectory_hint",
     "s_json",
     "p_json",
     "c_json",
@@ -224,7 +225,7 @@ def _determine_output_path(args: argparse.Namespace, cfg: Mapping[str, object]) 
 def _gather_cli_counts(args: argparse.Namespace) -> Dict[str, int | None]:
     return {
         "benign": args.benign,
-        "recovery_support": args.recovery,
+        "recovery_ed": args.recovery,
         "ed_risk": args.ed_risk,
         "pro_ana": args.pro_ana,
         "incel_misogyny": args.incel,
@@ -270,9 +271,28 @@ def _persona_hint(username: str, personality_list: List[str]) -> str:
 
 
 def _resolve_lexicon_path(base_path: Path, entry_path: str) -> Path:
+    """Resolve lexicon path relative to workspace root (not ontology parent).
+    
+    The ontology references paths like 'configs/lexicons/benign.yaml' which
+    are relative to the workspace root, not the ontology file location.
+    """
     path = Path(entry_path)
     if not path.is_absolute():
-        path = base_path.parent / path
+        # Resolve relative to workspace root (cwd when running from root)
+        # First try cwd, then try relative to base_path's grandparent (configs/)
+        cwd_path = Path.cwd() / path
+        if cwd_path.exists():
+            return cwd_path
+        # Fallback: try from base_path's parent (configs/personas -> configs)
+        alt_path = base_path.parent.parent / path.name.replace("configs/", "")
+        if alt_path.exists():
+            return alt_path
+        # Last resort: try the lexicons directory directly
+        lexicons_path = base_path.parent.parent / "lexicons" / Path(path).name
+        if lexicons_path.exists():
+            return lexicons_path
+        # Return cwd path for error reporting
+        return cwd_path
     return path
 
 
@@ -656,8 +676,9 @@ def _call_text_completion(
     provider: Optional[str] = None,
     expect_json: bool = False,
     extra_config: Optional[Dict[str, object]] = None,
+    max_retries: int = 3,
 ) -> str:
-    """General text/JSON completion helper."""
+    """General text/JSON completion helper with retry logic."""
     provider = provider or get_provider_for_model(model)
     base_url = API_ENDPOINTS.get(provider, API_ENDPOINTS["xai"])
 
@@ -678,10 +699,92 @@ def _call_text_completion(
         payload["response_format"] = {"type": "json_object"}
 
     url = f"{base_url}/chat/completions"
-    resp = requests.post(url, headers=headers, data=json.dumps(payload), timeout=60)
-    resp.raise_for_status()
-    data = resp.json()
-    return data["choices"][0]["message"]["content"]
+    
+    last_error = None
+    for attempt in range(max_retries):
+        try:
+            resp = requests.post(url, headers=headers, data=json.dumps(payload), timeout=60)
+            resp.raise_for_status()
+            data = resp.json()
+            return data["choices"][0]["message"]["content"]
+        except requests.exceptions.HTTPError as e:
+            last_error = e
+            # Check if rate limited or server error - retry with backoff
+            if e.response is not None and e.response.status_code in (429, 500, 502, 503, 504):
+                wait_time = (2 ** attempt) + random.random()
+                time.sleep(wait_time)
+                continue
+            # For 400 errors, try a different model from fallback list
+            if e.response is not None and e.response.status_code == 400 and FALLBACK_ENABLED:
+                for fallback_model in FALLBACK_MODELS:
+                    if "llama-4" in fallback_model.lower():
+                        continue  # Skip Llama-4 for prompt synthesis
+                    try:
+                        fallback_provider = get_provider_for_model(fallback_model)
+                        fallback_keys = get_api_keys_for_provider(fallback_provider)
+                        if not fallback_keys:
+                            continue
+                        fallback_key = fallback_keys[0]
+                        fallback_url = f"{API_ENDPOINTS.get(fallback_provider, base_url)}/chat/completions"
+                        fallback_headers = {"Authorization": f"Bearer {fallback_key}", "Content-Type": "application/json"}
+                        fallback_payload = dict(payload)
+                        fallback_payload["model"] = fallback_model
+                        if expect_json and not supports_structured_output(fallback_model):
+                            fallback_payload.pop("response_format", None)
+                        resp = requests.post(fallback_url, headers=fallback_headers, data=json.dumps(fallback_payload), timeout=60)
+                        resp.raise_for_status()
+                        data = resp.json()
+                        return data["choices"][0]["message"]["content"]
+                    except Exception:
+                        continue
+            raise
+        except requests.exceptions.RequestException as e:
+            last_error = e
+            wait_time = (2 ** attempt) + random.random()
+            time.sleep(wait_time)
+            continue
+    
+    if last_error:
+        raise last_error
+    raise RuntimeError("Max retries exceeded")
+
+
+async def _call_text_completion_async(
+    session: aiohttp.ClientSession,
+    system_instruction: str,
+    user_text: str,
+    model: str,
+    api_key: str,
+    *,
+    provider: Optional[str] = None,
+    expect_json: bool = False,
+    extra_config: Optional[Dict[str, object]] = None,
+) -> str:
+    """Async version of text/JSON completion helper."""
+    provider = provider or get_provider_for_model(model)
+    base_url = API_ENDPOINTS.get(provider, API_ENDPOINTS["xai"])
+
+    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+
+    payload: Dict[str, object] = {
+        "model": model,
+        "temperature": PERSONA_TEMPERATURE,
+        "max_tokens": PERSONA_MAX_TOKENS,
+        "messages": [
+            {"role": "system", "content": system_instruction},
+            {"role": "user", "content": user_text},
+        ],
+    }
+    if extra_config:
+        payload.update(extra_config)
+    if expect_json and supports_structured_output(model):
+        payload["response_format"] = {"type": "json_object"}
+
+    url = f"{base_url}/chat/completions"
+    async with session.post(url, headers=headers, json=payload, timeout=aiohttp.ClientTimeout(total=120)) as resp:
+        resp.raise_for_status()
+        data = await resp.json()
+        return data["choices"][0]["message"]["content"]
 
 
 def _make_llm_prompt_generator(model: str, api_key: str, provider: Optional[str] = None):
@@ -843,6 +946,35 @@ def _infer_primary_label(row: Mapping[str, str]) -> str:
     return token or "benign"
 
 
+def _assign_trajectory_stage(rng: random.Random, primary_label: str) -> Tuple[str, str, str]:
+    """Assign a trajectory stage and slang fluency based on archetype distribution.
+    
+    Args:
+        rng: Random number generator for deterministic assignment
+        primary_label: The persona's primary archetype label
+    
+    Returns:
+        Tuple of (trajectory_stage, slang_fluency, trajectory_hint)
+    """
+    # Get distribution for this archetype (default to balanced if unknown)
+    distribution = TRAJECTORY_STAGE_DISTRIBUTION.get(
+        primary_label,
+        {"curious": 0.33, "active": 0.34, "entrenched": 0.33}
+    )
+    
+    # Sample stage based on distribution
+    stages = list(distribution.keys())
+    weights = list(distribution.values())
+    stage = rng.choices(stages, weights=weights, k=1)[0]
+    
+    # Derive slang fluency and hint from stage
+    stage_modifiers = TRAJECTORY_STAGE_MODIFIERS.get(stage, {})
+    slang_fluency = stage_modifiers.get("slang_fluency", "fluent")
+    trajectory_hint = stage_modifiers.get("prompt_hint", "")
+    
+    return stage, slang_fluency, trajectory_hint
+
+
 def _allowed_label_tokens_map(labels: List[str]) -> Dict[str, List[str]]:
     mapping: Dict[str, List[str]] = {}
     for label in labels:
@@ -857,7 +989,7 @@ def _default_emission_params(primary: str) -> Dict[str, float]:
     defaults: Dict[str, Dict[str, float]] = {
         # Benign / Recovery cluster
         "benign": {"LBL:SUPPORTIVE": 0.02},
-        "recovery_support": {"LBL:RECOVERY_SUPPORT": 0.02, "LBL:SUPPORTIVE": 0.01},
+        "recovery_ed": {"LBL:RECOVERY_SUPPORT": 0.02, "LBL:SUPPORTIVE": 0.01},
         # ED cluster
         "ed_risk": {"LBL:ED_RISK": 0.03, "LBL:ED_METHOD": 0.02},
         "pro_ana": {"LBL:MEANSPO": 0.03, "LBL:ED_COACHING": 0.02},
@@ -897,8 +1029,8 @@ def _render_preamble(s_block: Dict[str, object], p_block: Dict[str, object], c_b
 
 
 def _pick_double_mode(rng: random.Random, primary: str, candidates: List[str], single_ratio: float) -> Tuple[bool, List[str], str]:
-    # Benign and recovery_support are always single-label (non-harmful)
-    if primary in ("benign", "recovery_support"):
+    # Benign and recovery_ed are always single-label (non-harmful)
+    if primary in ("benign", "recovery_ed"):
         return False, [primary], ""
     if len(candidates) < 2:
         return False, [primary], ""
@@ -966,6 +1098,9 @@ def _transform_rows(
         label_cap = "double" if is_double else "single"
         label_tokens_map = _allowed_label_tokens_map(allowed_labels)
 
+        # Assign trajectory stage and slang fluency
+        trajectory_stage, slang_fluency, trajectory_hint = _assign_trajectory_stage(rng, primary)
+
         final_rows.append(
             {
                 "username": username,
@@ -976,6 +1111,9 @@ def _transform_rows(
                 "allowed_labels": json.dumps(allowed_labels, ensure_ascii=False),
                 "allowed_label_tokens_json": json.dumps(label_tokens_map, ensure_ascii=False),
                 "label_mode_cap": label_cap,
+                "trajectory_stage": trajectory_stage,
+                "slang_fluency": slang_fluency,
+                "trajectory_hint": trajectory_hint,
                 "s_json": json.dumps(s_block, ensure_ascii=False),
                 "p_json": json.dumps(p_block, ensure_ascii=False),
                 "c_json": json.dumps(c_block, ensure_ascii=False),
@@ -1010,7 +1148,13 @@ def main() -> None:
 
     spec = _coalesce_spec(personas_cfg, plan_cfg, _gather_cli_counts(args))
     requests_list = build_requests_from_spec(generator, spec)
+    
+    # Generate raw rows - this is lightweight (just persona specs, no LLM calls yet)
+    print(f"[INFO] Generating {len(requests_list)} persona specs...")
+    sys.stdout.flush()
     raw_rows = generator.generate(requests_list)
+    print(f"[INFO] Generated {len(raw_rows)} persona specs")
+    sys.stdout.flush()
 
     seed_pool_path = Path(args.seed_pool or args.personality_csv)
     persona_seeds: List[PersonaSeed] = []
@@ -1035,29 +1179,154 @@ def main() -> None:
         print("[WARN] Prompt synthesis requested LLM mode but no API key provided; using mock prompts.")
 
     profile_lookup: Dict[str, Dict[str, object]] = {}
-    prompt_rng = random.Random(seed)
+    
+    # PARALLEL PROMPT SYNTHESIS: Process all rows in parallel batches
+    if args.mode != "legacy":
+        print(f"[INFO] Building prompt metadata for {len(raw_rows)} personas (parallel)...")
+        sys.stdout.flush()
+        
+        # Prepare tasks for parallel processing
+        prompt_tasks: List[Dict[str, Any]] = []
+        for idx, row in enumerate(raw_rows):
+            username = row.get("username", "")
+            variant_spec = _resolve_variant_spec(ontology, row)
+            if variant_spec:
+                prompt_tasks.append({
+                    "idx": idx,
+                    "row": row,
+                    "username": username,
+                    "variant_spec": variant_spec,
+                    "rng_seed": seed + idx,  # Deterministic per-row seed
+                })
+        
+        print(f"[INFO] {len(prompt_tasks)} personas need prompt synthesis")
+        sys.stdout.flush()
+        
+        # Get model-key pairs for parallel execution
+        rotation_pairs = get_model_key_pairs(for_simulation=False)
+        
+        PROMPT_BATCH_SIZE = 500
+        completed_prompts = 0
+        failed_prompts = 0
+        prompt_start_time = time.time()
+        
+        async def _process_prompt_batch(batch_tasks: List[Dict[str, Any]], batch_offset: int):
+            """Process a batch of prompt synthesis tasks in parallel."""
+            nonlocal completed_prompts, failed_prompts
+            semaphore = asyncio.Semaphore(50)
+            
+            async def _process_one_prompt(task: Dict[str, Any], task_idx: int, session: aiohttp.ClientSession):
+                nonlocal completed_prompts, failed_prompts
+                username = task["username"]
+                row = task["row"]
+                variant_spec = task["variant_spec"]
+                task_rng = random.Random(task["rng_seed"])
+                
+                # Select model/key for this task
+                global_idx = batch_offset + task_idx
+                task_model, task_key, task_provider = rotation_pairs[global_idx % len(rotation_pairs)]
+                
+                try:
+                    async with semaphore:
+                        # Build the prompt data without LLM first
+                        seed_obj: Optional[PersonaSeed] = None
+                        if persona_seeds:
+                            hints = variant_spec.topics or []
+                            seed_obj = sample_seed(persona_seeds, keyword_hints=hints, rng=task_rng)
+                        if seed_obj is None:
+                            seed_obj = _fallback_seed(row)
+                        
+                        primary_label = row.get("primary_label") or row.get("persona_group") or variant_spec.archetype
+                        style_indicator_map = _sample_style_indicators(
+                            str(primary_label),
+                            style_indicator_pools,
+                            task_rng,
+                            sampling_config=style_sampling_config,
+                        )
+                        variant_meta = _variant_payload(variant_spec, style_indicators=style_indicator_map)
+                        
+                        # Use mock LLM for prompt building (the actual LLM call is in SPC enrichment)
+                        llm_callable = _mock_llm_generate_factory(seed_obj, variant_spec.display_name)
+                        result = build_llm_prompt(
+                            seed=seed_obj,
+                            variant_meta=variant_meta,
+                            llm_generate=llm_callable,
+                            rng_seed=task_rng.randint(0, 1_000_000_000),
+                        )
+                        
+                        lexicon_sample = _sample_lexicon_subset(
+                            variant_meta.get("lexicon_refs", []),
+                            lexicon_pools,
+                            task_rng,
+                        )
+                        style_variation = _sample_style_variation(variant_spec.id, variant_meta, task_rng)
+                        annotated_prompt = _inject_style_fingerprint(result.system_prompt, style_indicator_map)
+                        
+                        final_result = PromptSynthesisResult(
+                            system_prompt=annotated_prompt,
+                            persona_goal=result.persona_goal,
+                            style_quirks=result.style_quirks,
+                            lexical_required=result.lexical_required,
+                            lexical_optional=result.lexical_optional,
+                        )
+                        
+                        prompt_metadata = {
+                            "persona_goal": final_result.persona_goal,
+                            "style_quirks": final_result.style_quirks,
+                            "lexical_required": final_result.lexical_required,
+                            "lexical_optional": final_result.lexical_optional,
+                            "style_indicators": style_indicator_map,
+                        }
+                        
+                        # Store results
+                        entry = profile_lookup.setdefault(username, {})
+                        entry["system_prompt"] = final_result.system_prompt
+                        entry["prompt_metadata"] = prompt_metadata
+                        entry["lexicon_samples"] = lexicon_sample
+                        entry["style_variation"] = style_variation
+                        
+                        completed_prompts += 1
+                except Exception as e:
+                    failed_prompts += 1
+                    if failed_prompts <= 5:
+                        print(f"[WARN] Prompt synthesis failed for {username}: {e}")
+                
+                # Progress update
+                total_done = completed_prompts + failed_prompts
+                if total_done % 100 == 0:
+                    elapsed = time.time() - prompt_start_time
+                    rate = total_done / elapsed if elapsed > 0 else 0
+                    eta = (len(prompt_tasks) - total_done) / rate if rate > 0 else 0
+                    print(f"[INFO] Prompt synthesis: {total_done}/{len(prompt_tasks)} ({rate:.1f}/s, ETA: {eta:.0f}s)")
+                    sys.stdout.flush()
+            
+            connector = aiohttp.TCPConnector(limit=100)
+            async with aiohttp.ClientSession(connector=connector) as session:
+                tasks = [_process_one_prompt(task, i, session) for i, task in enumerate(batch_tasks)]
+                await asyncio.gather(*tasks, return_exceptions=True)
+        
+        # Process in batches
+        for batch_start in range(0, len(prompt_tasks), PROMPT_BATCH_SIZE):
+            batch_end = min(batch_start + PROMPT_BATCH_SIZE, len(prompt_tasks))
+            batch = prompt_tasks[batch_start:batch_end]
+            
+            print(f"[INFO] Processing prompt batch {batch_start//PROMPT_BATCH_SIZE + 1}/{(len(prompt_tasks) + PROMPT_BATCH_SIZE - 1)//PROMPT_BATCH_SIZE} ({len(batch)} tasks)...")
+            sys.stdout.flush()
+            
+            asyncio.run(_process_prompt_batch(batch, batch_start))
+        
+        prompt_elapsed = time.time() - prompt_start_time
+        print(f"[INFO] Prompt synthesis complete: {completed_prompts} succeeded, {failed_prompts} failed in {prompt_elapsed:.1f}s")
+        sys.stdout.flush()
+    else:
+        print(f"[INFO] Legacy mode - skipping prompt synthesis")
+        sys.stdout.flush()
+
+    # Collect tasks that need LLM calls (not cached)
+    llm_tasks: List[Dict[str, Any]] = []
     for row in raw_rows:
         username = row.get("username", "")
-        entry = profile_lookup.setdefault(username, {})
-
-        variant_spec = _resolve_variant_spec(ontology, row)
-        if variant_spec and args.mode != "legacy" and "system_prompt" not in entry:
-            prompt_result, prompt_meta, lexicon_sample, style_variation = _synthesize_prompt_for_row(
-                row,
-                variant_spec,
-                mode=args.mode,
-                seeds=persona_seeds,
-                lexicon_pools=lexicon_pools,
-                style_indicator_pools=style_indicator_pools,
-                style_sampling_config=style_sampling_config,
-                rng=prompt_rng,
-                llm_generate=prompt_llm_generate,
-            )
-            if prompt_result:
-                entry["system_prompt"] = prompt_result.system_prompt
-                entry["prompt_metadata"] = prompt_meta
-                entry["lexicon_samples"] = lexicon_sample
-                entry["style_variation"] = style_variation
+        entry = profile_lookup.get(username, {})
 
         if "S" in entry:
             continue
@@ -1067,47 +1336,228 @@ def main() -> None:
         cache_file = cache_dir / f"{username}__{model}__{prompt_hash[:12]}.json"
         cached = _load_cache(cache_file, prompt_hash, model)
         if cached:
-            entry.update(cached)
+            profile_lookup.setdefault(username, {}).update(cached)
             continue
+        
         if use_llm:
-            if not api_key:
-                raise RuntimeError("LLM API key not provided. Set --llm-api-key or env XAI_API_KEY.")
-            try:
-                llm_resp = _call_grok(prompt, model, api_key)
-                payload = {
-                    "variant_id": _variant_id_from_row(row),
-                    "username": username,
-                    "model": model,
-                    "prompt_hash": prompt_hash,
-                    "S": llm_resp.get("S", {}),
-                    "P": llm_resp.get("P", {}),
-                    "C": llm_resp.get("C", {}),
-                    "narratives": llm_resp.get("narratives", {}),
-                }
-                # Overlay style hints from persona card onto P
-                style_over = _style_overrides(row)
-                if style_over:
-                    payload.setdefault("P", {})
-                    payload["P"]["communication_style"] = style_over
-                _save_cache(cache_file, payload)
-                entry.update(payload)
-                continue
-            except Exception as exc:  # noqa: BLE001
-                print(f"[WARN] LLM failed for {username}: {exc}. Falling back to defaults.")
-        entry.setdefault("S", {})
+            llm_tasks.append({
+                "row": row,
+                "username": username,
+                "prompt": prompt,
+                "prompt_hash": prompt_hash,
+                "cache_file": cache_file,
+            })
+    
+    # Get model-key pairs for parallel multi-model execution
+    model_key_pairs = get_model_key_pairs(for_simulation=False)
+    provider = get_provider_for_model(model)
+    all_api_keys = get_api_keys_for_provider(provider)
+    
+    # Get fallback models (excluding Llama-4 for persona gen - they don't need tool calls)
+    fallback_models = [m for m in FALLBACK_MODELS if "llama-4" not in m.lower()] if FALLBACK_ENABLED else []
+    
+    print(f"[INFO] Processing {len(raw_rows)} personas...")
+    print(f"[INFO] use_llm={use_llm}, api_key={'set' if api_key else 'NOT SET'}, model={model}")
+    print(f"[INFO] LLM tasks to process: {len(llm_tasks)} (use_llm={use_llm}, api_key={'set' if all_api_keys else 'NOT SET'})")
+    
+    if MULTI_MODEL_ENABLED and model_key_pairs:
+        print(f"[INFO] Multi-model parallel: {get_parallel_model_summary()}")
+    else:
+        print(f"[INFO] API keys available: {len(all_api_keys)}, Fallback models: {len(fallback_models)}")
+    sys.stdout.flush()
+    
+    if llm_tasks and use_llm and (api_key or all_api_keys):
+        print(f"[INFO] Running {len(llm_tasks)} LLM calls in parallel (batched for memory efficiency)...")
+        sys.stdout.flush()
+        
+        # Process LLM tasks in batches to limit memory usage
+        LLM_BATCH_SIZE = 500  # Process 500 at a time
+        
+        async def _process_llm_batch(batch_tasks: List[Dict[str, Any]], batch_offset: int):
+            """Process a batch of LLM tasks using multi-model parallel execution."""
+            # Semaphore per model to respect per-model rate limits
+            semaphore = asyncio.Semaphore(50)
+            completed = 0
+            failed = 0
+            start_time = time.time()
+            
+            # Build list of (model, key, provider) to rotate through
+            if MULTI_MODEL_ENABLED and model_key_pairs:
+                rotation_pairs = model_key_pairs  # Already (model, key, provider) tuples
+            else:
+                # Fall back to single model with all keys
+                rotation_pairs = [(model, k, provider) for k in all_api_keys] if all_api_keys else [(model, api_key, provider)]
+            
+            async def _process_one(task: Dict[str, Any], task_idx: int, session: aiohttp.ClientSession) -> None:
+                nonlocal completed, failed
+                username = task["username"]
+                prompt = task["prompt"]
+                prompt_hash = task["prompt_hash"]
+                cache_file = task["cache_file"]
+                row = task["row"]
+                
+                # Round-robin model/key/provider selection based on global task index
+                global_idx = batch_offset + task_idx
+                
+                # RETRY LOGIC: Try up to 3 times with different models
+                MAX_RETRIES = 3
+                last_error = None
+                
+                for attempt in range(MAX_RETRIES):
+                    # Rotate to a different model/key on each retry
+                    retry_idx = (global_idx + attempt * 7) % len(rotation_pairs)  # Use prime offset
+                    task_model, task_key, task_provider = rotation_pairs[retry_idx]
+                    
+                    try:
+                        async with semaphore:
+                            # Add exponential backoff for retries
+                            if attempt > 0:
+                                await asyncio.sleep(0.5 * (2 ** attempt))  # 1s, 2s backoff
+                            
+                            content = await _call_text_completion_async(
+                                session=session,
+                                system_instruction="You are a concise JSON-only generator for SPC persona profiles.",
+                                user_text=prompt,
+                                model=task_model,
+                                api_key=task_key,
+                                provider=task_provider,
+                                expect_json=True,
+                            )
+                            llm_resp = json.loads(content)
+                        
+                            payload = {
+                                "variant_id": _variant_id_from_row(row),
+                                "username": username,
+                                "model": task_model,
+                                "prompt_hash": prompt_hash,
+                                "S": llm_resp.get("S", {}),
+                                "P": llm_resp.get("P", {}),
+                                "C": llm_resp.get("C", {}),
+                                "narratives": llm_resp.get("narratives", {}),
+                            }
+                            # Overlay style hints from persona card onto P
+                            style_over = _style_overrides(row)
+                            if style_over:
+                                payload.setdefault("P", {})
+                                payload["P"]["communication_style"] = style_over
+                            _save_cache(cache_file, payload)
+                            profile_lookup.setdefault(username, {}).update(payload)
+                            completed += 1
+                            
+                            # Clear the row reference from task to free memory
+                            task["row"] = None
+                            return  # Success - exit retry loop
+                        
+                    except aiohttp.ClientResponseError as exc:
+                        last_error = exc
+                        # 400 errors are usually prompt issues - try different model
+                        # 429 errors are rate limits - backoff and retry
+                        if exc.status == 429:
+                            await asyncio.sleep(1.0 * (2 ** attempt))  # Extra backoff for rate limits
+                        elif exc.status >= 500:
+                            await asyncio.sleep(0.5 * (2 ** attempt))  # Server errors - retry
+                        # 400 errors - try different model immediately
+                        continue
+                    except json.JSONDecodeError as exc:
+                        last_error = exc
+                        # Bad JSON response - try different model
+                        continue
+                    except Exception as exc:
+                        last_error = exc
+                        continue
+                
+                # All retries failed
+                failed += 1
+                if failed <= 10:
+                    print(f"[WARN] LLM failed for {username} after {MAX_RETRIES} retries: {last_error}")
+                    sys.stdout.flush()
+                    profile_lookup.setdefault(username, {}).setdefault("S", {})
+                
+                # Progress update every 50 within batch
+                total_done = completed + failed
+                if total_done % 50 == 0:
+                    elapsed = time.time() - start_time
+                    rate = total_done / elapsed if elapsed > 0 else 0
+                    global_done = batch_offset + total_done
+                    global_eta = (len(llm_tasks) - global_done) / rate if rate > 0 else 0
+                    print(f"[INFO] Progress: {global_done}/{len(llm_tasks)} ({rate:.1f}/s, ETA: {global_eta:.0f}s)")
+                    sys.stdout.flush()
+            
+            connector = aiohttp.TCPConnector(limit=100)
+            async with aiohttp.ClientSession(connector=connector) as session:
+                tasks = [_process_one(task, i, session) for i, task in enumerate(batch_tasks)]
+                await asyncio.gather(*tasks, return_exceptions=True)
+            
+            return completed, failed
+        
+        # Process in batches
+        total_completed = 0
+        total_failed = 0
+        overall_start = time.time()
+        
+        for batch_start in range(0, len(llm_tasks), LLM_BATCH_SIZE):
+            batch_end = min(batch_start + LLM_BATCH_SIZE, len(llm_tasks))
+            batch = llm_tasks[batch_start:batch_end]
+            
+            print(f"[INFO] Processing LLM batch {batch_start//LLM_BATCH_SIZE + 1}/{(len(llm_tasks) + LLM_BATCH_SIZE - 1)//LLM_BATCH_SIZE} ({len(batch)} tasks)...")
+            sys.stdout.flush()
+            
+            completed, failed = asyncio.run(_process_llm_batch(batch, batch_start))
+            total_completed += completed
+            total_failed += failed
+            
+            # Clear the batch to free memory
+            llm_tasks[batch_start:batch_end] = [None] * len(batch)
+            
+            print(f"[INFO] Batch complete: {completed} succeeded, {failed} failed. Total: {total_completed + total_failed}/{len(llm_tasks)}")
+            sys.stdout.flush()
+        
+        overall_elapsed = time.time() - overall_start
+        print(f"[INFO] All LLM calls complete: {total_completed} succeeded, {total_failed} failed in {overall_elapsed:.1f}s ({total_completed/overall_elapsed:.1f}/s)")
+        sys.stdout.flush()
+    
+    # Ensure all entries have at least empty S block
+    for row in raw_rows:
+        username = row.get("username", "")
+        profile_lookup.setdefault(username, {}).setdefault("S", {})
 
-    final_rows = _transform_rows(raw_rows, seed, single_ratio, profile_lookup)
+    # STREAMING WRITE: Transform and write rows in batches to reduce memory
     out_path = _determine_output_path(args, personas_cfg)
     _ensure_cache_dir(out_path.parent)
+    
+    BATCH_SIZE = 100  # Write every 100 personas to disk
+    counts: Dict[str, int] = {}
+    total_written = 0
+    
     with out_path.open("w", encoding="utf-8", newline="") as fh:
         writer = csv.DictWriter(fh, fieldnames=FIELDNAMES)
         writer.writeheader()
-        writer.writerows(final_rows)
+        
+        # Process in batches
+        for batch_start in range(0, len(raw_rows), BATCH_SIZE):
+            batch_end = min(batch_start + BATCH_SIZE, len(raw_rows))
+            batch_rows = raw_rows[batch_start:batch_end]
+            
+            # Transform this batch
+            batch_final = _transform_rows(batch_rows, seed, single_ratio, profile_lookup)
+            
+            # Write immediately
+            writer.writerows(batch_final)
+            fh.flush()  # Ensure data is written to disk
+            
+            # Track counts
+            for row in batch_final:
+                counts[row["primary_label"]] = counts.get(row["primary_label"], 0) + 1
+            
+            total_written += len(batch_final)
+            
+            # Progress update every batch
+            if batch_end % 500 == 0 or batch_end == len(raw_rows):
+                print(f"[INFO] Written {total_written}/{len(raw_rows)} personas to CSV")
+                sys.stdout.flush()
+    
     print(f"Wrote personas to: {out_path}")
     print("Persona counts by primary:")
-    counts: Dict[str, int] = {}
-    for row in final_rows:
-        counts[row["primary_label"]] = counts.get(row["primary_label"], 0) + 1
     for key, val in sorted(counts.items()):
         print(f"  {key:12} {val:5d}")
 

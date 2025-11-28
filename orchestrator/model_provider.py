@@ -134,13 +134,19 @@ def create_model_backend(settings: LLMProviderSettings) -> BaseModelBackend:
         api_key = settings.api_key or os.getenv("GEMINI_API_KEY", "")
         if not api_key:
             raise RuntimeError("Gemini selected but no API key provided.")
-        # ModelFactory accepts string model types for Gemini
-        default_model_cfg = {"max_output_tokens": int(cfg.gemini_max_output_tokens)}
-        return ModelFactory.create(
-            model_platform=ModelPlatformType.GEMINI,
-            model_type=settings.model_name,
+        
+        # Use native Gemini adapter with safety settings disabled
+        # This bypasses the OpenAI-compatible endpoint which doesn't support safety_settings
+        from oasis.gemini_native_adapter import create_gemini_native_backend
+        from configs.llm_settings import SIMULATION_TEMPERATURE
+        
+        return create_gemini_native_backend(
+            model_name=settings.model_name,
             api_key=api_key,
-            model_config_dict=default_model_cfg,
+            model_config_dict={
+                "temperature": SIMULATION_TEMPERATURE,
+                "max_output_tokens": int(cfg.gemini_max_output_tokens) if hasattr(cfg, 'gemini_max_output_tokens') else 4096,
+            },
             timeout=settings.timeout_seconds,
         )
     if provider == "openai":

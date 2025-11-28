@@ -89,10 +89,16 @@ def create_db(db_path: str | None = None):
     if db_path is None:
         db_path = get_db_path()
 
-    # Connect to the database:
+    # Connect to the database with optimizations for concurrent access:
     print("db_path", db_path)
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(db_path, check_same_thread=False, timeout=30.0)
     cursor = conn.cursor()
+    
+    # Enable WAL mode for better concurrent read/write performance
+    cursor.execute("PRAGMA journal_mode=WAL")
+    cursor.execute("PRAGMA synchronous=NORMAL")  # Faster than FULL, safer than OFF
+    cursor.execute("PRAGMA cache_size=-64000")   # 64MB cache
+    cursor.execute("PRAGMA temp_store=MEMORY")   # Store temp tables in memory
 
     try:
         # Read and execute the user table SQL script:

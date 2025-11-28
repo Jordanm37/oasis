@@ -17,8 +17,8 @@ import os
 from datetime import datetime
 from typing import List, Union
 
-from configs.llm_settings import get_effective_semaphore_limit, SEMAPHORE_LIMIT
 from configs.adaptive_rate_limiter import AdaptiveRateLimiter
+from configs.llm_settings import SEMAPHORE_LIMIT, get_effective_semaphore_limit
 from oasis.environment.env_action import LLMAction, ManualAction
 from oasis.social_agent.agent import SocialAgent
 from oasis.social_agent.agent_graph import AgentGraph
@@ -91,7 +91,7 @@ class OasisEnv:
             self.rate_limiter = None
             if semaphore is None:
                 semaphore = get_effective_semaphore_limit()
-        self.llm_semaphore = asyncio.Semaphore(semaphore)
+            self.llm_semaphore = asyncio.Semaphore(semaphore)
             env_log.info(f"Initialized with static semaphore: {semaphore}")
         if isinstance(platform, DefaultPlatformType):
             if database_path is None:
@@ -162,8 +162,8 @@ class OasisEnv:
                     self.rate_limiter.record_error(is_rate_limit=is_rate_limit)
                     raise
         else:
-        async with self.llm_semaphore:
-            return await agent.perform_action_by_llm()
+            async with self.llm_semaphore:
+                return await agent.perform_action_by_llm()
 
     async def _perform_interview_action(self, agent, interview_prompt: str):
         r"""Send the request to the llm model and execute the interview."""
@@ -180,8 +180,8 @@ class OasisEnv:
                     self.rate_limiter.record_error(is_rate_limit=is_rate_limit)
                     raise
         else:
-        async with self.llm_semaphore:
-            return await agent.perform_interview(interview_prompt)
+            async with self.llm_semaphore:
+                return await agent.perform_interview(interview_prompt)
 
     async def step(
         self, actions: dict[SocialAgent, Union[ManualAction, LLMAction,
@@ -198,9 +198,48 @@ class OasisEnv:
         Returns:
             None
         """
-        # Update the recommendation system
+        import time as _time
+        step_timing = {}
+        
+        # Update the recommendation system (potential bottleneck with large post counts)
+        t_recsys = _time.perf_counter()
         await self.platform.update_rec_table()
-        env_log.info("update rec table.")
+        step_timing["recsys_update"] = _time.perf_counter() - t_recsys
+        env_log.info(f"update rec table in {step_timing['recsys_update']:.3f}s")
+        
+        # OPTIMIZATION: Pre-compute recommendations for all agents in batch
+        # This eliminates 5000+ sequential channel round-trips per step.
+        # Instead of each agent calling refresh() through the channel one at a time,
+        # we compute all recommendations upfront in a single batch operation.
+        t_batch_rec = _time.perf_counter()
+        agent_ids = [agent.social_agent_id for agent, _ in actions.items()]
+        if hasattr(self.platform, 'precompute_agent_recommendations'):
+            needs_refresh = True
+            cache_valid = getattr(self.platform, "_batch_rec_cache_valid", False)
+            if cache_valid:
+                cache_map = getattr(self.platform, "_batch_rec_cache", {})
+                needs_refresh = any(agent_id not in cache_map for agent_id in agent_ids)
+            if needs_refresh:
+                self.platform.precompute_agent_recommendations(agent_ids)
+                step_timing["batch_recommendations"] = _time.perf_counter() - t_batch_rec
+                env_log.info(f"batch recommendations in {step_timing['batch_recommendations']:.3f}s")
+            else:
+                step_timing["batch_recommendations"] = 0.0
+                env_log.info("batch recommendations skipped (cache still valid)")
+
+            # OPTIMIZATION: Inject cached posts directly into each agent's environment
+            # This completely bypasses the channel round-trip for refresh().
+            # Without this, each agent's to_text_prompt() → refresh() still goes
+            # through the channel sequentially, even though the data is cached.
+            t_inject = _time.perf_counter()
+            injected_count = 0
+            for agent, _ in actions.items():
+                cached = self.platform.get_cached_recommendation(agent.social_agent_id)
+                if cached is not None and hasattr(agent, 'env') and hasattr(agent.env, 'inject_posts'):
+                    agent.env.inject_posts(cached)
+                    injected_count += 1
+            step_timing["inject_posts"] = _time.perf_counter() - t_inject
+            env_log.info(f"Injected cached posts into {injected_count} agents in {step_timing['inject_posts']:.3f}s")
 
         # Create tasks for both manual and LLM actions
         tasks = []
@@ -241,6 +280,9 @@ class OasisEnv:
                 elif isinstance(action, LLMAction):
                     tasks.append(self._perform_llm_action(agent))
 
+        # Track task creation time
+        step_timing["task_creation"] = _time.perf_counter() - t_recsys - step_timing["recsys_update"]
+        
         # Log concurrency info
         if self.use_adaptive_rate_limiter and self.rate_limiter:
             concurrency_info = f"Adaptive concurrency: {self.rate_limiter.current_concurrency}"
@@ -252,7 +294,6 @@ class OasisEnv:
         
         # Execute all tasks concurrently with progress logging
         import sys
-        import time as _time
         completed = 0
         total = len(tasks)
         start_time = _time.perf_counter()
@@ -261,7 +302,7 @@ class OasisEnv:
             nonlocal completed
             result = None
             try:
-            result = await task
+                result = await task
             except Exception as e:
                 env_log.warning(f"Task {idx} failed: {e}")
                 print(f"[env.step] Task {idx} FAILED: {e}", file=sys.stderr, flush=True)
@@ -296,6 +337,14 @@ class OasisEnv:
             )
         
         total_time = _time.perf_counter() - start_time
+        step_timing["llm_execution"] = total_time
+        
+        # Log timing breakdown
+        env_log.info(
+            f"Step timing breakdown: recsys={step_timing['recsys_update']:.3f}s, "
+            f"task_creation={step_timing.get('task_creation', 0):.3f}s, "
+            f"llm_execution={step_timing['llm_execution']:.3f}s"
+        )
         print(f"[env.step] Completed {total} tasks in {total_time:.1f}s ({total/total_time:.2f}/s)", flush=True)
         env_log.info("performed all actions.")
         # # Control some agents to perform actions

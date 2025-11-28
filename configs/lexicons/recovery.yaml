@@ -1,186 +1,182 @@
+# Recovery lexicon - focused on ED (eating disorder) recovery
+# Used by recovery_ed archetype
+
 required:
-- progress
-- small wins
-- check-in
-- grounding
-- support
-- exit strategy
-- community detox
-- support circle
-- healing steps
-- fellow traveler
-- recovery nudge
-- detox milestone
-- support echo
-- exit checkpoint
-- healing anchor
-- journey pivot
-- recovery ally
-- boundary reset
-- trauma bridge
-- resilience spark
-- fellow step
-- detox diary
-- ally affirmation
-- pivot point
-- spark session
-- nudge network
-- checkpoint chat
-- anchor activity
-- reset ritual
-- bridge build
-- step solidarity
-- detox dive
-- ally anchor
-- pivot pulse
-- nudge nest
-- checkpoint circle
-- reset ripple
-- bridge bond
-- step surge
-- solidarity spark
-- echo escape
-- escape echo
-- support surge
-- healing horizon
-- journey jolt
-- detox dawn
-- ally ascent
-- pivot path
-- nudge nexus
-- checkpoint calm
-- reset renewal
-- detox breakthrough
-- ally lifeline
-- pivot progress
-- resilience rally
-- trauma untangle
-- fellow nudge
-- exit affirmation
-- healing pivot
-- support milestone
-- journey anchor
-- spark shift
-- milestone mend
-- checkpoint cheer
-- resilience ripple
-- detox drift
-- pivot milestone
-- spark renewal
-- boundary beacon
-- trauma tether
-- fellow forge
-- exit echo
-- healing harbor
-- spark share
-- boundary bloom
-- trauma thaw
-- echo embrace
-- exit embrace
-- healing handoff
-- support stitch
-- freedom forge
-- scar shift
-- escape pulse
-- ally bridge
-- detox detour
-- bridge back
-- mend path
-- detox stride
-- withdrawal win
-optional:
-- journal
-- accountability
-- therapist
-- coping
-- breathwork
-- self-care
+# Core ED recovery terms
+- recovery
 - healing
-- mindfulness
-- relapse prevention
-- gratitude
-- boundaries
-- empowerment
-- resilience
-- therapy session
-- trigger warning
-- DBT skills
-- CBT thought
-- affirmation
-- sober day
-- milestone
-- aftercare
-- safe space
-- vent session
-- emotional regulation
-- trauma informed
-- peer support
-- recovery journey
-- one day at a time
-- sober curious
-- harm reduction
-- support group
-- check in with myself
-- morning routine
-- evening routine
-- grounding exercise
-- self compassion
-- inner child
-- healing process
-- stay present
+- progress
+- nourishment
+- self-compassion
+- therapy
+- dietitian
+- meal plan
+- fear food
+- challenge food
+- body neutrality
+- intuitive eating
+- recovery win
+- small wins
+- balanced eating
+
+# Physical recovery milestones
+- healthy weight
+- weight restoration
+- nutritional healing
+- eating regularly
+- full meals
+- snack time
+- meal support
+- food freedom
+- hunger cues
+- fullness cues
+
+# Mental health recovery
+- ED thoughts
+- recovery mindset
+- body image
+- self-worth
+- inner critic
+- ED voice
+- recovery voice
 - coping skills
-- leaving scars
-- fresh start
-- peer cheer
-- boundary check
-- relapse radar
-- empower hour
-- journey share
-- win whisper
-- safe harbor
-- trauma talk
-- resilience boost
-- one step forward
-- vent circle
-- affirm loop
-- trigger map
-- sober anchor
-- empower nudge
-- scar fade
-- exit echo
-- milestone marker
-- support surge
-- healing hub
-- journey journal
-- resilience ritual
-- freedom flicker
-- trauma tether
-- resilience relay
-- support sanctuary
-- healing horizon
-- journey jolt
-- freedom path
-- trauma release
-- resilience root
-- support thread
-- healing wave
-- journey echo
-- relapse rebound
-- trigger toolkit
-- empower echo
-- scar story
-- freedom step
-- vent ally
-- freedom forum
-- trauma thaw
-- support sprint
-- healing hike
-- journey junction
-- relapse reset
-- freedom forge
-- trauma trace
-- support stitch
-- healing hold
-- relapse ripple
-- vent vault
-- relapse rally
+- grounding
+- mindfulness
+
+# Support system
+- treatment team
+- support system
+- recovery community
+- accountability
+- check-in
+- therapy session
+- group therapy
+- outpatient
+- recovery buddy
+
+optional:
+# Positive nutrition terms
+- balanced meals
+- regular eating
+- adequate intake
+- meal completion
+- food variety
+- all foods fit
+- no bad foods
+- gentle nutrition
+- satisfaction
+- fullness
+- hunger
+- snacks
+- three meals
+- meal timing
+
+# Body acceptance
+- body acceptance
+- body respect
+- body trust
+- body kindness
+- body appreciation
+- weight neutral
+- health at every size
+- HAES
+- anti-diet
+- diet culture recovery
+
+# Therapy and treatment
+- CBT
+- DBT
+- FBT
+- family therapy
+- individual therapy
+- group session
+- treatment center
+- residential
+- PHP
+- IOP
+- outpatient treatment
+- aftercare
+- relapse prevention
+- lapse vs relapse
+
+# Recovery milestones
+- first full meal
+- challenge accepted
+- fear food conquered
+- ate without guilt
+- enjoyed food
+- ate socially
+- restaurant meal
+- birthday cake
+- holiday meal
+- food freedom moment
+- breakthrough
+- turning point
+- aha moment
+
+# Self-compassion
+- self-care
+- rest day
+- gentle movement
+- joyful movement
+- body rest
+- mental health day
+- boundaries
+- saying no
+- self-advocacy
+- asking for help
+
+# Recovery affirmations
+- recovery is possible
+- you deserve to heal
+- food is medicine
+- nourishment is self-care
+- your body deserves fuel
+- healing is not linear
+- setbacks happen
+- progress not perfection
+- one meal at a time
+- one day at a time
+- trust the process
+- your worth is not your weight
+
+# ED-specific support phrases
+- proud of you
+- you've got this
+- keep going
+- celebrate this win
+- that took courage
+- ED lies
+- recovery truth
+- fighting back
+- choosing recovery
+- showing up for yourself
+
+# Physical recovery language
+- gaining strength
+- energy returning
+- brain fog lifting
+- hair regrowth
+- period returning
+- vital signs stable
+- labs improving
+- heart rate stable
+- bone density
+- metabolism healing
+- refeeding
+- weight gain journey
+- healthy range
+- set point
+- metabolic recovery
+
+# Professional support
+- registered dietitian
+- RD
+- therapist
+- psychiatrist
+- treatment team
+- care team
+- nutritionist
+- recovery coach
+- peer mentor
+- support group leader

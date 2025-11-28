@@ -17,7 +17,7 @@ class Manifest:
 
     @property
     def post_label_mode_probs(self) -> Dict[str, float]:
-        return dict(self.data.get("post_label_mode_probs", {"none": 0.5, "single": 0.4, "double": 0.1}))
+        return dict(self.data.get("post_label_mode_probs", {"none": 0.4, "single": 0.4, "double": 0.2}))
 
     @property
     def multi_label_targets(self) -> Dict[str, float]:

@@ -99,7 +99,10 @@ class Platform:
         self.sandbox_clock = sandbox_clock
 
         self.db, self.db_cursor = create_db(self.db_path)
-        self.db.execute("PRAGMA synchronous = OFF")
+        # WAL mode is set in create_db, but ensure it's active
+        self.db.execute("PRAGMA journal_mode=WAL")
+        self.db.execute("PRAGMA synchronous=NORMAL")  # Balance speed and safety
+        self.db.execute("PRAGMA busy_timeout=30000")  # 30s timeout for locks
 
         self.channel = channel or Channel()
 
@@ -142,6 +145,136 @@ class Platform:
             self.recsys_type,
             self.report_threshold,
         )
+        
+        # OPTIMIZATION: Batch recommendation cache
+        # Pre-computed recommendations for all agents, populated at step start.
+        # Key: agent_id, Value: {"success": True, "posts": [...]}
+        # This eliminates 5000+ sequential channel round-trips per step.
+        self._batch_rec_cache: dict[int, dict] = {}
+        self._batch_rec_cache_valid = False
+
+    def precompute_agent_recommendations(self, agent_ids: list[int]) -> None:
+        """Pre-compute recommendations for all agents at step start.
+        
+        This is called once per step before agents act, computing all
+        recommendations in a single batch instead of 5000+ sequential
+        channel round-trips.
+        
+        Args:
+            agent_ids: List of agent IDs to pre-compute recommendations for.
+        """
+        import time
+        start_time = time.perf_counter()
+        
+        # Clear previous cache
+        self._batch_rec_cache.clear()
+        
+        if self.recsys_type == RecsysType.REDDIT:
+            current_time = self.sandbox_clock.time_transfer(
+                datetime.now(), self.start_time)
+        else:
+            current_time = self.sandbox_clock.get_time_step()
+        
+        # Fetch all data needed for recommendations in bulk
+        # 1. Get all rec table entries
+        self.pl_utils._execute_db_command("SELECT user_id, post_id FROM rec")
+        all_recs = self.db_cursor.fetchall()
+        
+        # Build user_id -> [post_ids] mapping
+        user_rec_posts: dict[int, list[int]] = {}
+        for user_id, post_id in all_recs:
+            if user_id not in user_rec_posts:
+                user_rec_posts[user_id] = []
+            user_rec_posts[user_id].append(post_id)
+        
+        # 2. Get all follow relationships for Twitter-style following posts
+        user_following_posts: dict[int, list[int]] = {}
+        if self.recsys_type != RecsysType.REDDIT:
+            self.pl_utils._execute_db_command(
+                "SELECT follow.follower_id, post.post_id "
+                "FROM post JOIN follow ON post.user_id = follow.followee_id "
+                "ORDER BY post.num_likes DESC"
+            )
+            follow_posts = self.db_cursor.fetchall()
+            for follower_id, post_id in follow_posts:
+                if follower_id not in user_following_posts:
+                    user_following_posts[follower_id] = []
+                # Limit to following_post_count per user
+                if len(user_following_posts[follower_id]) < self.following_post_count:
+                    user_following_posts[follower_id].append(post_id)
+        
+        # 3. Fetch ALL posts in one query (we'll filter by ID later)
+        self.pl_utils._execute_db_command(
+            "SELECT post_id, user_id, original_post_id, content, "
+            "quote_content, created_at, num_likes, num_dislikes, num_shares "
+            "FROM post"
+        )
+        all_posts_rows = self.db_cursor.fetchall()
+        posts_by_id: dict[int, tuple] = {row[0]: row for row in all_posts_rows}
+        
+        # 4. Pre-compute recommendations for each agent
+        for agent_id in agent_ids:
+            try:
+                user_id = agent_id
+                
+                # Get recommended post IDs for this user
+                rec_post_ids = user_rec_posts.get(user_id, [])
+                
+                # Sample if too many
+                if len(rec_post_ids) >= self.refresh_rec_post_count:
+                    rec_post_ids = random.sample(rec_post_ids, self.refresh_rec_post_count)
+                
+                # Add following posts for Twitter
+                if self.recsys_type != RecsysType.REDDIT:
+                    following_ids = user_following_posts.get(user_id, [])
+                    rec_post_ids = list(set(following_ids + rec_post_ids))
+                
+                # Get post data
+                selected_posts = [posts_by_id[pid] for pid in rec_post_ids if pid in posts_by_id]
+                
+                if not selected_posts:
+                    self._batch_rec_cache[agent_id] = {
+                        "success": False, 
+                        "message": "No posts found."
+                    }
+                    continue
+                
+                # Add comments to posts
+                results_with_comments = self.pl_utils._add_comments_to_posts(selected_posts)
+                
+                self._batch_rec_cache[agent_id] = {
+                    "success": True,
+                    "posts": results_with_comments
+                }
+                
+            except Exception as e:
+                self._batch_rec_cache[agent_id] = {
+                    "success": False,
+                    "error": str(e)
+                }
+        
+        self._batch_rec_cache_valid = True
+        elapsed = time.perf_counter() - start_time
+        twitter_log.info(
+            f"Batch recommendations pre-computed for {len(agent_ids)} agents in {elapsed:.3f}s"
+        )
+
+    def get_cached_recommendation(self, agent_id: int) -> dict | None:
+        """Get pre-computed recommendation for an agent.
+        
+        Returns None if cache is invalid or agent not in cache.
+        """
+        if not self._batch_rec_cache_valid:
+            return None
+        return self._batch_rec_cache.get(agent_id)
+
+    def invalidate_rec_cache(self) -> None:
+        """Invalidate the batch recommendation cache.
+        
+        Should be called after any action that modifies posts/follows.
+        """
+        self._batch_rec_cache_valid = False
+        self._batch_rec_cache.clear()
 
     async def running(self):
         while True:
@@ -280,6 +413,23 @@ class Platform:
                 datetime.now(), self.start_time)
         else:
             current_time = self.sandbox_clock.get_time_step()
+        
+        # OPTIMIZATION: Use batch cache if available
+        # This eliminates sequential channel round-trips when recommendations
+        # were pre-computed at step start.
+        cached = self.get_cached_recommendation(agent_id)
+        if cached is not None:
+            # Still record the trace for this refresh action
+            user_id = agent_id
+            if cached.get("success"):
+                action_info = {"posts": cached.get("posts", [])}
+            else:
+                action_info = {"error": cached.get("message", cached.get("error", "No posts"))}
+            self.pl_utils._record_trace(user_id, ActionType.REFRESH.value,
+                                        action_info, current_time)
+            return cached
+        
+        # Fallback to original per-agent query if cache miss
         try:
             user_id = agent_id
             # Retrieve all post_ids for a given user_id from the rec table
@@ -445,6 +595,7 @@ class Platform:
             #                  f"current_time={current_time}, "
             #                  f"action={ActionType.CREATE_POST.value}, "
             #                  f"info={action_info}")
+            self.invalidate_rec_cache()
             return {"success": True, "post_id": post_id}
 
         except Exception as e:
@@ -520,6 +671,7 @@ class Platform:
             self.pl_utils._record_trace(user_id, ActionType.REPOST.value,
                                         action_info, current_time)
 
+            self.invalidate_rec_cache()
             return {"success": True, "post_id": new_post_id}
         except Exception as e:
             return {"success": False, "error": str(e)}
@@ -579,6 +731,7 @@ class Platform:
             self.pl_utils._record_trace(user_id, ActionType.QUOTE_POST.value,
                                         action_info, current_time)
 
+            self.invalidate_rec_cache()
             return {"success": True, "post_id": new_post_id}
         except Exception as e:
             return {"success": False, "error": str(e)}
@@ -634,6 +787,7 @@ class Platform:
             action_info = {"post_id": post_id, "like_id": like_id}
             self.pl_utils._record_trace(user_id, ActionType.LIKE_POST.value,
                                         action_info, current_time)
+            self.invalidate_rec_cache()
             return {"success": True, "like_id": like_id}
         except Exception as e:
             return {"success": False, "error": str(e)}
@@ -683,6 +837,7 @@ class Platform:
             action_info = {"post_id": post_id, "like_id": like_id}
             self.pl_utils._record_trace(user_id, ActionType.UNLIKE_POST.value,
                                         action_info)
+            self.invalidate_rec_cache()
             return {"success": True, "like_id": like_id}
         except Exception as e:
             return {"success": False, "error": str(e)}
@@ -738,6 +893,7 @@ class Platform:
             action_info = {"post_id": post_id, "dislike_id": dislike_id}
             self.pl_utils._record_trace(user_id, ActionType.DISLIKE_POST.value,
                                         action_info, current_time)
+            self.invalidate_rec_cache()
             return {"success": True, "dislike_id": dislike_id}
         except Exception as e:
             return {"success": False, "error": str(e)}
@@ -789,6 +945,7 @@ class Platform:
             self.pl_utils._record_trace(user_id,
                                         ActionType.UNDO_DISLIKE_POST.value,
                                         action_info)
+            self.invalidate_rec_cache()
             return {"success": True, "dislike_id": dislike_id}
         except Exception as e:
             return {"success": False, "error": str(e)}
@@ -932,6 +1089,7 @@ class Platform:
             #                  f"current_time={current_time}, "
             #                  f"action={ActionType.FOLLOW.value}, "
             #                  f"info={action_info}")
+            self.invalidate_rec_cache()
             return {"success": True, "follow_id": follow_id}
         except Exception as e:
             return {"success": False, "error": str(e)}
@@ -979,6 +1137,7 @@ class Platform:
             action_info = {"followee_id": followee_id}
             self.pl_utils._record_trace(user_id, ActionType.UNFOLLOW.value,
                                         action_info)
+            self.invalidate_rec_cache()
             return {
                 "success": True,
                 "follow_id": follow_id,
@@ -1129,6 +1288,7 @@ class Platform:
                                         ActionType.CREATE_COMMENT.value,
                                         action_info, current_time)
 
+            self.invalidate_rec_cache()
             return {"success": True, "comment_id": comment_id}
         except Exception as e:
             return {"success": False, "error": str(e)}
@@ -1187,6 +1347,7 @@ class Platform:
             }
             self.pl_utils._record_trace(user_id, ActionType.LIKE_COMMENT.value,
                                         action_info, current_time)
+            self.invalidate_rec_cache()
             return {"success": True, "comment_like_id": comment_like_id}
         except Exception as e:
             return {"success": False, "error": str(e)}
@@ -1237,6 +1398,7 @@ class Platform:
             self.pl_utils._record_trace(user_id,
                                         ActionType.UNLIKE_COMMENT.value,
                                         action_info)
+            self.invalidate_rec_cache()
             return {"success": True, "comment_like_id": comment_like_id}
         except Exception as e:
             return {"success": False, "error": str(e)}
@@ -1296,6 +1458,7 @@ class Platform:
             self.pl_utils._record_trace(user_id,
                                         ActionType.DISLIKE_COMMENT.value,
                                         action_info, current_time)
+            self.invalidate_rec_cache()
             return {"success": True, "comment_dislike_id": comment_dislike_id}
         except Exception as e:
             return {"success": False, "error": str(e)}
@@ -1348,6 +1511,7 @@ class Platform:
             self.pl_utils._record_trace(user_id,
                                         ActionType.UNDO_DISLIKE_COMMENT.value,
                                         action_info, current_time)
+            self.invalidate_rec_cache()
             return {"success": True, "comment_dislike_id": comment_dislike_id}
         except Exception as e:
             return {"success": False, "error": str(e)}

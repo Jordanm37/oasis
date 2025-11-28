@@ -42,9 +42,9 @@ _DEFAULTS = LLMConfig(
     gemini_max_output_tokens=4096,
     est_prompt_tokens=12000,
     # Iterations - controls how many tool calls per agent per step
-    # max_step_iterations=2 allows agents to: refresh -> comment, or post -> like
-    # This increases thread engagement by letting agents do more per turn
-    max_step_iterations=2,
+    # max_step_iterations=1: Single action per step (faster, less complex)
+    # max_step_iterations=2: Allows agents to: refresh -> comment, or post -> like
+    max_step_iterations=1,  # Reduced from 2 for faster generation
     # xAI rate limits
     xai_rpm=480,
     xai_tpm=4_000_000,
