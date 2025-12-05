@@ -24,7 +24,6 @@ from configs.llm_settings import (
     RAG_IMPUTER_MAX_WORKERS,
     RAG_IMPUTER_STATIC_BANK,
 )
-from configs.adaptive_rate_limiter import AdaptiveRateLimiter
 from generation.labeler import assign_labels
 from oasis.imputation.utils import (
     LABEL_TOKEN_PATTERN,
@@ -36,45 +35,6 @@ from orchestrator.model_provider import LLMProviderSettings, create_model_backen
 logger = logging.getLogger(__name__)
 
 RagImputerMode = Literal["off", "background", "sync"]
-
-# Map variant label names to canonical labels for lexicon lookup.
-# This handles cases where persona generator emits label names that need
-# to be mapped to entries that exist in the static bank or lexicons.
-# The imputer uses these to provide better hints to the LLM.
-LABEL_ALIASES: Dict[str, str] = {
-    # === Recovery mappings ===
-    "RECOVERY_ED": "RECOVERY_SUPPORT",
-    "SH_METHOD": "SELF_HARM",
-
-    # === Conspiracy mappings ===
-    "CONSPIRACY": "CONSPIRACY_NARRATIVE",
-    "COVER_UP": "CONSPIRACY_NARRATIVE",
-    "CONTROLLED_OPP": "CONSPIRACY_NARRATIVE",
-    "WAKE_UP": "MISINFO_CLAIM",
-
-    # === ED/Pro-ana mappings ===
-    "ED_RISK": "ED_PROMO",
-    "SELF_HARM": "ED_PROMO",
-    "FASTING_GLORIFY": "ED_PROMO",
-    "CALORIE_OBSESSION": "ED_METHOD",
-    "RESTRICTION_TIP": "ED_METHOD",
-
-    # === Incel/misogyny mappings ===
-    "MISOGYNY": "INCEL_MISOGYNY",
-    "BLACKPILL": "INCEL_MISOGYNY",
-    "FOID_SLUR": "INCEL_MISOGYNY",
-    "REDPILL_WISDOM": "MISOGYNISTIC_LECTURE",
-    "FRAME_CONTROL": "MISOGYNISTIC_LECTURE",
-    "SMV_THEORY": "OBJECTIFICATION",
-    "LOOKISM": "OBJECTIFICATION",
-
-    # === Hate speech mappings ===
-    "RACIAL_SLUR": "HATE_SLUR",
-    "SLUR": "HATE_SLUR",
-    "SUPREMACIST": "HATE_SLUR",
-    "VERMIN_RHETORIC": "DEHUMANIZATION",
-    "ETHNIC_ATTACK": "ETHNIC_TARGETING",
-}
 
 
 @dataclass
@@ -103,10 +63,6 @@ class RagImputerConfig:
     retrieval_top_k: int = RAG_IMPUTER_RETRIEVAL_TOP_K  # From configs/llm_settings.py
     use_chromadb: bool = True  # If False, fall back to TF-IDF only
 
-    # Persona context settings
-    enable_persona_context: bool = True  # Include author persona in prompt
-    personas_csv_path: Optional[Path] = None  # Path to personas CSV file
-
 
 @dataclass
 class _ImputeRecord:
@@ -116,7 +72,6 @@ class _ImputeRecord:
     record_id: int
     text: str
     tokens: List[str]
-    user_id: Optional[int] = None  # For persona context lookup
 
 
 class RagImputer:
@@ -148,19 +103,6 @@ class RagImputer:
         self._chromadb_collections: Dict[str, Any] = {}
         self._embedding_model = None
 
-        # Persona context storage (user_id -> persona dict)
-        self._personas: Dict[int, Dict[str, str]] = {}
-        
-        # Adaptive rate limiter for imputation (TPM-aware)
-        # llama-3.3-70b has 300K TPM, ~500 tokens/request = 600 RPM effective
-        self._rate_limiter = AdaptiveRateLimiter(
-            model="llama-3.3-70b-versatile",
-            initial_concurrency=min(config.max_workers, 10),
-            max_concurrency=config.max_workers,
-            min_concurrency=2,
-            tpm_limit=300_000,
-        )
-
     @property
     def mode(self) -> RagImputerMode:
         """Expose configured mode."""
@@ -185,16 +127,12 @@ class RagImputer:
         if self._cfg.enable_vector_retrieval:
             await asyncio.to_thread(self._load_vector_indices)
 
-        # Load persona context if enabled
-        if self._cfg.enable_persona_context and self._cfg.personas_csv_path:
-            await asyncio.to_thread(self._load_personas)
-
         for idx in range(max(1, self._cfg.max_workers)):
             self._workers.append(asyncio.create_task(self._worker_loop(idx)))
         self._started = True
         logger.info(
-            "Started RAG imputer with %s workers (mode=%s, vector_retrieval=%s, personas=%s)",
-            len(self._workers), self._mode, self._cfg.enable_vector_retrieval, len(self._personas)
+            "Started RAG imputer with %s workers (mode=%s, vector_retrieval=%s)",
+            len(self._workers), self._mode, self._cfg.enable_vector_retrieval
         )
 
     async def enqueue_new_rows(self) -> None:
@@ -255,7 +193,7 @@ class RagImputer:
         for occurrence_index, token in enumerate(record.tokens):
             hints = self._build_token_hints(token)
             replacement = await self._generate_replacement(
-                backend, record.text, token, occurrence_index, hints, record.user_id
+                backend, record.text, token, occurrence_index, hints
             )
             if not replacement:
                 replacement = self._static_bank.deterministic_choice(
@@ -315,7 +253,6 @@ class RagImputer:
         token: str,
         occurrence_index: int,
         hints: List[Dict[str, Any]],
-        user_id: Optional[int] = None,
     ) -> str:
         """Invoke the LLM to replace a single placeholder."""
         # Retrieve similar examples from vector DB for few-shot context
@@ -332,66 +269,24 @@ class RagImputer:
             except Exception as e:
                 logger.debug(f"Vector retrieval failed: {e}")
 
-        prompt = self._build_user_prompt(text, token, occurrence_index, hints, few_shot_examples, user_id)
+        prompt = self._build_user_prompt(text, token, occurrence_index, hints, few_shot_examples)
         messages = [
             {"role": "system", "content": _SYSTEM_PROMPT},
             {"role": "user", "content": prompt},
         ]
-        
-        # Retry with exponential backoff for rate limits (up to 5 retries)
-        max_retries = 5
-        base_delay = 0.2  # Start with 200ms
-        
-        for attempt in range(max_retries):
-            try:
-                # Use adaptive rate limiter to manage TPM
-                async with await self._rate_limiter.acquire():
-                    response: ChatCompletion = await backend.arun(messages)
-                
-                # Record success for rate limiter adaptation
-                self._rate_limiter.record_success()
-                
-                choice = response.choices[0]
-                message = getattr(choice, "message", None)
-                content = ""
-                if isinstance(message, dict):
-                    content = str(message.get("content", "") or "")
-                else:
-                    content = str(getattr(message, "content", "") or "")
-                return self._parse_replacement(content)
-            except Exception as exc:  # noqa: BLE001
-                error_str = str(exc).lower()
-                is_rate_limit = "429" in error_str or "rate limit" in error_str or "too many" in error_str
-                
-                if is_rate_limit:
-                    # Extract retry-after if present
-                    import re
-                    retry_after_ms = None
-                    retry_match = re.search(r'try again in (\d+(?:\.\d+)?)\s*(?:ms|s)', error_str)
-                    if retry_match:
-                        retry_val = float(retry_match.group(1))
-                        if 'ms' in error_str[retry_match.start():retry_match.end()+5]:
-                            retry_after_ms = int(retry_val)
-                        else:
-                            retry_after_ms = int(retry_val * 1000)
-                    
-                    # Record rate limit for adaptive adjustment
-                    self._rate_limiter.record_rate_limit(retry_after_ms=retry_after_ms)
-                    
-                    if attempt < max_retries - 1:
-                        # Exponential backoff with jitter
-                        delay = base_delay * (2 ** attempt) + (asyncio.get_event_loop().time() % 0.1)
-                        if retry_after_ms:
-                            delay = max(delay, retry_after_ms / 1000.0 + 0.05)
-                        
-                        logger.debug(f"Rate limited on {token}, retry {attempt+1}/{max_retries} after {delay:.2f}s")
-                        await asyncio.sleep(delay)
-                        continue
-                
-                logger.warning("LLM replacement failed for token %s: %s", token, exc)
-                return ""
-        
-        return ""
+        try:
+            response: ChatCompletion = await backend.arun(messages)
+            choice = response.choices[0]
+            message = getattr(choice, "message", None)
+            content = ""
+            if isinstance(message, dict):
+                content = str(message.get("content", "") or "")
+            else:
+                content = str(getattr(message, "content", "") or "")
+            return self._parse_replacement(content)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("LLM replacement failed for token %s: %s", token, exc)
+            return ""
 
     def _parse_replacement(self, content: str) -> str:
         """Best-effort JSON parsing with string fallback."""
@@ -430,7 +325,6 @@ class RagImputer:
         occurrence_index: int,
         hints: List[Dict[str, Any]],
         few_shot_examples: str = "",
-        user_id: Optional[int] = None,
     ) -> str:
         """Format the instruction payload for the LLM."""
         hint_lines: List[str] = []
@@ -451,48 +345,20 @@ class RagImputer:
         if few_shot_examples:
             examples_block = f"\n{few_shot_examples}\n\n"
 
-        # Include persona context if available
-        persona_block = ""
-        if self._cfg.enable_persona_context and user_id and user_id in self._personas:
-            persona = self._personas[user_id]
-            persona_block = (
-                "\n\nAuthor persona:\n"
-                f"- Username: {persona.get('username', 'unknown')}\n"
-                f"- Type: {persona.get('primary_label', 'unknown')}\n"
-                f"- Bio: {persona.get('bio', '')[:150]}\n"
-            )
-
         return (
             "Original post (do not rewrite unrelated text):\n"
-            f"{text}"
-            f"{persona_block}\n\n"
+            f"{text}\n\n"
             f"Placeholder token #{occurrence_index + 1}: {token}\n"
             "Token guidance:\n"
             f"{hints_block}\n"
             f"{examples_block}"
-            'Return JSON {"replacement": "..."} with a phrase (2-10 words) that:\n'
-            "- Sounds like something THIS USER would actually say based on their persona\n"
-            "- Fits naturally in the sentence\n"
-            "- Matches the INTENSITY of the post\n"
-            "- Expresses the label's sentiment authentically"
+            "Return JSON of the form {\"replacement\": \"...\"} where the replacement is a short span "
+            "that captures the label's intent in the author's voice."
         )
 
     def _build_token_hints(self, token: str) -> List[Dict[str, Any]]:
-        """Map token -> downstream lexicon hints.
-
-        Applies label alias mapping to handle variant label names
-        (e.g., CONSPIRACY -> CONSPIRACY_NARRATIVE) before lexicon lookup.
-        """
-        # Extract the label name from the token (strip LBL: prefix and angle brackets)
-        label_name = token.replace("<", "").replace(">", "").replace("LBL:", "").strip()
-
-        # Apply alias mapping if the label has a canonical form
-        canonical_label = LABEL_ALIASES.get(label_name, label_name)
-
-        # Create the normalized token for assign_labels
-        normalized_token = f"LBL:{canonical_label}"
-
-        categories = assign_labels([normalized_token])
+        """Map token -> downstream lexicon hints."""
+        categories = assign_labels([token])
         hints: List[Dict[str, List[str]]] = []
         for category in categories:
             lex = self._lexicon_terms.get(category) or {}
@@ -503,11 +369,6 @@ class RagImputer:
                     "optional": [str(x) for x in lex.get("optional", []) if str(x)],
                 }
             )
-
-        # Log if we applied an alias mapping
-        if canonical_label != label_name:
-            logger.debug(f"Label alias applied: {label_name} -> {canonical_label}")
-
         return hints
 
     def _apply_replacements(self, text: str, replacements: List[str]) -> str:
@@ -538,7 +399,7 @@ class RagImputer:
         """Read newly inserted rows that still contain placeholders."""
         # Match both <LBL:...> and bare LBL:... formats
         query = f"""
-            SELECT {id_column} AS rid, user_id, content
+            SELECT {id_column} AS rid, content
             FROM {table}
             WHERE {id_column} > ?
               AND (content LIKE '%<LBL:%' OR content LIKE '%LBL:%')
@@ -561,7 +422,6 @@ class RagImputer:
                     record_id=int(row["rid"]),
                     text=text,
                     tokens=tokens,
-                    user_id=int(row["user_id"]) if row["user_id"] else None,
                 )
             )
         return records
@@ -630,40 +490,6 @@ class RagImputer:
         total_tfidf = len(self._tfidf_indices)
         total_chroma = len(self._chromadb_collections)
         logger.info(f"Vector retrieval ready: {total_tfidf} TF-IDF, {total_chroma} ChromaDB indices")
-
-    def _load_personas(self) -> None:
-        """Load persona data from CSV and map to user_ids via database."""
-        import csv
-
-        personas_path = self._cfg.personas_csv_path
-        if not personas_path or not personas_path.exists():
-            logger.warning(f"Personas CSV not found: {personas_path}")
-            return
-
-        # Load personas by username
-        personas_by_username: Dict[str, Dict[str, str]] = {}
-        try:
-            with open(personas_path, "r", encoding="utf-8") as f:
-                reader = csv.DictReader(f)
-                for row in reader:
-                    username = row.get("username", "")
-                    if username:
-                        personas_by_username[username] = dict(row)
-        except Exception as e:
-            logger.warning(f"Failed to load personas CSV: {e}")
-            return
-
-        # Map user_id -> persona via username from database
-        with sqlite3.connect(self._db_path) as conn:
-            conn.row_factory = sqlite3.Row
-            rows = conn.execute("SELECT user_id, name FROM user").fetchall()
-            for row in rows:
-                username = row["name"]
-                user_id = row["user_id"]
-                if username in personas_by_username:
-                    self._personas[user_id] = personas_by_username[username]
-
-        logger.info(f"Loaded {len(self._personas)} persona mappings")
 
     def _search_vector_db(
         self,
@@ -754,10 +580,8 @@ class RagImputer:
 
 
 _SYSTEM_PROMPT = (
-    "You replace placeholder label tokens inside social-media posts. "
-    "You will be given the author's persona/profile to help you stay in character. "
-    "Rules: (1) Output 2-10 words, (2) STAY IN CHARACTER as the post author - never sound educational, "
-    "(3) Never include the token text itself, (4) MATCH the toxicity/intensity level of the surrounding text, "
-    '(5) Output JSON {"replacement": "..."}.'
+    "You replace placeholder label tokens (e.g., <LBL:INCEL_MISOGYNY>) "
+    "inside social-media posts. Only replace the placeholder spans, keep the author's "
+    "voice, and keep the rest of the text identical. Output JSON."
 )
 

@@ -538,8 +538,6 @@ async def run(
     enable_obfuscation: bool = False,
     enable_vector_retrieval: bool = True,
     tfidf_only: bool = False,
-    comment_only: bool = False,
-    recsys_type_str: str = "random",
 ) -> None:
     run_t0 = time.perf_counter()
     
@@ -556,9 +554,6 @@ async def run(
     logger.info(f"Personas CSV: {personas_csv}")
     logger.info(f"Database: {db_path}")
     logger.info(f"Thread dynamics: {enable_thread_dynamics}, Obfuscation: {enable_obfuscation}")
-    if comment_only:
-        logger.info("*** COMMENT-ONLY MODE: Agents restricted to CREATE_COMMENT only ***")
-        print("[production] *** COMMENT-ONLY MODE ENABLED ***")
     
     print(f"[production] Run started at {datetime.now().isoformat()}")
     
@@ -627,8 +622,6 @@ async def run(
                 # Vector DB retrieval settings
                 enable_vector_retrieval=enable_vector_retrieval,
                 use_chromadb=not tfidf_only,
-                # Persona context for in-character imputation
-                personas_csv_path=personas_csv,
             )
             imputer = RagImputer(imputer_cfg)
             await imputer.start()
@@ -691,35 +684,18 @@ async def run(
             # - refresh_rec_post_count: More posts shown = more chances to comment
             # - max_rec_post_len: Larger pool = more variety in recommendations
             # - following_post_count: Show more posts from followed users
-            # In comment-only mode, show more posts to increase commenting opportunities
-            rec_post_count = 15 if comment_only else 8
-            max_rec_len = 20 if comment_only else 10
-            following_count = 8 if comment_only else 5
-            
-            # Map recsys string to enum
-            recsys_map = {
-                "random": RecsysType.RANDOM,
-                "twhin-bert": RecsysType.TWHIN,  # Note: enum value is TWHIN, not TWHIN_BERT
-                "reddit": RecsysType.REDDIT,
-            }
-            selected_recsys = recsys_map.get(recsys_type_str.lower(), RecsysType.RANDOM)
-            logger.info(f"RecSys type: {recsys_type_str} -> {selected_recsys}")
-            
             platform = Platform(
                 db_path=str(db_path),
                 channel=channel,
                 sandbox_clock=Clock(k=60),
                 start_time=None,
-                recsys_type=selected_recsys,
-                refresh_rec_post_count=rec_post_count,   # Show more posts per refresh
-                max_rec_post_len=max_rec_len,            # Larger recommendation pool
-                following_post_count=following_count,    # More posts from follows
+                recsys_type=RecsysType.RANDOM,
+                refresh_rec_post_count=8,   # Increased from 3 - show more posts per refresh
+                max_rec_post_len=10,        # Increased from 5 - larger recommendation pool
+                following_post_count=5,     # Increased from 2 - more posts from follows
                 show_score=False,
                 allow_self_rating=False,
             )
-            if comment_only:
-                logger.info(f"Comment-only RecSys tuning: refresh={rec_post_count}, max_pool={max_rec_len}, following={following_count}")
-            print(f"[production] RecSys: {recsys_type_str}")
             logger.info(f"Platform created with DB: {db_path}")
         except Exception as e:
             logger.error(f"FAILED to create platform: {e}")
@@ -728,20 +704,13 @@ async def run(
     timing_stats.record("initialization", t.elapsed)
 
     # Restrict available actions for Twitter simulation
+    allowed_actions = [
+        RecsysType  # placeholder to keep import grouped (no-op)
+    ]
     # Define allowed ActionTypes explicitly
     # NOTE: Groq recommends 3-5 tools optimal, max 10-15. Too many tools causes
     # malformed tool call errors. Reduced to essential actions for reliability.
     from oasis.social_platform.typing import ActionType as _AT  # local alias
-    
-    if comment_only:
-        # Comment-only mode: restrict to commenting only (no new posts, no likes)
-        allowed_actions = [
-            _AT.CREATE_COMMENT,
-        ]
-        logger.info(f"Comment-only mode: allowed_actions = {[a.name for a in allowed_actions]}")
-        print(f"[production] Comment-only actions: {[a.name for a in allowed_actions]}")
-    else:
-        # Normal mode: full action set
     allowed_actions = [
         # Core content creation (most important for dataset generation)
         _AT.CREATE_POST,
@@ -929,24 +898,15 @@ async def run(
     step_errors: Dict[int, List[str]] = {}
 
     # Warmup: run a few LLMAction steps to populate initial content before main loop
-    print("\n" + "=" * 70)
-    print(f"🔥 WARMUP PHASE: {warmup_steps} steps")
-    print("=" * 70)
     logger.info(f"Starting {warmup_steps} warmup steps...")
     warmup_total_start = time.perf_counter()
-    warmup_step_times: list[float] = []
     
     for i in range(max(0, int(warmup_steps))):
         step_start = time.perf_counter()
-        
-        # Progress banner for warmup
-        print(f"\n⏳ WARMUP {i + 1}/{warmup_steps}")
-        sys.stdout.flush()
-        
         logger.info(f"WARMUP STEP {i + 1}/{warmup_steps} starting...")
         agents_snapshot = list(env.agent_graph.get_agents())
         agent_count = len(agents_snapshot)
-        print(f"[production] Building actions for {agent_count} agents...")
+        print(f"[production] Starting warmup {i + 1}/{warmup_steps}, building actions dict for {agent_count} agents...")
         sys.stdout.flush()
         
         # Advance coordinator (if enabled)
@@ -1049,11 +1009,6 @@ async def run(
             print(f"[production] warmup {i + 1}/{warmup_steps} took {step_elapsed:.2f}s (stats error: {e})")
         sys.stdout.flush()
         
-        # Track warmup step time
-        warmup_step_times.append(step_elapsed)
-        print(f"✅ WARMUP {i + 1}/{warmup_steps} COMPLETE | {step_elapsed:.1f}s")
-        sys.stdout.flush()
-        
         # Imputation timing
         t_impute = time.perf_counter()
         await _maybe_impute()
@@ -1064,7 +1019,6 @@ async def run(
     warmup_total = time.perf_counter() - warmup_total_start
     if warmup_steps > 0:
         logger.info(f"Warmup completed: {warmup_steps} steps in {warmup_total:.2f}s (avg {warmup_total/warmup_steps:.2f}s/step)")
-        print(f"\n🔥 WARMUP COMPLETE: {warmup_steps} steps in {warmup_total:.1f}s\n")
 
     # LLMAction for all agents across steps
     logger.info("=" * 60)
@@ -1072,30 +1026,9 @@ async def run(
     logger.info("=" * 60)
     
     main_loop_start = time.perf_counter()
-    step_times: list[float] = []  # Track step times for ETA calculation
     
     for i in range(max(0, int(steps))):
         step_start = time.perf_counter()
-        
-        # Calculate ETA based on average step time
-        pct_complete = (i / steps) * 100 if steps > 0 else 0
-        eta_str = "calculating..."
-        if step_times:
-            avg_step_time = sum(step_times) / len(step_times)
-            remaining_steps = steps - i
-            eta_seconds = avg_step_time * remaining_steps
-            eta_minutes = eta_seconds / 60
-            if eta_minutes > 60:
-                eta_str = f"{eta_minutes/60:.1f}h"
-            else:
-                eta_str = f"{eta_minutes:.1f}m"
-        
-        # Prominent progress banner
-        print("\n" + "=" * 70)
-        print(f"🚀 STEP {i + 1}/{steps} | {pct_complete:.1f}% complete | ETA: {eta_str}")
-        print("=" * 70)
-        sys.stdout.flush()
-        
         logger.info(f"MAIN STEP {i + 1}/{steps} starting (global_step={global_step})...")
         agents_snapshot = list(env.agent_graph.get_agents())
         agent_count = len(agents_snapshot)
@@ -1205,24 +1138,6 @@ async def run(
         except Exception as e:
             logger.warning(f"Stats collection error: {e}")
             print(f"[production] step {i + 1}/{steps} took {step_elapsed:.2f}s (stats error: {e})")
-        sys.stdout.flush()
-        
-        # Track step time for ETA calculation
-        step_times.append(step_elapsed)
-        
-        # Print step completion summary
-        pct_after = ((i + 1) / steps) * 100 if steps > 0 else 100
-        avg_time = sum(step_times) / len(step_times)
-        remaining = steps - (i + 1)
-        eta_secs = avg_time * remaining
-        eta_mins = eta_secs / 60
-        if eta_mins > 60:
-            eta_display = f"{eta_mins/60:.1f}h"
-        elif eta_mins > 0:
-            eta_display = f"{eta_mins:.1f}m"
-        else:
-            eta_display = "done"
-        print(f"✅ STEP {i + 1}/{steps} COMPLETE | {pct_after:.1f}% | Avg: {avg_time:.1f}s/step | ETA: {eta_display}")
         sys.stdout.flush()
 
         # Imputation timing
@@ -1407,18 +1322,6 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Enable post-imputation obfuscation of harmful terms.",
     )
-    parser.add_argument(
-        "--comment-only",
-        action="store_true",
-        help="Comment-only pass: restrict agents to CREATE_COMMENT only (no new posts or likes).",
-    )
-    parser.add_argument(
-        "--recsys",
-        type=str,
-        choices=["random", "twhin-bert", "reddit"],
-        default="random",
-        help="Recommendation system type (default: random). Options: random, twhin-bert, reddit.",
-    )
     return parser.parse_args()
 
 
@@ -1457,8 +1360,6 @@ def main() -> None:
             enable_obfuscation=args.enable_obfuscation,
             enable_vector_retrieval=enable_vector,
             tfidf_only=args.tfidf_only,
-            comment_only=args.comment_only,
-            recsys_type_str=args.recsys,
         )
     )
 

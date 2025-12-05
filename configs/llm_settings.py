@@ -340,7 +340,7 @@ MULTI_KEY_MAX_KEYS = 12  # Max keys to check per provider (up to 11 for Groq)
 API_KEY_PATTERNS = {
     "groq": ["GROQ_API_KEY", "GROQ_API_KEY_2", "GROQ_API_KEY_3", "GROQ_API_KEY_4", "GROQ_API_KEY_5", "GROQ_API_KEY_6", "GROQ_API_KEY_7", "GROQ_API_KEY_8", "GROQ_API_KEY_9", "GROQ_API_KEY_10", "GROQ_API_KEY_11", "GROQ_API_KEY_12", "GROQ_API_KEY_13", "GROQ_API_KEY_14", "GROQ_API_KEY_15", "GROQ_API_KEY_16", "GROQ_API_KEY_17", "GROQ_API_KEY_18", "GROQ_API_KEY_19", "GROQ_API_KEY_20", "GROQ_API_KEY_21", "GROQ_API_KEY_22", "GROQ_API_KEY_23", "GROQ_API_KEY_24", "GROQ_API_KEY_25", "GROQ_API_KEY_26", "GROQ_API_KEY_27", "GROQ_API_KEY_28", "GROQ_API_KEY_29", "GROQ_API_KEY_30", "GROQ_API_KEY_31", "GROQ_API_KEY_32", "GROQ_API_KEY_33", "GROQ_API_KEY_34", "GROQ_API_KEY_35", "GROQ_API_KEY_36", "GROQ_API_KEY_37", "GROQ_API_KEY_38", "GROQ_API_KEY_39", "GROQ_API_KEY_40", "GROQ_API_KEY_41", "GROQ_API_KEY_42", "GROQ_API_KEY_43", "GROQ_API_KEY_44"],
     "openai": ["OPENAI_API_KEY", "OPENAI_API_KEY_2", "OPENAI_API_KEY_3"],
-    "xai": ["XAI_API_KEY", "XAI_API_KEY_2", "XAI_API_KEY_3", "XAI_API_KEY_4", "XAI_API_KEY_5"],
+    "xai": ["XAI_API_KEY", "XAI_API_KEY_2", "XAI_API_KEY_3"],
     "gemini": ["GEMINI_API_KEY", "GEMINI_API_KEY_2", "GEMINI_API_KEY_3", "GEMINI_API_KEY_4", "GEMINI_API_KEY_5", "GEMINI_API_KEY_6", "GEMINI_API_KEY_7", "GEMINI_API_KEY_8"],
 }
 
@@ -391,6 +391,7 @@ PARALLEL_MODELS_PERSONA = [
 # IMPORTANT: Only models with reliable JSON tool calling should be used here.
 # Llama-4 models use XML-style tool calls which often fail even with the adapter
 # because they use placeholder strings ("post_id_here") or hallucinate tools.
+# Gemini disabled for simulation due to safety filtering issues.
 # OpenAI disabled - too expensive and causes 400 errors with tool schemas.
 PARALLEL_MODELS_SIMULATION = [
     ("llama-3.3-70b-versatile", "groq"),                         # Most reliable for tool calls
@@ -398,8 +399,7 @@ PARALLEL_MODELS_SIMULATION = [
     ("qwen/qwen3-32b", "groq"),                                  # Good tool support
     ("meta-llama/llama-4-maverick-17b-128e-instruct", "groq"),   # Re-enabled: Llama4ToolAdapter handles XML
     ("meta-llama/llama-4-scout-17b-16e-instruct", "groq"),       # Re-enabled: fastest Llama-4
-    ("gemini-2.5-flash-lite", "gemini"),                         # Flash-lite: faster, higher throughput
-    ("grok-4-fast-non-reasoning", "xai"),                        # xAI Grok-4: 4M TPM, very high throughput
+    ("gemini-2.5-flash", "gemini"),                              # Re-enabled: GeminiNativeAdapter with safety=OFF
     # DISABLED models:
     # ("gpt-5-nano-2025-08-07", "openai"),   # 400 errors with tool schemas
 ]

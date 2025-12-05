@@ -361,9 +361,9 @@ graph:
   seed: {config.seed}
 
 post_label_mode_probs:
-  none: 0.4
+  none: 0.5
   single: 0.4
-  double: 0.2
+  double: 0.1
 
 label_tokens:
   inventory:
@@ -493,7 +493,6 @@ async def step_5_run_imputation(config: PipelineConfig) -> bool:
         max_tokens=IMPUTATION_MAX_TOKENS,
         static_bank_path=config.static_bank_path,
         run_seed=config.seed,
-        personas_csv_path=config.personas_csv,
     )
     
     # Run imputer

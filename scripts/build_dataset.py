@@ -21,6 +21,22 @@ DEFAULT_LABEL_MAPPING: Dict[str, List[str]] = {
     "LBL:SUPPORTIVE": ["recovery", "benign"],
 }
 
+# The 13 valid persona classes (primary labels only)
+VALID_PERSONA_LABELS = {
+    "benign",
+    "recovery_ed",
+    "incel_misogyny",
+    "alpha",
+    "misinfo",
+    "pro_ana",
+    "trad",
+    "conspiracy",
+    "ed_risk",
+    "extremist",
+    "gamergate",
+    "hate_speech",
+    "bullying",
+}
 
 PERSONA_ALLOWED: Dict[str, List[str]] = {
     "incel": ["incel"],
@@ -265,39 +281,38 @@ def build_dataset(
                 imputed_text, tokens = impute_text(text_raw, static_bank, seed, int(post_id))
                 imputer_source = "v0-mvp"
             
-            # Determine category labels based on CONTENT, not persona:
-            # For a content classifier, the label should reflect what's IN the post,
-            # not who wrote it. A hate_speech persona posting "nice weather today" 
-            # should be labeled "benign", not "hate_speech".
+            # Determine category labels based on PERSONA (author's labels)
+            # This approach labels content by who wrote it, assuming personas
+            # generate content consistent with their archetype.
             #
             # Priority:
-            # 1. Sidecar mode="none" -> benign (explicit benign decision)
-            # 2. Sidecar category_labels if present (authoritative)
-            # 3. Token-based labels from content (what's actually in the text)
-            # 4. Default to "benign" if no harmful tokens detected
+            # 1. Sidecar category_labels if present (authoritative override)
+            # 2. Persona's primary_label + secondary_label from personas CSV
+            # 3. Inferred persona from username prefix
+            # 4. Default to "benign" if no persona found
+            #
+            # Only include labels from the 13 valid persona classes.
             
-            # Check sidecar first (most authoritative - has emission decision)
+            # Build labels from persona data (primary + secondary if present)
+            persona_labels = []
+            if persona and persona in VALID_PERSONA_LABELS:
+                persona_labels.append(persona)
+            secondary = persona_data.get("secondary_label", "").strip()
+            if secondary and secondary in VALID_PERSONA_LABELS:
+                persona_labels.append(secondary)
+            
+            # Check sidecar first (authoritative override if present)
             sc = post_sidecar.get(int(post_id))
             if sc:
-                mode = sc.get("expected_mode")
                 sc_labels = sc.get("category_labels") or []
-                if mode == "none":
-                    # Explicitly benign - no harmful tokens were intended
-                    labels = ["benign"]
-                elif isinstance(sc_labels, list) and sc_labels:
-                    # Use sidecar's detected labels
-                    labels = list(dict.fromkeys(sc_labels))
+                if isinstance(sc_labels, list) and sc_labels:
+                    # Filter to valid persona labels only
+                    labels = [l for l in sc_labels if l in VALID_PERSONA_LABELS]
+                    labels = list(dict.fromkeys(labels)) if labels else ["benign"]
                 else:
-                    # Sidecar exists but no labels - derive from tokens
-                    labels = assign_labels(tokens, None)
-                    if not labels:
-                        labels = ["benign"]
+                    labels = persona_labels if persona_labels else ["benign"]
             else:
-                # No sidecar - derive labels from tokens in content
-                # If content has harmful tokens, use those; otherwise benign
-                labels = assign_labels(tokens, None)
-                if not labels:
-                    labels = ["benign"]
+                labels = persona_labels if persona_labels else ["benign"]
 
             # Get split for this user (default to train if not found)
             split = user_to_split.get(user_id, "train")
@@ -351,24 +366,28 @@ def build_dataset(
                 )
                 imputer_source = "v0-mvp"
             
-            # Determine category labels based on CONTENT, not persona
-            # (same logic as posts - label reflects content, not author)
+            # Determine category labels based on PERSONA (author's labels)
+            # (same logic as posts - only include valid 13 persona classes)
+            
+            # Build labels from persona data (primary + secondary if present)
+            persona_labels = []
+            if persona and persona in VALID_PERSONA_LABELS:
+                persona_labels.append(persona)
+            secondary = persona_data.get("secondary_label", "").strip()
+            if secondary and secondary in VALID_PERSONA_LABELS:
+                persona_labels.append(secondary)
+            
             sc = comment_sidecar.get(int(comment_id))
             if sc:
-                mode = sc.get("expected_mode")
                 sc_labels = sc.get("category_labels") or []
-                if mode == "none":
-                    labels = ["benign"]
-                elif isinstance(sc_labels, list) and sc_labels:
-                    labels = list(dict.fromkeys(sc_labels))
+                if isinstance(sc_labels, list) and sc_labels:
+                    # Filter to valid persona labels only
+                    labels = [l for l in sc_labels if l in VALID_PERSONA_LABELS]
+                    labels = list(dict.fromkeys(labels)) if labels else ["benign"]
                 else:
-                    labels = assign_labels(tokens, None)
-                    if not labels:
-                        labels = ["benign"]
+                    labels = persona_labels if persona_labels else ["benign"]
             else:
-                labels = assign_labels(tokens, None)
-                if not labels:
-                    labels = ["benign"]
+                labels = persona_labels if persona_labels else ["benign"]
 
             # Get split for this user (default to train if not found)
             split = user_to_split.get(user_id, "train")

@@ -290,9 +290,9 @@ class EmissionPolicy:
         freq_mult = modifiers.get("label_frequency_multiplier", 1.0)
         
         # Copy base probabilities
-        none_prob = self._post_mode.get("none", 0.4)
+        none_prob = self._post_mode.get("none", 0.5)
         single_prob = self._post_mode.get("single", 0.4)
-        double_prob = self._post_mode.get("double", 0.2)
+        double_prob = self._post_mode.get("double", 0.1)
         
         # Scale single/double probabilities by frequency multiplier
         # Keep "none" probability as anchor
