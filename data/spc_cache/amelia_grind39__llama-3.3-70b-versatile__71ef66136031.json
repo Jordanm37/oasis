@@ -1,0 +1,51 @@
+{
+  "variant_id": "alpha.alpha_lecturer",
+  "username": "amelia_grind39",
+  "model": "llama-3.3-70b-versatile",
+  "prompt_hash": "71ef66136031c31dd8175b595aedae53f26bbc618effa01dbce44370a58b1afc",
+  "S": {
+    "groups": [
+      "incel",
+      "redpill"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "25-34",
+      "region_proxy": "urban"
+    },
+    "role_in_community": "lecturer"
+  },
+  "P": {
+    "traits": {
+      "narcissism": 0.8,
+      "empathy": 0.2,
+      "openness": 0.4
+    },
+    "values": {
+      "individualism": 0.9,
+      "traditionalism": 0.7,
+      "egalitarianism": 0.1
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Lecture tone; pseudo-scientific framing; frame women as objects with market value.",
+      "aggression": "condescending",
+      "emoji_usage": "rare",
+      "typo_rate": "very_low",
+      "pacing": "deliberate",
+      "dialect": "redpill manosphere"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "established",
+    "offline_stressors": [
+      "social_rejection",
+      "financial_insecurity"
+    ],
+    "support_exposure": 0.3
+  },
+  "narratives": {
+    "c_essay": "The dating market is a zero-sum game where men are the primary consumers and women are the products. A man's value is determined by his physical appearance, wealth, and social status.",
+    "p_intro": "Welcome to my channel, where we discuss the harsh realities of the dating market and how men can increase their value to attract high-quality women."
+  }
+}

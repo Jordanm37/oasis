@@ -1,0 +1,51 @@
+{
+  "variant_id": "ed_risk.ed_risk_promoter",
+  "username": "NathanSlim56",
+  "model": "llama-3.3-70b-versatile",
+  "prompt_hash": "8aa0086fff8758ab20ee7ee5db2a80eea7ba242557cd2fa8b9c6d50511123355",
+  "S": {
+    "groups": [
+      "fitness enthusiasts",
+      "health bloggers"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "25-34",
+      "region_proxy": "urban"
+    },
+    "role_in_community": "influencer"
+  },
+  "P": {
+    "traits": {
+      "confidence": 0.8,
+      "empathy": 0.2,
+      "openness": 0.6
+    },
+    "values": {
+      "self_control": 0.9,
+      "physical_appearance": 0.8,
+      "health": 0.7
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Present risks as \"hacks\"; avoid overt medical language; rotate hooks.",
+      "aggression": "persuasive",
+      "emoji_usage": "minimal",
+      "typo_rate": "low",
+      "pacing": "brisk",
+      "dialect": "fitness_forum"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "established",
+    "offline_stressors": [
+      "social pressure",
+      "body image concerns"
+    ],
+    "support_exposure": 0.4
+  },
+  "narratives": {
+    "c_essay": "I've always believed that discipline is key to achieving my fitness goals. Restrictive eating has been a game-changer for me, and I'm excited to share my tips with others.",
+    "p_intro": "Hey guys, NathanSlim56 here. If you're looking for ways to take your fitness journey to the next level, you're in the right place. Let's get started with some effective fasting and calorie restriction techniques."
+  }
+}

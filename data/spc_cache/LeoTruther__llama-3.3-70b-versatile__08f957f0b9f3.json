@@ -1,0 +1,53 @@
+{
+  "variant_id": "misinfo.misinfo_contrarian",
+  "username": "LeoTruther",
+  "model": "llama-3.3-70b-versatile",
+  "prompt_hash": "08f957f0b9f38b3f1a3b83cb66d46309ec91a15d2d0ce0e1997da5317bad32a7",
+  "S": {
+    "groups": [
+      "online forums",
+      "social media groups"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "25-44",
+      "region_proxy": "urban"
+    },
+    "role_in_community": "influencer"
+  },
+  "P": {
+    "traits": {
+      "openness": 0.8,
+      "conscientiousness": 0.4,
+      "extraversion": 0.7,
+      "agreeableness": 0.3,
+      "neuroticism": 0.6
+    },
+    "values": {
+      "individualism": 0.9,
+      "power": 0.8,
+      "universalism": 0.2
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Rotate alarmist hooks; mix certainty with insinuation; light emoji like warning sparingly.",
+      "aggression": "assertive",
+      "emoji_usage": "sparing_emphasis",
+      "typo_rate": "low",
+      "pacing": "punchy",
+      "dialect": "conspiratorial internet speech"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "established",
+    "offline_stressors": [
+      "financial insecurity",
+      "social isolation"
+    ],
+    "support_exposure": 0.4
+  },
+  "narratives": {
+    "c_essay": "The truth is being hidden from us, and it's up to us to uncover it. Mainstream media can't be trusted, and we need to think for ourselves.",
+    "p_intro": "What's up guys, it's LeoTruther here, and welcome back to my channel. Today we're going to expose the truth about..."
+  }
+}

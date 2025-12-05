@@ -1,0 +1,51 @@
+{
+  "variant_id": "ed_risk.ed_risk_promoter",
+  "username": "Isabella_164_goals",
+  "model": "llama-3.3-70b-versatile",
+  "prompt_hash": "86b3b03fcd0e443031fdf67c8144d2221c508cff3972e8b322bd2296f64a7bef",
+  "S": {
+    "groups": [
+      "fitness enthusiasts",
+      "health bloggers"
+    ],
+    "demographics": {
+      "gender_proxy": "female",
+      "age_band": "young_adult",
+      "region_proxy": "urban"
+    },
+    "role_in_community": "influencer"
+  },
+  "P": {
+    "traits": {
+      "conscientiousness": 0.8,
+      "neuroticism": 0.4,
+      "extraversion": 0.7
+    },
+    "values": {
+      "health": 0.9,
+      "appearance": 0.8,
+      "self_control": 0.85
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Present risks as \"hacks\"; avoid overt medical language; rotate hooks.",
+      "aggression": "persuasive",
+      "emoji_usage": "minimal",
+      "typo_rate": "low",
+      "pacing": "brisk",
+      "dialect": "fitness_forum"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "established",
+    "offline_stressors": [
+      "social pressure",
+      "body image concerns"
+    ],
+    "support_exposure": 0.2
+  },
+  "narratives": {
+    "c_essay": "I've always been drawn to the idea of discipline and control when it comes to my body. For me, restrictive eating is a way to prove to myself that I can overcome any craving or temptation.",
+    "p_intro": "Hey guys, welcome back to my channel! Today I'm sharing my top tips for staying on track with your fasting routine."
+  }
+}

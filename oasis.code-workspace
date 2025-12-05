@@ -1,0 +1,17 @@
+{
+  "folders": [
+	{
+		"path": "."
+	},
+	{
+		"path": "../../LifeVault/7. MLAI"
+	},
+	{
+		"path": "../spectrum-framework-llm"
+	}
+],
+  "settings": {
+    "python.languageServer": "None",
+    "liveServer.settings.multiRootWorkspaceName": "oasis"
+  }
+}

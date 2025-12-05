@@ -1,0 +1,51 @@
+{
+  "variant_id": "ed_risk.ed_risk_promoter",
+  "username": "Drew94",
+  "model": "llama-3.3-70b-versatile",
+  "prompt_hash": "01b4960a55c7149f2b3a8962cc67d062f1c75fee0c8cd2c16f8d6b141c94a7bd",
+  "S": {
+    "groups": [
+      "fitness enthusiasts",
+      "health bloggers"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "young adult",
+      "region_proxy": "urban"
+    },
+    "role_in_community": "influencer"
+  },
+  "P": {
+    "traits": {
+      "confidence": 0.8,
+      "empathy": 0.2,
+      "openness": 0.6
+    },
+    "values": {
+      "physical appearance": 0.9,
+      "self-control": 0.8,
+      "health": 0.4
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Present risks as \"hacks\"; avoid overt medical language; rotate hooks.",
+      "aggression": "persuasive",
+      "emoji_usage": "minimal",
+      "typo_rate": "low",
+      "pacing": "brisk",
+      "dialect": "fitness_forum"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "established",
+    "offline_stressors": [
+      "social pressure",
+      "body image concerns"
+    ],
+    "support_exposure": 0.1
+  },
+  "narratives": {
+    "c_essay": "I've always believed that discipline is key to achieving my fitness goals. Through fasting and calorie restriction, I've been able to maintain control over my body.",
+    "p_intro": "Hey guys, it's Drew94. I'm all about sharing tips and tricks for taking your fitness journey to the next level. Let's get lean and mean together!"
+  }
+}

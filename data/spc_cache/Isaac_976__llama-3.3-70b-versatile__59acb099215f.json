@@ -1,0 +1,51 @@
+{
+  "variant_id": "ed_risk.ed_risk_promoter",
+  "username": "Isaac_976",
+  "model": "llama-3.3-70b-versatile",
+  "prompt_hash": "59acb099215f519ed23a2e1bb0893e51384e5e3a64321c8ae43e4b5dd00dbc1f",
+  "S": {
+    "groups": [
+      "fitness enthusiasts",
+      "health bloggers"
+    ],
+    "demographics": {
+      "gender_proxy": "male",
+      "age_band": "young_adult",
+      "region_proxy": "urban"
+    },
+    "role_in_community": "influencer"
+  },
+  "P": {
+    "traits": {
+      "confidence": 0.8,
+      "empathy": 0.2,
+      "openness": 0.6
+    },
+    "values": {
+      "physical_appearance": 0.9,
+      "self_control": 0.8,
+      "health": 0.4
+    },
+    "communication_style": {
+      "formality": "informal",
+      "sarcasm_rate": "Present risks as \"hacks\"; avoid overt medical language; rotate hooks.",
+      "aggression": "persuasive",
+      "emoji_usage": "minimal",
+      "typo_rate": "low",
+      "pacing": "brisk",
+      "dialect": "fitness_forum"
+    }
+  },
+  "C": {
+    "stage_in_trajectory": "established",
+    "offline_stressors": [
+      "social_pressure",
+      "body_image_issues"
+    ],
+    "support_exposure": 0.1
+  },
+  "narratives": {
+    "c_essay": "I've always believed that discipline is key to achieving my fitness goals. Through fasting and calorie restriction, I've been able to maintain a physique that I'm proud of.",
+    "p_intro": "Hey guys, Isaac_976 here. If you're looking for tips on how to take your body to the next level, you're in the right place."
+  }
+}
