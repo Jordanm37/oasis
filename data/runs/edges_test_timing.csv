@@ -1,0 +1,4 @@
+follower_id,followee_id
+0,1
+1,2
+2,0

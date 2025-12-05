@@ -1,0 +1,15 @@
+run_seed: 42
+num_agents: 5
+post_label_mode_probs:
+  none: 0.3
+  single: 0.5
+  double: 0.2
+multi_label_targets:
+  target_rate: 0.4
+  min_rate: 0.2
+  max_rate: 0.6
+guidance_config:
+  enable_lexical_hints: true
+  enable_style_hints: true
+  enable_step_hints: true
+  enable_thread_context: true
